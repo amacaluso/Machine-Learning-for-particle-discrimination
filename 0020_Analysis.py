@@ -33,16 +33,16 @@ decision_tree = tree.DecisionTreeClassifier(criterion = "gini",
                                             max_depth = 10,
                                             min_samples_leaf = 5 )
 
-dt_parameters = {'max_depth': [10, 20], #range(5, 200, 10),
-                 'min_samples_leaf': [50, 100], #range(50, int(training_set.shape[0]/100), 50),
+dt_parameters = {'max_depth': range(5, 200, 10),
+                 'min_samples_leaf': range(50, int(training_set.shape[0]/100), 50),
                  'min_samples_split': range( 100, 100, 100),
-                 'criterion': ['gini', 'entropy']                 }
+                 'criterion': ['gini', 'entropy']}
 
 decision_tree = GridSearchCV( tree.DecisionTreeClassifier(), dt_parameters, n_jobs = 6 )
 
 decision_tree = decision_tree.fit( X, Y )
 
-tree_model = clf.best_estimator_
+tree_model = decision_tree.best_estimator_
 
 
 importance_dt = tree_model.feature_importances_[tree_model.feature_importances_>0]
