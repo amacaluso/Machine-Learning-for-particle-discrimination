@@ -3,54 +3,45 @@
 # import tensorflow as tf
 
 exec(open("Utils.py").read(), globals())
+exec(open("0015_Pre_processing.py").read(), globals())
+
 
 RANDOM_SEED = int( np.random.randint( low = 1, high = 100, size = 1))
 
-
-############################################################################
-df = pd.read_csv('DATA/balanced_df.csv').dropna()
-
-groups = pd.crosstab(df.ix[ : , 0:3 ].FILE,
-                     df.ix[ : , 0:3 ].TTree ).transpose()
-
-df_analysis, df_pre_training = train_test_split( df, test_size = 0.1,
-                                                 random_state = RANDOM_SEED)
-
-df_pre_training.shape
-df_analysis.shape
+training_set, test_set = train_test_split( data, test_size = 0.2,
+                                           random_state = RANDOM_SEED)
 
 
-## colonne da sistemare
-cols_to_check = df.columns[ 127:129 ]
-######################
-
-col_pred = list(range( 8, 127 ) ) + list(range( 129, 261 ))
-
-data = df_pre_training.ix[ : , col_pred ].copy()
-type ( df_pre_training )
-target = df_pre_training[ 'Y' ]
+cols_to_remove = ['index', 'FILE', 'TTree', 'TIME', 'PID', 'EVENT_NUMBER',
+                  'EVENT_TYPE', 'DIRNAME', 'FLG_BRNAME01', 'FLG_EVSTATUS' ]
 
 
-####################################################################à
+training_set = training_set.drop( cols_to_remove, axis=1 )
+test_set = test_set.drop( cols_to_remove, axis=1 )
 
-X = data.copy().astype(np.float32)
-X_COLS = X.columns.copy()
-Y = pd.Series ( target.copy() )
+target_variable = 'Y'
 
+X = training_set.drop( target_variable, axis = 1)
+Y = training_set[ target_variable ]
 
-clf = tree.DecisionTreeClassifier(criterion = "gini",
-                                   random_state = 100,
-                                   max_depth = 10,
-                                   min_samples_leaf = 5)
+#################################################################
 
-parameters = {'max_depth':range(5, 200, 10),
-              'min_samples_leaf': range(50, int(df_pre_training.shape[0]/10), 50), 
-              'min_samples_split': range( 100, 1000, 100),
-              'criterion': ['gini', 'entropy']}
+""" MODELING """
 
-clf = GridSearchCV(tree.DecisionTreeClassifier(), parameters, n_jobs = 7)
+decision_tree = tree.DecisionTreeClassifier(criterion = "gini",
+                                            random_state = RANDOM_SEED,
+                                            max_depth = 10,
+                                            min_samples_leaf = 5 )
 
-clf = clf.fit(X, Y )
+dt_parameters = {'max_depth':range(5, 200, 10),
+                 'min_samples_leaf': range(50, int(training_set.shape[0]/100), 50),
+                 'min_samples_split': range( 100, 1000, 100),
+                 'criterion': ['gini', 'entropy']}
+
+decision_tree = GridSearchCV(tree.DecisionTreeClassifier(), dt_parameters, n_jobs = 6)
+
+decision_tree = decision_tree.fit( X, Y )
+
 tree_model = clf.best_estimator_
 
 
@@ -360,3 +351,184 @@ plt.show()
 #
 #
 #
+
+
+############################################################################
+# df = pd.read_csv('DATA/balanced_df.csv').dropna()
+df = pd.read_csv('DATA/df_ML.csv')  # Open raw .csv
+
+
+groups = pd.crosstab(df.ix[ : , 0:3 ].FILE,
+                     df.ix[ : , 0:3 ].TTree ).transpose()
+
+test, training = train_test_split( df, test_size = 0.8, random_state = RANDOM_SEED)
+
+col_pred = df.columns[0:13]
+
+data = training.ix[ : , col_pred ].copy()
+target = training[ 'Y' ]
+
+X = data.copy().astype(np.float32)
+X_COLS = X.columns.copy()
+Y = pd.Series ( target.copy() )
+
+
+from sklearn.neural_network import MLPClassifier
+
+clf = MLPClassifier(solver='lbfgs', alpha = 0.001,
+                    hidden_layer_sizes=(1000, 1000, 1000, 1000, 
+                                        1000, 1000, 1000, 1000),
+                    activation = 'tanh', random_state = RANDOM_SEED)
+
+clf.fit(X, Y)        
+
+
+data_test = test.ix[ : , col_pred ].copy()
+y_test = target = test[ 'Y' ]
+
+
+
+prob = clf.predict_proba( data_test )
+
+prob_1 = []
+
+for p in prob:
+    prob_1.append( max(p) )
+
+
+prediction_nn = pd.read_csv('DATA/neural_net.csv', sep = ";", decimal = ",")  # Open raw .csv
+
+metrics = skl.metrics.roc_curve( prediction_nn.Y, prediction_nn.p1 )
+fpr, tpr, thresholds = skl.metrics.roc_curve( prediction_nn.Y, prediction_nn.p1 )
+df_metrics_nn = pd.DataFrame()
+df_metrics_nn['fpr'] = fpr.copy() 
+df_metrics_nn['tpr'] = tpr.copy() 
+df_metrics_nn['thresholds'] = thresholds.copy() 
+
+auc_nn = skl.metrics.roc_auc_score( prediction_nn.Y, prediction_nn.p1 )
+auc_nn
+
+
+prediction = pd.read_csv('DATA/rf.csv', sep = ",", decimal = ".")  # Open raw .csv
+
+metrics = skl.metrics.roc_curve( prediction.Y, prediction.p1 )
+fpr, tpr, thresholds = skl.metrics.roc_curve( prediction.Y, prediction.p1 )
+df_metrics = pd.DataFrame()
+df_metrics['fpr'] = fpr.copy() 
+df_metrics['tpr'] = tpr.copy() 
+df_metrics['thresholds'] = thresholds.copy() 
+
+auc = skl.metrics.roc_auc_score( prediction.Y, prediction.p1 )
+auc
+RANDOM_SEED
+
+
+
+
+plt.figure(figsize = (15, 8))
+plt.plot(df_metrics_nn.fpr, df_metrics_nn.tpr,lw = 4)
+plt.plot(df_metrics.fpr, df_metrics.tpr, lw = 4,)
+plt.plot( [0,1], [0,1], color = 'navy', lw = 2, linestyle = '--')
+plt.legend( ('Deep Neural Network (area = %0.2f)' % auc_nn, 
+             'Random Forest (area = %0.2f)' % auc) )
+
+plt.xlim([0.0, 1.0])
+plt.ylim([0.0, 1.05])
+plt.xlabel('False Positive Rate')
+plt.ylabel('True Positive Rate')
+plt.title('Receiver Operating Characteristic\n')
+plt.show()
+
+
+accuracy = skl.metrics.accuracy_score( prediction.Y, prediction.predict)
+accuracy_nn = skl.metrics.accuracy_score( prediction_nn.Y, prediction_nn.predict)
+
+#### stampare df_metrics
+df_metrics.to_csv("DATA/df_metrics.csv", index = False)
+
+
+## colonne da sistemare
+cols_to_check = df.columns[ 127:129 ]
+######################
+
+col_pred = list(range( 8, 127 ) ) + list(range( 129, 261 ))
+
+data = df_pre_training.ix[ : , col_pred ].copy()
+type ( df_pre_training )
+target = df_pre_training[ 'Y' ]
+
+
+####################################################################à
+
+X = data.copy().astype(np.float32)
+X_COLS = X.columns.copy()
+Y = pd.Series ( target.copy() )
+
+
+clf = tree.DecisionTreeClassifier(criterion = "gini",
+                                   random_state = 100,
+                                   max_depth = 10,
+                                   min_samples_leaf = 5)
+
+parameters = {'max_depth':range(5, 200, 10),
+              'min_samples_leaf': range(50, int(df_pre_training.shape[0]/10), 50), 
+              'min_samples_split': range( 100, 1000, 100),
+              'criterion': ['gini', 'entropy']}
+
+clf = GridSearchCV(tree.DecisionTreeClassifier(), parameters, n_jobs = 7)
+
+clf = clf.fit(X, Y )
+tree_model = clf.best_estimator_
+
+
+importance_dt = tree_model.feature_importances_[tree_model.feature_importances_>0]
+variables_dt = list( X.columns[ tree_model.feature_importances_>0 ] )
+len( variables_dt )
+variables_dt.append( 'Y' )
+
+CV_score_DT = cross_val_score( tree_model, X = X, y = Y, cv = 20 )
+CV_score_DT.mean() # 0.85
+
+
+df_analysis[variables_dt].to_csv('DATA/df_ML.csv', index = False )
+
+clf = RandomForestClassifier(n_estimators=1000, max_depth=None,
+                            min_samples_split=2, random_state=0)
+
+
+parameters = {'n_estimators':range(100, 900, 400),
+              'max_features': [ 10, 15, 25], 
+              'max_depth': [20, 50, 100],
+              'min_samples_split': range( 100, 900, 400)
+              }
+
+
+clf = GridSearchCV( RandomForestClassifier(), parameters, n_jobs = 7)
+rf = clf.fit( X, Y )
+
+rf_model = rf.best_estimator_
+
+
+importance = rf_model.feature_importances_
+variables_rf = list( X.columns[ rf_model.feature_importances_>0 ] )
+len( variables_rf )                           
+
+normalized_importance = []
+max = importance.max()
+min = importance.min()
+
+
+for num in importance:
+    norm_num = (num-min)/(max-min)
+    normalized_importance.append(norm_num)
+
+
+
+
+# normalized_importance
+density = gaussian_kde(normalized_importance)
+xs = np.linspace(0,8,200)
+density.covariance_factor = lambda : .25
+density._compute_covariance()
+plt.plot(xs,density(xs))
+plt.show()
