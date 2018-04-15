@@ -24,6 +24,9 @@ target_variable = 'Y'
 X = training_set.drop( target_variable, axis = 1).astype( np.float32 )
 Y = training_set[ target_variable ]
 
+X_test = test_set.drop( target_variable, axis = 1).astype( np.float32 )
+Y_test = test_set[ target_variable ]
+
 #################################################################
 
 """ MODELING """
@@ -33,13 +36,12 @@ decision_tree = tree.DecisionTreeClassifier(criterion = "gini",
                                             max_depth = 10,
                                             min_samples_leaf = 5 )
 
-dt_parameters = {'max_depth': range(5, 200, 10),
-                 'min_samples_leaf': range(50, int(training_set.shape[0]/100), 50),
-                 'min_samples_split': range( 100, 100, 100),
+dt_parameters = {'max_depth': range(5, 50, 10),
+                 'min_samples_leaf': range(50, 400, 50),
+                 'min_samples_split': range( 100, 500, 100),
                  'criterion': ['gini', 'entropy']}
 
-decision_tree = GridSearchCV( tree.DecisionTreeClassifier(), dt_parameters, n_jobs = 6 )
-decision_tree = GridSearchCV( tree.DecisionTreeClassifier(), dt_parameters, n_jobs = 6 )
+decision_tree = GridSearchCV( tree.DecisionTreeClassifier(), dt_parameters, n_jobs = 3 )
 
 decision_tree = decision_tree.fit( X, Y )
 
@@ -47,15 +49,27 @@ tree_model = decision_tree.best_estimator_
 
 
 importance_dt = tree_model.feature_importances_[tree_model.feature_importances_>0]
+
+plt.bar( variables_dt, importance_dt)
+plt.xticks(rotation=90)
+plt.show()
+
 variables_dt = list( X.columns[ tree_model.feature_importances_>0 ] )
 len( variables_dt )
 variables_dt.append( 'Y' )
 
 CV_score_DT = cross_val_score( tree_model, X = X, y = Y, cv = 20 )
-CV_score_DT.mean() # 0.85
+CV_score_DT.mean() # 0.88,9
+CV_score_DT.std()
+
+cv_validation_dt_mean = CV_score_DT.mean()
+cv_validation_dt_std = CV_score_DT.std()
+score_test = tree_model.score(X_test, Y_test)
 
 
-df_analysis[variables_dt].to_csv('DATA/df_ML.csv', index = False )
+result_dt = [ ]
+
+
 
 clf = RandomForestClassifier(n_estimators=1000, max_depth=None,
                             min_samples_split=2, random_state=0)
