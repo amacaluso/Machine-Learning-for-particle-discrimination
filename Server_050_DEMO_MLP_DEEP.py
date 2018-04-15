@@ -23,7 +23,7 @@ DISPLAY_STEP = 20
 
 
 TEMP_HIDDEN_SIZE = range( 100, 500, 100 )
-HIDDEN_SIZE = TEMP_HIDDEN_SIZE + sorted( TEMP_HIDDEN_SIZE, reverse = True)
+HIDDEN_SIZE = 1000
 
 ACTIVATION_FUNCTION_OUT = tf.nn.tanh
 STDDEV = 0.1 # density function inizializzazione pesi
@@ -52,14 +52,14 @@ data_train, data_test, labels_train, labels_test = train_test_split(data,
 
 # Parameters
 n_input = N_INPUT  # input n labels
-n_hidden_1 = HIDDEN_SIZE[ 0 ]
-n_hidden_2 = HIDDEN_SIZE[ 1 ]
-n_hidden_3 = HIDDEN_SIZE[ 2 ]
-n_hidden_4 = HIDDEN_SIZE[ 3 ]
-n_hidden_5 = HIDDEN_SIZE[ 4 ]
-n_hidden_6 = HIDDEN_SIZE[ 5 ]
-n_hidden_7 = HIDDEN_SIZE[ 6 ]
-n_hidden_8 = HIDDEN_SIZE[ 7 ]
+n_hidden_1 = HIDDEN_SIZE
+n_hidden_2 = HIDDEN_SIZE
+n_hidden_3 = HIDDEN_SIZE
+n_hidden_4 = HIDDEN_SIZE
+n_hidden_5 = HIDDEN_SIZE
+n_hidden_6 = HIDDEN_SIZE
+n_hidden_7 = HIDDEN_SIZE
+n_hidden_8 = HIDDEN_SIZE
 n_classes = N_CLASSES  # output m classes
 
 # Tf placeholders
@@ -149,11 +149,63 @@ for epoch in range(TRAINING_EPOCHS):
         train_acc = sess.run(accuracy, feed_dict={X: batch_xs, y: batch_ys, dropout_keep_prob: 1.})
         print ("Training accuracy: %.3f" % (train_acc))
 
-------------------------------------------------
+#------------------------------------------------
 # Testing
+prediction=tf.argmax( y , 0.5)
+print "predictions", prediction.eval(feed_dict={X: data_test, y: labels_test, dropout_keep_prob: 0.5}, session=sess)
+
+probabilities = y
+print "probabilities", probabilities.eval(feed_dict={ X: data_test }, session=sess)
+
+
+prediction=tf.argmax(y,1)
+print prediction.eval(feed_dict={X: data_test}, session=sess )
+
+sess.run(prediction, feed_dict={X: batch_xs, y: batch_ys, dropout_keep_prob: 1.})
 
 test_acc = sess.run(accuracy, feed_dict={X: data_test, y: labels_test, dropout_keep_prob: 1.})
 print ("Test accuracy: %.3f" % (test_acc))
+
+sess = tf.Session()
+sess.run(init_all)
+
+auc_op = tf.metrics.auc(labels = labels, predictions = tf.sigmoid(mlp), num_thresholds = 102400)
+tf.predict( data_test )
+
+output = sess.run(mlp.out, feed_dict={X: data_test}
+
+roc_score = tf.metrics.auc(y, pred)
+roc_score = tf.convert_to_tensor(roc_score)
+print(roc_score.eval({X : data_test, y : labels_test, dropout_keep_prob: 0, },  session=sess))
+print(sess.run(roc_score, feed_dict={X : data_test, y : labels_test, dropout_keep_prob: 1.0, }))
+
+
+prediction = tf.argmax(pred, 1)
+best = sess.run([prediction], feed_dict)
+print(best)
+
+
+
+
+
+
+predictions = list(mlp.predict_proba(input_fn=data_test))
+
+
+predict = tf.argmax(y)
+classification = sess.run(tf.argmax(y, 1), feed_dict={X: [data_test]})
+
+feed_dict={X: data_test, y: labels_test, dropout_keep_prob: 1.}
+classification = tf.run(y, feed_dict)
+print classification
+
+sess = tf.Session()
+sess.run(init_all)
+
+value = sess.run(feed_dict)
+tf.shape(feed_dict)
+
+predictions = list(classifier.predict_proba(input_fn=new_tests))
 
 sess.close()
 print("Session closed!")
