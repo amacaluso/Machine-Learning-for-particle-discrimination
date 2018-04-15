@@ -5,8 +5,12 @@ Spyder Editor
 
 This is a temporary script file.
 """
-
+## IMPORTAZIONE MODULI
 exec(open("Utils.py").read(), globals())
+
+"""
+IMPORTAZIONE MODULI SPECIFICI PER ELABORAZIONE CON ESTENSIONE ROOT
+"""
 
 import ROOT as R
 import rootpy
@@ -15,6 +19,9 @@ import rootpy
 # from rootpy.tree import Tree
 from root_numpy import root2array, tree2array
 
+"""
+DEFINIZIONE NOME OGGETTI PRESENTI NEI FILE ROOT
+"""
 
 file_kB2 = R.TFile.Open( "AGILE/TMVA_INPUT.kB2.root" )
 
@@ -29,22 +36,17 @@ labels_B2_photons = ["P25", "P39", "P59", "P84", "P141", "P283", "P632",
                      "P250", "P700", "P2000", "P500", "P200", "P100", "P1000",
                      "P50", "P400" ]
 
-
-
-
-complete_dataframe = pd.DataFrame()
-
-
 files = [ file_kB2, file_B2_photons ]
 TTree_labels =  [ labels_kB2, labels_B2_photons ]
 
-# =============================================================================
-# for i_file in range( len(files) ) : 
-#     
-#     file = files[ i_file ]
-#     labels = TTree_labels[ i_file ]
-#     print( file, "\n", labels, i_file )
-# =============================================================================
+
+
+
+# Dataframe su cui vengono caricati 
+# tutti i dati estratti dai file .root
+complete_dataframe = pd.DataFrame()
+
+
 for i in range( len(files) ):
 
     file = files[ i ]
@@ -53,7 +55,7 @@ for i in range( len(files) ):
     for label in labels:
         
         df = pd.DataFrame()
-        print( label, "\n\n\n" )
+        print( label, "\n" )
         current_tree = file.Get( label )
         n_rows = current_tree.GetEntries()
         
@@ -62,7 +64,6 @@ for i in range( len(files) ):
         list_of_var_name = []
         
         print( "tree --> ", label, "n_righe --> ", n_rows, "n_col --> ", n_var )
-    
             
         lista = []
         
@@ -103,25 +104,43 @@ for i in range( len(files) ):
         df.columns = [ 'FILE', 'TTree' ] + list_of_var_name
         
         complete_dataframe = complete_dataframe.append( df )
-        print( label, "\n\n\n" )
+        print( label, "\n" )
+
+
+
+cols_to_convert = [ 'EVENT_TYPE', 'PID', 'DIRNAME', 'FLG_BRNAME01', 'FLG_EVSTATUS']
+
+for col in cols_to_convert:
+    complete_dataframe[col] = complete_dataframe[col].str.decode("utf-8")
 
 
 
 
+# ALL DATA
+complete_dataframe.to_csv("DATA/ALL_DATA.csv")
 
-groups = pd.crosstab(complete_dataframe.ix[ : , 0:2 ].FILE,
-                     complete_dataframe.ix[ : , 0:2 ].TTree ).transpose()
+df = complete_dataframe.copy()   
+
+
+## Appartenenza ai files delle particelle
+## Elimino le particelle duplicate in entrambi i file
+groups = pd.crosstab(df.ix[ : , 0:2 ].FILE,
+                     df.ix[ : , 0:2 ].TTree ).transpose()
 
 
 for i in range( len(groups.index) ):
     if groups.ix[i, 0] == groups.ix[i,1]:
-        complete_dataframe = complete_dataframe.ix[ -((complete_dataframe.FILE == groups.columns[1]) 
-                                & (complete_dataframe.TTree == groups.index[i])), : ]
+        df = df.ix[ -((df.FILE == groups.columns[1]) 
+                                & (df.TTree == groups.index[i])), : ]
+
+df.EVENT_TYPE.value_counts()
+ 
+df.to_csv("DATA/Complete_DataFrame.csv")
+########################################################
 
 
-complete_dataframe.EVENT_TYPE.value_counts()
-df = complete_dataframe.copy()    
-
+##########################################
+""" Definizione della variabile target """
 
 nrows = complete_dataframe.shape[ 0 ]
 Y = pd.Series( np.repeat( 0, nrows) ) 
@@ -137,49 +156,38 @@ Y_1 =[ 'G_100', 'G_1000', 'G_10000', 'G_141', 'G_1414', 'G_17320', 'G_200',
 colnames = []
 for col in df.columns[0:261]:
     colnames.append(col)
-
+    
 colnames.append( 'Y' )
-
 df.columns = colnames
 
 
 for i in range( nrows ):
-    if df.ix[ i, 'EVENT_TYPE'].decode("utf-8") in Y_1:
+    if df.ix[ i, 'EVENT_TYPE'] in Y_1:
         df.ix[ i, 'Y'] = 1
 
-col_to_group = [6, 261]
-col_to_group_II = [ 6, 261 ]
+groups_Y = pd.crosstab(df.EVENT_TYPE, df.Y )
 
-
-groups_Y = pd.crosstab(df.ix[ : , col_to_group].EVENT_TYPE, df.ix[:, col_to_group_II ].Y )
 groups_Y.to_csv( "DATA/target_variable.csv")
+df.to_csv("DATA/DataFrame_with_Y.csv")
 
-
-
-EVENT_TYPE_DECODE = []
-
-for i in range( nrows ):
-    EVENT_TYPE_DECODE.append( df.ix[ i, 'EVENT_TYPE'].decode("utf-8") )
-
-df['EVENT_TYPE_DECODE'] = EVENT_TYPE_DECODE
 
 n_samples = np.sum( groups_Y.ix[:, 0] )
-
 labels_Y0 = []
 
 for label in groups_Y.index[ groups_Y.ix[:, 0] > 0 ]:
-    labels_Y0.append( label.decode( "utf-8"))
+    labels_Y0.append( label )
 
 
-df_Y_0 = df[ df.EVENT_TYPE_DECODE.isin (labels_Y0) ]
-df_Y_1 = df[ df.EVENT_TYPE_DECODE.isin (Y_1) ]
+df_Y_0 = df[ df.EVENT_TYPE.isin (labels_Y0) ]
+df_Y_1 = df[ df.EVENT_TYPE.isin (Y_1) ]
 
-balanced_df = pd.concat( [df_Y_1.sample( n = n_samples ), df_Y_0] )
+balanced_df = pd.concat( [df_Y_1.sample( n = n_samples ), 
+                          df_Y_0] )
 
 nrows = balanced_df.shape[ 0 ]
 balanced_df.columns
 
-balanced_df.to_csv( "DATA/balanced_df.csv", index = False)
+balanced_df.to_csv( "DATA/random_balanced_df_with_Y.csv", index = False)
 
 
 
