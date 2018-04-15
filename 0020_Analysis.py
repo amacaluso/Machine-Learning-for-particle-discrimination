@@ -39,6 +39,7 @@ dt_parameters = {'max_depth': range(5, 200, 10),
                  'criterion': ['gini', 'entropy']}
 
 decision_tree = GridSearchCV( tree.DecisionTreeClassifier(), dt_parameters, n_jobs = 6 )
+decision_tree = GridSearchCV( tree.DecisionTreeClassifier(), dt_parameters, n_jobs = 6 )
 
 decision_tree = decision_tree.fit( X, Y )
 
