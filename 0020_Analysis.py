@@ -36,8 +36,8 @@ decision_tree = tree.DecisionTreeClassifier(criterion = "gini",
                                             max_depth = 10,
                                             min_samples_leaf = 5 )
 
-dt_parameters = {'max_depth': range(5, 50, 10),
-                 'min_samples_leaf': range(50, 400, 50),
+dt_parameters = {'max_depth': [20], #range(5, 15, 5),
+                 'min_samples_leaf': [100], #range(50, 400, 100),
                  'min_samples_split': range( 100, 500, 100),
                  'criterion': ['gini', 'entropy']}
 
@@ -49,40 +49,118 @@ tree_model = decision_tree.best_estimator_
 
 
 importance_dt = tree_model.feature_importances_[tree_model.feature_importances_>0]
+variables_dt = list( X.columns[ tree_model.feature_importances_>0 ] )
 
-plt.bar( variables_dt, importance_dt)
-plt.xticks(rotation=90)
-plt.show()
+
+importance_dt.mean()
+importance_dt.std()
+
+
+sns.kdeplot(pd.Series(importance_dt))
+plt.title( "Variable importance of energy (photons)")
+plt.show(block=True)
+plt.interactive(False)
+
+
+
+series_imp = pd.Series( importance_dt)
+series_imp = series_imp.sort_values( ascending = False)
+importance = series_imp[ series_imp > 0.01 ]
+
+
+plt.barh( series_imp[ series_imp > 0.01 ].index, series_imp[ series_imp > 0.01 ]  )
+#plt.xticks(rotation=90)
+plt.interactive(False)
+plt.show(block=True)
+
+
+
 
 variables_dt = list( X.columns[ tree_model.feature_importances_>0 ] )
 len( variables_dt )
 variables_dt.append( 'Y' )
 
-CV_score_DT = cross_val_score( tree_model, X = X, y = Y, cv = 20 )
+CV_score_DT = cross_val_score( tree_model, X = X, y = Y, cv = 10 )
 CV_score_DT.mean() # 0.88,9
 CV_score_DT.std()
 
 cv_validation_dt_mean = CV_score_DT.mean()
 cv_validation_dt_std = CV_score_DT.std()
-score_test = tree_model.score(X_test, Y_test)
+test_error = tree_model.score(X_test, Y_test)
+
+probabilities = tree_model.predict_proba( X_test )
+
+p1 = []
+for p in probabilities:
+    p1.append( p[1] )
+
+probabilities_treshold = np.arange( 0.1, 0.91, 0.05)
+roc_matrix = pd.DataFrame()
+
+for treshold in probabilities_treshold:
+    y_pred = []
+    for p in p1:
+        if p > treshold:
+            y_pred.append( 1 )
+        else :
+            y_pred.append( 0 )
+    accuracy = skl.metrics.accuracy_score( Y_test, y_pred)
+    precision, recall, fscore, support = skl.metrics.precision_recall_fscore_support( Y_test, y_pred, average = 'binary')
+
+    metrics = [treshold, accuracy, precision, recall, fscore]
+    current_result = pd.DataFrame( [metrics] )
+    roc_matrix = pd.concat( [roc_matrix, pd.DataFrame( current_result)] , axis = 0)
+
+roc_matrix.columns = [ "prob_treshold", "accuracy", "precision", "recall", "fscore" ]
 
 
-result_dt = [ ]
+metrics = skl.metrics.roc_curve( Y_test, p1 )
+fpr, tpr, thresholds = skl.metrics.roc_curve( Y_test, p1 )
+df_metrics = pd.DataFrame()
+df_metrics['fpr'] = fpr.copy()
+df_metrics['tpr'] = tpr.copy()
+df_metrics['thresholds'] = thresholds.copy()
+
+auc = skl.metrics.roc_auc_score( Y_test, p1 )
+auc
+RANDOM_SEED
 
 
 
-clf = RandomForestClassifier(n_estimators=1000, max_depth=None,
-                            min_samples_split=2, random_state=0)
+
+plt.figure(figsize = (15, 8))
+plt.plot(df_metrics.fpr, df_metrics.tpr, lw = 4,)
+plt.plot( [0,1], [0,1], color = 'navy', lw = 2, linestyle = '--')
+plt.legend( ('Deep Neural Network (area = %0.2f)' % auc,
+             'Random Forest (area = %0.2f)' % auc) )
+plt.interactive(False)
+plt.show(block=True)
 
 
-parameters = {'n_estimators':range(100, 900, 400),
+
+
+
+
+
+
+
+
+result_dt = [ tree_model, importance, variables_dt, cv_validation_dt_mean, cv_validation_dt_std,  ]
+
+
+
+clf = RandomForestClassifier(n_estimators = 1000, max_depth = None,
+                             min_samples_split = 2, random_state = 0)
+
+
+parameters = {'n_estimators':range(100, 2000, 100),
               'max_features': [ 10, 15, 25], 
               'max_depth': [20, 50, 100],
               'min_samples_split': range( 100, 900, 400)
               }
 
 
-clf = GridSearchCV( RandomForestClassifier(), parameters, n_jobs = 7)
+clf = GridSearchCV( RandomForestClassifier(), parameters, n_jobs = 24)
 rf = clf.fit( X, Y )
 
 rf_model = rf.best_estimator_
