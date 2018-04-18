@@ -9,10 +9,19 @@ from sklearn.model_selection import train_test_split
 DATAFRAME = pd.read_csv('DATA/df_ML.csv', encoding = 'utf-8')
 
 # DATAFRAME = pd.read_csv('DATA/Dataframe_finale.csv', encoding = 'utf-8')
+#
+# DATAFRAME.shape
+#
+# DATAFRAME.columns
+
 # DATAFRAME.DIRNAME.value_counts()
+
 # DATAFRAME.FLG_BRNAME01.value_counts()
 # DATAFRAME.FLG_EVSTATUS.value_counts()
+#
 # DIRNAME, FLG_BRANCHNAME, FLG_EVSTATUS
+
+
 
 
 #to_delete = []
