@@ -3,8 +3,14 @@ import pandas as pd
 import numpy as np
 from sklearn.cross_validation import train_test_split
 
-raw_data = pd.read_csv('DATA/df_ML.csv')  # Open raw .csv
+raw_data = pd.read_csv('DATA/random_balanced_df_with_Y.csv')  # Open raw .csv
 
+
+cols_to_remove = ['index', 'FILE', 'TTree', 'TIME', 'PID', 'EVENT_NUMBER',
+                  'EVENT_TYPE', 'DIRNAME', 'FLG_BRNAME01', 'FLG_EVSTATUS' ]
+
+
+raw_data = raw_data.drop( cols_to_remove, axis=1 )
 # kilgharrah.iasfbo.inaf.it
 # ------------------------------------------------------------------------------
 
@@ -17,7 +23,7 @@ N_CLASSES = raw_data[ Y_LABEL ].unique().shape[ 0 ]
 TEST_SIZE = 0.2
 TRAIN_SIZE = int(N_INSTANCES * (1 - TEST_SIZE))
 LEARNING_RATE = 0.001
-TRAINING_EPOCHS = 200
+TRAINING_EPOCHS = 400
 BATCH_SIZE = 100
 DISPLAY_STEP = 20
 
@@ -122,7 +128,7 @@ optimizer = tf.train.AdamOptimizer(learning_rate=LEARNING_RATE).minimize(cost)
 correct_prediction = tf.equal(tf.argmax(pred, 1), tf.argmax(y, 1))
 accuracy = tf.reduce_mean(tf.cast(correct_prediction, tf.float32))
 
-
+epoch_result = []
 # ------------------------------------------------------------------------------
 # Training
 
@@ -147,7 +153,16 @@ for epoch in range(TRAINING_EPOCHS):
     if epoch % DISPLAY_STEP == 0:
         print ("Epoch: %03d/%03d cost: %.9f" % (epoch, TRAINING_EPOCHS, avg_cost))
         train_acc = sess.run(accuracy, feed_dict={X: batch_xs, y: batch_ys, dropout_keep_prob: 1.})
+        epoch_result.append( train_acc )
         print ("Training accuracy: %.3f" % (train_acc))
+
+test_acc = sess.run(accuracy, feed_dict={X: data_test, y: labels_test, dropout_keep_prob: 1.})
+print ("Test accuracy: %.3f" % (test_acc))
+
+sep = '_'
+name_file = str(test_acc) + "acc" + sep + str(TRAINING_EPOCHS) + "ep" + sep + str(HIDDEN_SIZE) + "hidden" + sep + "ALL" + ".csv"
+epoch_result_s = pd.Series(epoch_result)
+epoch_result_s.to_csv(name_file)
 
 #------------------------------------------------
 # Testing

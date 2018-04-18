@@ -6,7 +6,7 @@ exec(open("Utils.py").read(), globals())
 exec(open("0015_Pre_processing.py").read(), globals())
 
 
-RANDOM_SEED = int( np.random.randint( low = 1, high = 100, size = 1))
+RANDOM_SEED = 70
 
 training_set, test_set = train_test_split( data, test_size = 0.2,
                                            random_state = RANDOM_SEED)
@@ -36,29 +36,27 @@ decision_tree = tree.DecisionTreeClassifier(criterion = "gini",
                                             max_depth = 10,
                                             min_samples_leaf = 5 )
 
-dt_parameters = {'max_depth': range(5, 50, 10),
-                 'min_samples_leaf': range(50, 400, 50),
-                 'min_samples_split': range( 100, 500, 100),
+dt_parameters = {'max_depth': [10, 20], #range(5, 50, 10),
+                 'min_samples_leaf': [50, 100], #range(50, 400, 50),
+                 'min_samples_split': [ 100], #range( 100, 500, 100),
                  'criterion': ['gini', 'entropy']}
 
-decision_tree = GridSearchCV( tree.DecisionTreeClassifier(), dt_parameters, n_jobs = 3 )
-
+decision_tree = GridSearchCV( tree.DecisionTreeClassifier(), dt_parameters, n_jobs = 4 )
 decision_tree = decision_tree.fit( X, Y )
 
 tree_model = decision_tree.best_estimator_
 
-
 importance_dt = tree_model.feature_importances_[tree_model.feature_importances_>0]
+
+variables_dt = list( X.columns[ tree_model.feature_importances_>0 ] )
+len( variables_dt )
 
 plt.bar( variables_dt, importance_dt)
 plt.xticks(rotation=90)
 plt.show()
 
-variables_dt = list( X.columns[ tree_model.feature_importances_>0 ] )
-len( variables_dt )
-variables_dt.append( 'Y' )
 
-CV_score_DT = cross_val_score( tree_model, X = X, y = Y, cv = 20 )
+CV_score_DT = cross_val_score( tree_model, X = X, y = Y, cv = 10 )
 CV_score_DT.mean() # 0.88,9
 CV_score_DT.std()
 
@@ -67,7 +65,13 @@ cv_validation_dt_std = CV_score_DT.std()
 score_test = tree_model.score(X_test, Y_test)
 
 
-result_dt = [ ]
+importance_dt = pd.Series( importance_dt, index = variables_dt)
+importance_dt = importance_dt[ importance_dt > 0.01]
+
+plt.barh( importance_dt.index, importance_dt)
+plt.xticks(rotation=90)
+plt.show()
+
 
 
 

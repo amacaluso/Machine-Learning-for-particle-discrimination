@@ -31,7 +31,7 @@ for string in data.DIRNAME:
     if photon == True:
         num = re.findall('\d+', string)
         Y_REG.append(int(num[0]))
-    else:
-        Y_REG.append( None )
+        print string, num[0]
+
 
 # data['Y'] = Y_REG
