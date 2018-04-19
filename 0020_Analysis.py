@@ -36,14 +36,13 @@ decision_tree = tree.DecisionTreeClassifier(criterion = "gini",
                                             max_depth = 10,
                                             min_samples_leaf = 5 )
 
-dt_parameters = {'max_depth': [10, 20], #range(5, 50, 10),
-                 'min_samples_leaf': [50, 100], #range(50, 400, 50),
+dt_parameters = {'max_depth': [20], #range(5, 50, 10),
+                 'min_samples_leaf': [50], #range(50, 400, 50),
                  'min_samples_split': [ 100], #range( 100, 500, 100),
                  'criterion': ['gini', 'entropy']}
 
-decision_tree = GridSearchCV( tree.DecisionTreeClassifier(), dt_parameters, n_jobs = 4 )
+decision_tree = GridSearchCV( tree.DecisionTreeClassifier(), dt_parameters, n_jobs = 2 )
 decision_tree = decision_tree.fit( X, Y )
-
 tree_model = decision_tree.best_estimator_
 
 importance_dt = tree_model.feature_importances_[tree_model.feature_importances_>0]
@@ -56,7 +55,7 @@ plt.xticks(rotation=90)
 plt.show()
 
 
-CV_score_DT = cross_val_score( tree_model, X = X, y = Y, cv = 10 )
+CV_score_DT = cross_val_score( tree_model, X = X, y = Y, cv = 2 )
 CV_score_DT.mean() # 0.88,9
 CV_score_DT.std()
 
@@ -69,8 +68,36 @@ importance_dt = pd.Series( importance_dt, index = variables_dt)
 importance_dt = importance_dt[ importance_dt > 0.01]
 
 plt.barh( importance_dt.index, importance_dt)
-plt.xticks(rotation=90)
+plt.xticks( rotation = 90 )
 plt.show()
+
+
+
+pred = tree_model.predict(X_test)
+prob = tree_model.predict_proba(X_test)
+
+prediction = []
+for p in prob:
+    prediction.append(p[1])
+prediction = np.array( prediction )
+
+"""" ROC MATRIX """
+
+
+roc_matrix = pd.DataFrame()
+tresholds = np.arange( 0.1, 0.91, 0.05 )
+
+for tresh in tresholds:
+    current_y_hat = ( prediction > tresh).astype(int)
+    precision, recall, fscore, support = skl.metrics.precision_recall_fscore_support(Y_test, current_y_hat)
+    accuracy = skl.metrics.accuracy_score(Y_test, current_y_hat)
+    AUC = skl.metrics.roc_auc_score(Y_test, current_y_hat)
+    result = pd.Series([ tresh, accuracy, AUC,  precision[1] , recall[1], recall[0], fscore[1]])
+    roc_matrix = roc_matrix.append( result, ignore_index=True )
+
+roc_matrix.columns = [ "Treshold", "Accuracy", "AUC",
+                       "Precision", "Recall", "Specificity", "F-score"]
+
 
 
 
@@ -86,10 +113,10 @@ parameters = {'n_estimators':range(100, 900, 400),
               }
 
 
-clf = GridSearchCV( RandomForestClassifier(), parameters, n_jobs = 7)
-rf = clf.fit( X, Y )
+random_forest = GridSearchCV( RandomForestClassifier(), parameters, n_jobs = 7)
+random_forest = random_forest.fit( X, Y )
 
-rf_model = rf.best_estimator_
+rf_model = random_forest.best_estimator_
 
 
 importance = rf_model.feature_importances_
