@@ -54,14 +54,13 @@ plt.bar( variables_dt, importance_dt)
 plt.xticks(rotation=90)
 plt.show()
 
-
-CV_score_DT = cross_val_score( tree_model, X = X, y = Y, cv = 2 )
-CV_score_DT.mean() # 0.88,9
-CV_score_DT.std()
-
-cv_validation_dt_mean = CV_score_DT.mean()
-cv_validation_dt_std = CV_score_DT.std()
-score_test = tree_model.score(X_test, Y_test)
+# CV_score_DT = cross_val_score( tree_model, X = X, y = Y, cv = 2 )
+# CV_score_DT.mean() # 0.88,9
+# CV_score_DT.std()
+#
+# cv_validation_dt_mean = CV_score_DT.mean()
+# cv_validation_dt_std = CV_score_DT.std()
+# score_test = tree_model.score(X_test, Y_test)
 
 
 importance_dt = pd.Series( importance_dt, index = variables_dt)
@@ -76,44 +75,27 @@ plt.show()
 pred = tree_model.predict(X_test)
 prob = tree_model.predict_proba(X_test)
 
-prediction = []
+prediction_dt = []
 for p in prob:
-    prediction.append(p[1])
-prediction = np.array( prediction )
-
-"""" ROC MATRIX """
+    prediction_dt.append(p[1])
+prediction_dt = np.array( prediction_dt )
 
 
-roc_matrix = pd.DataFrame()
-tresholds = np.arange( 0.1, 0.91, 0.05 )
-
-for tresh in tresholds:
-    current_y_hat = ( prediction > tresh).astype(int)
-    precision, recall, fscore, support = skl.metrics.precision_recall_fscore_support(Y_test, current_y_hat)
-    accuracy = skl.metrics.accuracy_score(Y_test, current_y_hat)
-    AUC = skl.metrics.roc_auc_score(Y_test, current_y_hat)
-    result = pd.Series([ tresh, accuracy, AUC,  precision[1] , recall[1], recall[0], fscore[1]])
-    roc_matrix = roc_matrix.append( result, ignore_index=True )
-
-roc_matrix.columns = [ "Treshold", "Accuracy", "AUC",
-                       "Precision", "Recall", "Specificity", "F-score"]
+ROC_dt = ROC_analysis( Y_test, prediction_dt, label = "DECISION TREE"  )
 
 
+# clf = RandomForestClassifier(n_estimators=1000, max_depth=None,
+#                            min_samples_split=2, random_state=0)
 
 
-
-clf = RandomForestClassifier(n_estimators=1000, max_depth=None,
-                            min_samples_split=2, random_state=0)
-
-
-parameters = {'n_estimators':range(100, 900, 400),
-              'max_features': [ 10, 15, 25], 
-              'max_depth': [20, 50, 100],
-              'min_samples_split': range( 100, 900, 400)
+parameters = {'n_estimators': [100],#range(100, 900, 400),
+              'max_features': [10], #[ 10, 15, 25],
+              'max_depth': [20], # [20, 50, 100],
+              'min_samples_split': [100]#range( 100, 900, 400)
               }
 
 
-random_forest = GridSearchCV( RandomForestClassifier(), parameters, n_jobs = 7)
+random_forest = GridSearchCV( RandomForestClassifier(), parameters, n_jobs = 2)
 random_forest = random_forest.fit( X, Y )
 
 rf_model = random_forest.best_estimator_
@@ -123,109 +105,52 @@ importance = rf_model.feature_importances_
 variables_rf = list( X.columns[ rf_model.feature_importances_>0 ] )
 len( variables_rf )                           
 
-normalized_importance = []
-max = importance.max()
-min = importance.min()
 
-
-for num in importance:
-    norm_num = (num-min)/(max-min)
-    normalized_importance.append(norm_num)
-
-
-
-
-# normalized_importance
-density = gaussian_kde(normalized_importance)
-xs = np.linspace(0,8,200)
-density.covariance_factor = lambda : .25
-density._compute_covariance()
-plt.plot(xs,density(xs))
+plt.bar( variables_rf, importance_rf)
+plt.xticks(rotation=90)
 plt.show()
 
 
 
-#
-# import tensorflow as tf
-#
-# # Parameters
-# learning_rate = 0.001
-# training_epochs = 15
-# batch_size = 100
-# display_step = 1
-#
-# # Network Parameters
-# n_hidden_1 = 256 # 1st layer number of neurons
-# n_hidden_2 = 256 # 2nd layer number of neurons
-# n_input = 784 # MNIST data input (img shape: 28*28)
-# n_classes = 10 # MNIST total classes (0-9 digits)
-#
-# # tf Graph input
-# X = tf.placeholder("float", [None, n_input])
-# Y = tf.placeholder("float", [None, n_classes])
-#
-# # Store layers weight & bias
-# weights = {
-#     'h1': tf.Variable(tf.random_normal([n_input, n_hidden_1])),
-#     'h2': tf.Variable(tf.random_normal([n_hidden_1, n_hidden_2])),
-#     'out': tf.Variable(tf.random_normal([n_hidden_2, n_classes]))
-# }
-# biases = {
-#     'b1': tf.Variable(tf.random_normal([n_hidden_1])),
-#     'b2': tf.Variable(tf.random_normal([n_hidden_2])),
-#     'out': tf.Variable(tf.random_normal([n_classes]))
-# }
-#
-#
-# # Create model
-# def multilayer_perceptron(x):
-#     # Hidden fully connected layer with 256 neurons
-#     layer_1 = tf.add(tf.matmul(x, weights['h1']), biases['b1'])
-#     # Hidden fully connected layer with 256 neurons
-#     layer_2 = tf.add(tf.matmul(layer_1, weights['h2']), biases['b2'])
-#     # Output fully connected layer with a neuron for each class
-#     out_layer = tf.matmul(layer_2, weights['out']) + biases['out']
-#     return out_layer
-#
-# # Construct model
-# logits = multilayer_perceptron(X)
-#
-# # Define loss and optimizer
-# loss_op = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits(
-#     logits=logits, labels=Y))
-# optimizer = tf.train.AdamOptimizer(learning_rate=learning_rate)
-# train_op = optimizer.minimize(loss_op)
-# # Initializing the variables
-# init = tf.global_variables_initializer()
-#
-# with tf.Session() as sess:
-#     sess.run(init)
-#
-#     # Training cycle
-#     for epoch in range(training_epochs):
-#         avg_cost = 0.
-#         total_batch = int(mnist.train.num_examples/batch_size)
-#         # Loop over all batches
-#         for i in range(total_batch):
-#             batch_x, batch_y = mnist.train.next_batch(batch_size)
-#             # Run optimization op (backprop) and cost op (to get loss value)
-#             _, c = sess.run([train_op, loss_op], feed_dict={X: batch_x,
-#                                                             Y: batch_y})
-#             # Compute average loss
-#             avg_cost += c / total_batch
-#         # Display logs per epoch step
-#         if epoch % display_step == 0:
-#             print("Epoch:", '%04d' % (epoch+1), "cost={:.9f}".format(avg_cost))
-#     print("Optimization Finished!")
-#
-#     # Test model
-#     pred = tf.nn.softmax(logits)  # Apply softmax to logits
-#     correct_prediction = tf.equal(tf.argmax(pred, 1), tf.argmax(Y, 1))
-#     # Calculate accuracy
-#     accuracy = tf.reduce_mean(tf.cast(correct_prediction, "float"))
-#     print("Accuracy:", accuracy.eval({X: mnist.test.images, Y: mnist.test.labels}))
-#
+importance_rf = importance_rf[ importance_rf > 0.01]
+variables_rf = list( X.columns[ rf_model.feature_importances_>0.01 ] )
+len( variables_rf )
 
+plt.barh( importance_rf.index, importance_rf)
+plt.xticks( rotation = 90 )
+plt.show()
+
+
+""" Salvataggio dataframe ridotto """
+
+# RANDOM_ SEED = 70
+variables = variables_rf
+variables.append( target_variable )
+
+reduced_training = training_set[ variables ]
+reduced_test = test_set[ variables ]
+
+""" FINE """
+
+
+
+
+
+pred = rf_model.predict(X_test)
+prob = rf_model.predict_proba(X_test)
+
+prediction_rf = []
+for p in prob:
+    prediction_rf.append(p[1])
+prediction_rf = np.array( prediction_rf )
+
+ROC_rf = ROC_analysis( Y_test, prediction_rf, label = "RANDOM FOREST" )
+
+
+
+ROC = pd.concat( [ROC_dt, ROC_rf], ignore_index = True)
+
+ROC.to_csv( "results/ROC.csv", index=False)
 
 ############################################################################
 # df = pd.read_csv('DATA/balanced_df.csv').dropna()
