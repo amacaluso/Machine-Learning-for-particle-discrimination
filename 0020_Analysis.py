@@ -159,8 +159,74 @@ ROC.to_csv( "results/ROC.csv", index=False)
 parameters = pd.Series( [ decision_tree.best_params_, random_forest.best_params_ ],
                         index = ["DT", "RF"])
 parameters.to_csv("results/parameters.csv")
+
+
+
+"""Gradient Boosting Machine"""
+
+gbm = GradientBoostingClassifier(n_estimators = 500, max_depth = 25,
+                                       min_samples_split = 100, max_features = 25)
+
+
+# parameters = {'n_estimators': range(100, 900, 400),
+#               'max_features': [ 10, 15, 25],
+#               'max_depth':  [20, 50, 100],
+#               'min_samples_split': range( 100, 900, 400)
+#               }
+#
+#
+# random_forest = GridSearchCV( RandomForestClassifier(), parameters, n_jobs = 2)
+# rf_model = random_forest.best_estimator_
+
+
+gbm = random_forest.fit( X, Y )
+rf_model = random_forest
+
+
+# importance = rf_model.feature_importances_
+# len( variables_rf )
+# plt.bar( variables_rf, importance_rf)
+# plt.xticks(rotation=90)
+# plt.show()
+
+
+importance_rf = rf_model.feature_importances_[ rf_model.feature_importances_>0 ]
+variables_rf = list( X.columns[ rf_model.feature_importances_> 0 ] )
+importance_rf = pd.Series( importance_rf, index = variables_rf)
+
+
+importance_rf = importance_rf[ importance_rf > 0.01]
+variables_rf = list( X.columns[ rf_model.feature_importances_>0.01 ] )
+importance_rf = pd.Series( importance_rf, index = variables_rf)
+len( importance_rf )
+
+plt.barh( importance_rf.index, importance_rf)
+plt.xticks( rotation = 90 )
+plt.show()
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 ############################################################################
 """ROC ANALYSIS"""
+
 fpr, tpr, thresholds = skl.metrics.roc_curve( Y_test, prediction_rf )
 
 df_metrics = pd.DataFrame()
@@ -192,30 +258,33 @@ plt.savefig("Images/ROC_rf_vs_dt.png")
 plt.show()
 
 #############################################################################
-from sklearn.neural_network import MLPClassifier
+# from sklearn.neural_network import MLPClassifier
+#
+# clf = MLPClassifier(solver='lbfgs', alpha = 0.001,
+#                     hidden_layer_sizes=(1000, 1000, 1000, 1000,
+#                                         1000, 1000, 1000, 1000),
+#                     activation = 'tanh', random_state = RANDOM_SEED)
+#
+# clf.fit(X, Y)
+#
+#
+# data_test = test.ix[ : , col_pred ].copy()
+# y_test = target = test[ 'Y' ]
+#
+#
+#
+# prob = clf.predict_proba( data_test )
+#
+# prob_1 = []
+#
+# for p in prob:
+#     prob_1.append( max(p) )
+#
+#
+# prediction_nn = pd.read_csv('DATA/neural_net.csv', sep = ";", decimal = ",")  # Open raw .csv
 
-clf = MLPClassifier(solver='lbfgs', alpha = 0.001,
-                    hidden_layer_sizes=(1000, 1000, 1000, 1000, 
-                                        1000, 1000, 1000, 1000),
-                    activation = 'tanh', random_state = RANDOM_SEED)
-
-clf.fit(X, Y)        
-
-
-data_test = test.ix[ : , col_pred ].copy()
-y_test = target = test[ 'Y' ]
-
-
-
-prob = clf.predict_proba( data_test )
-
-prob_1 = []
-
-for p in prob:
-    prob_1.append( max(p) )
-
-
-prediction_nn = pd.read_csv('DATA/neural_net.csv', sep = ";", decimal = ",")  # Open raw .csv
+prediction_nn = pd.read_csv( "results/Neural_network.csv")
+prediction_nn.columns = ["Y", "p1"]
 
 metrics = skl.metrics.roc_curve( prediction_nn.Y, prediction_nn.p1 )
 fpr, tpr, thresholds = skl.metrics.roc_curve( prediction_nn.Y, prediction_nn.p1 )
@@ -228,7 +297,7 @@ auc_nn = skl.metrics.roc_auc_score( prediction_nn.Y, prediction_nn.p1 )
 auc_nn
 
 
-prediction = pd.read_csv('DATA/rf.csv', sep = ",", decimal = ".")  # Open raw .csv
+prediction = pd.read_csv('DATA/neural_net.csv', sep = ",", decimal = ".")  # Open raw .csv
 
 metrics = skl.metrics.roc_curve( prediction.Y, prediction.p1 )
 fpr, tpr, thresholds = skl.metrics.roc_curve( prediction.Y, prediction.p1 )
@@ -248,7 +317,7 @@ plt.figure(figsize = (15, 8))
 plt.plot(df_metrics_nn.fpr, df_metrics_nn.tpr,lw = 4)
 plt.plot(df_metrics.fpr, df_metrics.tpr, lw = 4,)
 plt.plot( [0,1], [0,1], color = 'navy', lw = 2, linestyle = '--')
-plt.legend( ('Deep Neural Network (area = %0.2f)' % auc_nn, 
+plt.legend( ('Deep Neural Network (area = %0.2f)' % auc_nn,
              'Random Forest (area = %0.2f)' % auc) )
 
 plt.xlim([0.0, 1.0])
