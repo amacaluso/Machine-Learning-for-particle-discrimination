@@ -31,19 +31,22 @@ Y_test = test_set[ target_variable ]
 
 """ MODELING """
 
-# decision_tree = tree.DecisionTreeClassifier(criterion = "gini",
-#                                             random_state = RANDOM_SEED,
-#                                            max_depth = 10,
-#                                            min_samples_leaf = 5 )
+decision_tree = tree.DecisionTreeClassifier(criterion = "entropy",
+                                            min_samples_split = 100,
+                                            random_state = RANDOM_SEED,
+                                            max_depth = 45,
+                                            min_samples_leaf = 50 )
 
-dt_parameters = {'max_depth': range(5, 50, 10),
-                 'min_samples_leaf': range(50, 400, 50),
-                 'min_samples_split': range( 100, 500, 100),
-                 'criterion': ['gini', 'entropy']}
+# dt_parameters = {'max_depth': range(5, 50, 10),
+#                  'min_samples_leaf': range(50, 400, 50),
+#                  'min_samples_split': range( 100, 500, 100),
+#                  'criterion': ['gini', 'entropy']}
+#
+# decision_tree = GridSearchCV( tree.DecisionTreeClassifier(), dt_parameters, n_jobs = 2 )
+# tree_model = decision_tree.best_estimator_
 
-decision_tree = GridSearchCV( tree.DecisionTreeClassifier(), dt_parameters, n_jobs = 2 )
 decision_tree = decision_tree.fit( X, Y )
-tree_model = decision_tree.best_estimator_
+tree_model = decision_tree
 
 importance_dt = tree_model.feature_importances_[tree_model.feature_importances_>0]
 
@@ -84,21 +87,23 @@ prediction_dt = np.array( prediction_dt )
 ROC_dt = ROC_analysis( Y_test, prediction_dt, label = "DECISION TREE"  )
 
 
-# clf = RandomForestClassifier(n_estimators=1000, max_depth=None,
-#                            min_samples_split=2, random_state=0)
+random_forest = RandomForestClassifier(n_estimators = 500, max_depth = 25,
+                                       min_samples_split = 100, max_features = 25)
 
 
-parameters = {'n_estimators': range(100, 900, 400),
-              'max_features': [ 10, 15, 25],
-              'max_depth':  [20, 50, 100],
-              'min_samples_split': range( 100, 900, 400)
-              }
+# parameters = {'n_estimators': range(100, 900, 400),
+#               'max_features': [ 10, 15, 25],
+#               'max_depth':  [20, 50, 100],
+#               'min_samples_split': range( 100, 900, 400)
+#               }
+#
+#
+# random_forest = GridSearchCV( RandomForestClassifier(), parameters, n_jobs = 2)
+# rf_model = random_forest.best_estimator_
 
 
-random_forest = GridSearchCV( RandomForestClassifier(), parameters, n_jobs = 2)
 random_forest = random_forest.fit( X, Y )
-
-rf_model = random_forest.best_estimator_
+rf_model = random_forest
 
 
 # importance = rf_model.feature_importances_
@@ -165,8 +170,8 @@ df_metrics['tpr_rf'] = tpr.copy()
 
 fpr, tpr, thresholds = skl.metrics.roc_curve( Y_test, prediction_dt )
 
-df_metrics['fpr_dt'] = fpr.copy()
-df_metrics['tpr_dt'] = tpr.copy()
+# df_metrics['fpr_dt'] = fpr.copy()
+# df_metrics['tpr_dt'] = tpr.copy()
 
 auc_rf = skl.metrics.roc_auc_score( Y_test, prediction_rf )
 auc_dt = skl.metrics.roc_auc_score( Y_test, prediction_dt )
@@ -174,15 +179,16 @@ auc_dt = skl.metrics.roc_auc_score( Y_test, prediction_dt )
 
 plt.figure(figsize = (15, 8))
 plt.plot(df_metrics.fpr_rf, df_metrics.tpr_rf,lw = 4)
-plt.plot(df_metrics.fpr_dt, df_metrics.tpr_dt, lw = 4,)
+# plt.plot(df_metrics.fpr_dt, df_metrics.tpr_dt, lw = 4,)
+plt.plot( fpr, tpr, lw = 4,)
 plt.plot( [0,1], [0,1], color = 'navy', lw = 2, linestyle = '--')
-plt.legend( ('Decision Tree (area = %0.2f)' % auc_dt,
-              'Random Forest (area = %0.2f)' % auc_rf) )
+plt.legend( ( 'Random Forest (area = %0.2f)' % auc_rf, 'Decision Tree (area = %0.2f)' % auc_dt) )
 plt.xlim([0.0, 1.0])
 plt.ylim([0.0, 1.05])
 plt.xlabel('False Positive Rate')
 plt.ylabel('True Positive Rate')
 plt.title('Receiver Operating Characteristic\n')
+plt.savefig("Images/ROC_rf_vs_dt.png")
 plt.show()
 
 #############################################################################
