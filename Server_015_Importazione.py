@@ -2,7 +2,7 @@
 exec(open("Utils.py").read(), globals())
 
 
-RANDOM_SEED = int( np.random.randint( low = 1, high = 100, size = 1))
+RANDOM_SEED = 70
 
 ############################################################################
 data = pd.read_csv('DATA/random_balanced_df_with_Y.csv').dropna()
@@ -18,11 +18,11 @@ for string in data.DIRNAME:
         energy.append(int(num[0]))
 
 pd.Series(energy).value_counts()
-
+"""
 sns.kdeplot(pd.Series(energy))
 plt.xlim(xmin=0)
 plt.title( "Density of energy (photons)")
-plt.show()
+plt.savefig("DATA/Density_enrgy.jpeg")
 
 
 Y_REG = []
@@ -33,5 +33,5 @@ for string in data.DIRNAME:
         Y_REG.append(int(num[0]))
         print string, num[0]
 
-
+"""
 # data['Y'] = Y_REG

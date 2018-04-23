@@ -2,7 +2,6 @@
 # Requires: numpy, sklearn>=0.18.1, tensorflow>=1.0
 # import tensorflow as tf
 
-exec(open("Utils.py").read(), globals())
 exec(open("0015_Pre_processing.py").read(), globals())
 
 
@@ -31,28 +30,25 @@ Y_test = test_set[ target_variable ]
 
 """ MODELING """
 
-decision_tree = tree.DecisionTreeClassifier(criterion = "entropy",
-                                            min_samples_split = 100,
-                                            random_state = RANDOM_SEED,
-                                            max_depth = 45,
-                                            min_samples_leaf = 50 )
+# decision_tree = tree.DecisionTreeClassifier(criterion = "gini",
+#                                             random_state = RANDOM_SEED,
+#                                            max_depth = 10,
+#                                            min_samples_leaf = 5 )
 
-# dt_parameters = {'max_depth': range(5, 50, 10),
-#                  'min_samples_leaf': range(50, 400, 50),
-#                  'min_samples_split': range( 100, 500, 100),
-#                  'criterion': ['gini', 'entropy']}
-#
-# decision_tree = GridSearchCV( tree.DecisionTreeClassifier(), dt_parameters, n_jobs = 2 )
-# tree_model = decision_tree.best_estimator_
+dt_parameters = {'max_depth': range(5, 50, 10),
+                 'min_samples_leaf': range(50, 400, 50),
+                 'min_samples_split': range( 100, 500, 100),
+                 'criterion': ['gini', 'entropy']}
 
+decision_tree = GridSearchCV( tree.DecisionTreeClassifier(), dt_parameters, n_jobs = 24 )
 decision_tree = decision_tree.fit( X, Y )
-tree_model = decision_tree
+tree_model = decision_tree.best_estimator_
 
 importance_dt = tree_model.feature_importances_[tree_model.feature_importances_>0]
 
 variables_dt = list( X.columns[ tree_model.feature_importances_>0 ] )
 len( variables_dt )
-
+"""
 plt.bar( variables_dt, importance_dt)
 plt.xticks(rotation=90)
 plt.show()
@@ -65,14 +61,14 @@ plt.show()
 # cv_validation_dt_std = CV_score_DT.std()
 # score_test = tree_model.score(X_test, Y_test)
 
-
+"""
 importance_dt = pd.Series( importance_dt, index = variables_dt)
 importance_dt = importance_dt[ importance_dt > 0.01]
-
+"""
 plt.barh( importance_dt.index, importance_dt)
 plt.xticks( rotation = 90 )
 plt.show()
-
+"""
 
 
 pred = tree_model.predict(X_test)
@@ -87,23 +83,21 @@ prediction_dt = np.array( prediction_dt )
 ROC_dt = ROC_analysis( Y_test, prediction_dt, label = "DECISION TREE"  )
 
 
-random_forest = RandomForestClassifier(n_estimators = 500, max_depth = 25,
-                                       min_samples_split = 100, max_features = 25)
+# clf = RandomForestClassifier(n_estimators=1000, max_depth=None,
+#                            min_samples_split=2, random_state=0)
 
 
-# parameters = {'n_estimators': range(100, 900, 400),
-#               'max_features': [ 10, 15, 25],
-#               'max_depth':  [20, 50, 100],
-#               'min_samples_split': range( 100, 900, 400)
-#               }
-#
-#
-# random_forest = GridSearchCV( RandomForestClassifier(), parameters, n_jobs = 2)
-# rf_model = random_forest.best_estimator_
+parameters = {'n_estimators': range(100, 900, 400),
+              'max_features': [ 10, 15, 25],
+              'max_depth':  [20, 50, 100],
+              'min_samples_split': range( 100, 900, 400)
+              }
 
 
+random_forest = GridSearchCV( RandomForestClassifier(), parameters, n_jobs = 54)
 random_forest = random_forest.fit( X, Y )
-rf_model = random_forest
+
+rf_model = random_forest.best_estimator_
 
 
 # importance = rf_model.feature_importances_
@@ -123,20 +117,21 @@ variables_rf = list( X.columns[ rf_model.feature_importances_>0.01 ] )
 importance_rf = pd.Series( importance_rf, index = variables_rf)
 len( importance_rf )
 
+"""
 plt.barh( importance_rf.index, importance_rf)
 plt.xticks( rotation = 90 )
 plt.show()
-
+"""
 
 """ Salvataggio dataframe ridotto """
-
+"""
 # RANDOM_ SEED = 70
 variables = variables_rf
 variables.append( target_variable )
 
 reduced_training = training_set[ variables ]
 reduced_test = test_set[ variables ]
-
+"""
 """ FINE """
 
 
@@ -161,119 +156,23 @@ parameters = pd.Series( [ decision_tree.best_params_, random_forest.best_params_
 parameters.to_csv("results/parameters.csv")
 
 
-
-"""Gradient Boosting Machine"""
-
-gbm = GradientBoostingClassifier(n_estimators = 500, max_depth = 25,
-                                       min_samples_split = 100, max_features = 25)
-
-parameters = {'n_estimators': [100, 200, 300, 400, 500, 600, 700, 800, 900, 1000],
-              'learning_rate': [0.1, 0.05, 0.02, 0.01],
-              'max_depth': [4, 6, 8],
-              'min_samples_leaf': [20, 50,100,150],
-              'max_features': [1.0, 0.3, 0.1]
-              }
-# parameters = {'n_estimators': range(100, 900, 400),
-#               'max_features': [ 10, 15, 25],
-#               'max_depth':  [20, 50, 100],
-#               'min_samples_split': range( 100, 900, 400)
-#               }
-#
-#
-gbm = GridSearchCV( GradientBoostingClassifier(), parameters, n_jobs = 24)
-
-
-gbm = gbm.fit( X, Y )
-# gbm_model = gbm.best_estimator_
-gbm_model = gbm
-
-# importance = rf_model.feature_importances_
-# len( variables_rf )
-# plt.bar( variables_rf, importance_rf)
-# plt.xticks(rotation=90)
-# plt.show()
-
-
-importance_gbm = gbm_model.feature_importances_[ gbm_model.feature_importances_>0 ]
-variables_gbm = list( X.columns[ gbm_model.feature_importances_> 0 ] )
-importance_gbm = pd.Series( importance_gbm, index = variables_gbm)
-
-
-importance_gbm = importance_gbm[ importance_gbm > 0.005]
-variables_gbm = list( X.columns[ gbm_model.feature_importances_>0.005 ] )
-importance_gbm= pd.Series( importance_gbm, index = variables_gbm)
-len( importance_gbm )
-
-plt.barh( importance_gbm.index, importance_gbm)
-plt.xticks( rotation = 90 )
-plt.show()
-
-
-pred = gbm_model.predict(X_test)
-prob = gbm_model.predict_proba(X_test)
-
-prediction_gbm = []
-for p in prob:
-    prediction_gbm.append(p[1])
-prediction_gbm = np.array( prediction_gbm )
-
-ROC_gbm = ROC_analysis( Y_test, prediction_gbm, label = "Gradient Boosting Machine" )
-
-
-ROC = pd.concat( [ROC_dt, ROC_rf], ignore_index = True)
+##########################################################################
 
 
 
+# plt.legend( ('Deep Neural Network (area = %0.2f)' % auc_nn,
+#              'Random Forest (area = %0.2f)' % auc) )
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-############################################################################
-"""ROC ANALYSIS"""
-
-fpr, tpr, thresholds = skl.metrics.roc_curve( Y_test, prediction_rf )
-
-df_metrics = pd.DataFrame()
-df_metrics['thresholds'] = thresholds.copy()
-df_metrics['fpr_rf'] = fpr.copy()
-df_metrics['tpr_rf'] = tpr.copy()
-
-fpr, tpr, thresholds = skl.metrics.roc_curve( Y_test, prediction_dt )
-
-# df_metrics['fpr_dt'] = fpr.copy()
-# df_metrics['tpr_dt'] = tpr.copy()
-
-auc_rf = skl.metrics.roc_auc_score( Y_test, prediction_rf )
-auc_dt = skl.metrics.roc_auc_score( Y_test, prediction_dt )
-
-
-plt.figure(figsize = (15, 8))
-plt.plot(df_metrics.fpr_rf, df_metrics.tpr_rf,lw = 4)
-# plt.plot(df_metrics.fpr_dt, df_metrics.tpr_dt, lw = 4,)
-plt.plot( fpr, tpr, lw = 4,)
-plt.plot( [0,1], [0,1], color = 'navy', lw = 2, linestyle = '--')
-plt.legend( ( 'Random Forest (area = %0.2f)' % auc_rf, 'Decision Tree (area = %0.2f)' % auc_dt) )
 plt.xlim([0.0, 1.0])
 plt.ylim([0.0, 1.05])
 plt.xlabel('False Positive Rate')
 plt.ylabel('True Positive Rate')
 plt.title('Receiver Operating Characteristic\n')
-plt.savefig("Images/ROC_rf_vs_dt.png")
 plt.show()
 
-#############################################################################
+
+############################################################################
+#
 # from sklearn.neural_network import MLPClassifier
 #
 # clf = MLPClassifier(solver='lbfgs', alpha = 0.001,
@@ -299,32 +198,29 @@ plt.show()
 #
 # prediction_nn = pd.read_csv('DATA/neural_net.csv', sep = ";", decimal = ",")  # Open raw .csv
 
-prediction_nn = pd.read_csv( "results/Neural_network.csv")
-prediction_nn.columns = ["Y", "p1"]
-
 metrics = skl.metrics.roc_curve( prediction_nn.Y, prediction_nn.p1 )
 fpr, tpr, thresholds = skl.metrics.roc_curve( prediction_nn.Y, prediction_nn.p1 )
 df_metrics_nn = pd.DataFrame()
-df_metrics_nn['fpr'] = fpr.copy() 
-df_metrics_nn['tpr'] = tpr.copy() 
-df_metrics_nn['thresholds'] = thresholds.copy() 
+df_metrics_nn['fpr'] = fpr.copy()
+df_metrics_nn['tpr'] = tpr.copy()
+df_metrics_nn['thresholds'] = thresholds.copy()
 
 auc_nn = skl.metrics.roc_auc_score( prediction_nn.Y, prediction_nn.p1 )
 auc_nn
 
 
-prediction = pd.read_csv('DATA/neural_net.csv', sep = ",", decimal = ".")  # Open raw .csv
-
-metrics = skl.metrics.roc_curve( prediction.Y, prediction.p1 )
-fpr, tpr, thresholds = skl.metrics.roc_curve( prediction.Y, prediction.p1 )
-df_metrics = pd.DataFrame()
-df_metrics['fpr'] = fpr.copy() 
-df_metrics['tpr'] = tpr.copy() 
-df_metrics['thresholds'] = thresholds.copy() 
-
-auc = skl.metrics.roc_auc_score( prediction.Y, prediction.p1 )
-auc
-RANDOM_SEED
+# prediction = pd.read_csv('DATA/rf.csv', sep = ",", decimal = ".")  # Open raw .csv
+#
+# metrics = skl.metrics.roc_curve( prediction.Y, prediction.p1 )
+# fpr, tpr, thresholds = skl.metrics.roc_curve( prediction.Y, prediction.p1 )
+# df_metrics = pd.DataFrame()
+# df_metrics['fpr'] = fpr.copy()
+# df_metrics['tpr'] = tpr.copy()
+# df_metrics['thresholds'] = thresholds.copy()
+#
+# auc = skl.metrics.roc_auc_score( prediction.Y, prediction.p1 )
+# auc
+# RANDOM_SEED
 
 
 
@@ -375,7 +271,7 @@ clf = tree.DecisionTreeClassifier(criterion = "gini",
                                    min_samples_leaf = 5)
 
 parameters = {'max_depth':range(5, 200, 10),
-              'min_samples_leaf': range(50, int(df_pre_training.shape[0]/10), 50), 
+              'min_samples_leaf': range(50, int(df_pre_training.shape[0]/10), 50),
               'min_samples_split': range( 100, 1000, 100),
               'criterion': ['gini', 'entropy']}
 
@@ -401,7 +297,7 @@ clf = RandomForestClassifier(n_estimators=1000, max_depth=None,
 
 
 parameters = {'n_estimators':range(100, 900, 400),
-              'max_features': [ 10, 15, 25], 
+              'max_features': [ 10, 15, 25],
               'max_depth': [20, 50, 100],
               'min_samples_split': range( 100, 900, 400)
               }
@@ -415,7 +311,7 @@ rf_model = rf.best_estimator_
 
 importance = rf_model.feature_importances_
 variables_rf = list( X.columns[ rf_model.feature_importances_>0 ] )
-len( variables_rf )                           
+len( variables_rf )
 
 normalized_importance = []
 max = importance.max()
@@ -436,3 +332,38 @@ density.covariance_factor = lambda : .25
 density._compute_covariance()
 plt.plot(xs,density(xs))
 plt.show()
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+def ROC_analysis(y_true, y_prob, label,
+                 probability_tresholds = np.arange(0.1, 0.91, 0.05)):
+    """" ROC MATRIX """
+y_true = Y_test
+y_prob = prediction_rf
+label = "RANDOM FOREST"
+roc_matrix = pd.DataFrame()
+
+for tresh in probability_tresholds:
+    current_y_hat = (y_prob > tresh).astype(int)
+    precision, recall, fscore, support = skl.metrics.precision_recall_fscore_support(y_true, current_y_hat)
+    accuracy = skl.metrics.accuracy_score(y_true, current_y_hat)
+    AUC = skl.metrics.roc_auc_score(y_true, current_y_hat)
+    result = pd.Series([label, tresh, accuracy, AUC, precision[1], recall[1], recall[0], fscore[1]])
+    roc_matrix = roc_matrix.append(result, ignore_index=True)
+
+roc_matrix.columns = ["Model", "Treshold", "Accuracy", "AUC",
+                      "Precision", "Recall", "Specificity", "F-score"]
+    return roc_matrix
