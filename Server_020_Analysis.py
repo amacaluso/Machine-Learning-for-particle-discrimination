@@ -338,6 +338,14 @@ plt.show()
 
 
 
+importance_rf = importance_rf[ importance_rf > 0.01]
+variables_rf = list( X.columns[ rf_model.feature_importances_>0.01 ] )
+importance_rf = pd.Series( importance_rf, index = variables_rf)
+len( importance_rf )
+
+plt.barh( importance_rf.index, importance_rf)
+plt.xticks( rotation = 90 )
+plt.show()
 
 
 

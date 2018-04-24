@@ -167,10 +167,10 @@ parameters.to_csv("results/parameters.csv")
 gbm = GradientBoostingClassifier(n_estimators = 500, max_depth = 25,
                                        min_samples_split = 100, max_features = 25)
 
-parameters = {'n_estimators': [100, 200, 300, 400, 500, 600, 700, 800, 900, 1000],
-              'learning_rate': [0.1, 0.05, 0.02, 0.01],
-              'max_depth': [4, 6, 8],
-              'min_samples_leaf': [20, 50,100,150],
+parameters = {'n_estimators': [ 200, 300, 500, 700, 1000],
+              'learning_rate': [0.1, 0.05, 0.01],
+              'max_depth': [4, 8],
+              'min_samples_leaf': [20, 50,100],
               'max_features': [1.0, 0.3, 0.1]
               }
 # parameters = {'n_estimators': range(100, 900, 400),
@@ -180,12 +180,11 @@ parameters = {'n_estimators': [100, 200, 300, 400, 500, 600, 700, 800, 900, 1000
 #               }
 #
 #
-gbm = GridSearchCV( GradientBoostingClassifier(), parameters, n_jobs = 24)
+gbm = GridSearchCV( GradientBoostingClassifier(), parameters, n_jobs = 2)
 
 
 gbm = gbm.fit( X, Y )
-# gbm_model = gbm.best_estimator_
-gbm_model = gbm
+gbm_model = gbm.best_estimator_
 
 # importance = rf_model.feature_importances_
 # len( variables_rf )
