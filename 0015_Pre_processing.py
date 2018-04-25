@@ -35,3 +35,23 @@ for string in data.DIRNAME:
 
 
 # data['Y'] = Y_REG
+
+# data = pd.read_csv('DATA/Complete_DataFrame.csv').dropna()
+#
+# columns_name = data.columns.get_values()
+# data.columns = columns_name
+#
+# energy = []
+# for string in data.DIRNAME:
+#     photon = bool(re.findall('MEV', string))
+#     if photon == True:
+#         num = re.findall('\d+', string)
+#         energy.append(int(num[0]))
+#
+# pd.Series(energy).value_counts()
+#
+# sns.kdeplot(pd.Series(energy))
+# plt.xlim(xmin=0)
+# plt.title( "Density of energy (photons)")
+# plt.savefig("Images/Density_of_energy.png")
+# plt.show()

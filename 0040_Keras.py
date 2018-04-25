@@ -39,8 +39,8 @@ encoded_Y_test = encoder.transform(Y_test)
 
 ## MODELING
 
-hidden_size = 1000
-deepness = 20
+hidden_size = 200
+deepness = 8
 
 
 model = Sequential()
