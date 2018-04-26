@@ -55,12 +55,29 @@ tree_model = decision_tree
 importance_dt = tree_model.feature_importances_[tree_model.feature_importances_>0]
 variables_dt = list( X.columns[ tree_model.feature_importances_>0 ] )
 len( variables_dt )
+scipy.stats.entropy(importance_dt)
+
 
 plt.bar( variables_dt, importance_dt)
 plt.xticks(rotation=90)
 plt.title( "Decision Tree - Variable Importance")
 plt.show()
 
+######################################################################
+#######################################################################
+
+from sklearn.tree import export_graphviz
+export_graphviz(tree_model,out_file="mytree.dot")
+###visualize the .dot file. Need to install graphviz seperately at first
+import graphviz
+with open("mytree.dot") as f:
+    dot_graph=f.read()
+graphviz.Source(dot_graph)
+
+import pydot
+
+(graph,) = pydot.graph_from_dot_file('mytree.dot')
+graph.write_png('mytree.png')
 # CV_score_DT = cross_val_score( tree_model, X = X, y = Y, cv = 2 )
 # CV_score_DT.mean() # 0.88,9
 # CV_score_DT.std()
@@ -123,7 +140,8 @@ rf_model = random_forest
 importance_rf = rf_model.feature_importances_[ rf_model.feature_importances_>0 ]
 variables_rf = list( X.columns[ rf_model.feature_importances_> 0 ] )
 importance_rf = pd.Series( importance_rf, index = variables_rf)
-
+len( importance_rf )
+scipy.stats.entropy(importance_rf)
 
 importance_rf = importance_rf[ importance_rf > 0.01]
 variables_rf = list( X.columns[ rf_model.feature_importances_>0.01 ] )
@@ -182,14 +200,14 @@ ROC.to_csv( "results/ROC.csv", index=False)
 
 """Gradient Boosting Machine"""
 
-gbm = GradientBoostingClassifier(n_estimators = 500, max_depth = 25,
-                                       min_samples_split = 100, max_features = 25)
+gbm = GradientBoostingClassifier(n_estimators = 100, max_depth = 25,
+                                 learning_rate = 0.1)
 
-parameters = {'n_estimators': [100, 150, 200, 300, 500, 600],
-              'learning_rate': [0.1, 0.01],
+#parameters = {'n_estimators': [100, 150, 200, 300],
+#              'learning_rate': [0.1, 0.05, 0.01]
 #              'max_depth': [4, 6, 8],
- #             'min_samples_leaf': [20, 50,100,150],
-              'max_features': [1.0, 0.3, 0.1]
+#             'min_samples_leaf': [20, 50,100,150],
+#              'max_features': [1.0, 0.3, 0.1]
               }
 # parameters = {'n_estimators': range(100, 900, 400),
 #               'max_features': [ 10, 15, 25],
@@ -198,11 +216,11 @@ parameters = {'n_estimators': [100, 150, 200, 300, 500, 600],
 #               }
 #
 #
-gbm = GridSearchCV( GradientBoostingClassifier(), parameters, n_jobs = 6)
+#gbm = GridSearchCV( GradientBoostingClassifier(), parameters, n_jobs = 64)
 
 
 gbm = gbm.fit( X, Y )
-gbm_model = gbm.best_estimator_
+#gbm_model = gbm.best_estimator_
 gbm_model = gbm
 
 # importance = rf_model.feature_importances_

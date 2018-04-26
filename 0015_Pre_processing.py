@@ -17,7 +17,13 @@ for string in data.DIRNAME:
         num = re.findall('\d+', string)
         energy.append(int(num[0]))
 
-pd.Series(energy).value_counts()
+table_energy = pd.Series(energy).value_counts()
+
+energy_df = pd.DataFrame()
+energy_df[ 'energy'] = table_energy.index
+energy_df[ 'Frequencies'] = table_energy.values
+energy_df = energy_df.sort_values('energy')
+
 
 sns.kdeplot(pd.Series(energy))
 plt.xlim(xmin=0)
@@ -33,7 +39,7 @@ for string in data.DIRNAME:
         Y_REG.append(int(num[0]))
         print string, num[0]
 
-
+scipy.stats.expon(scale = 2).pdf(1000)
 # data['Y'] = Y_REG
 
 # data = pd.read_csv('DATA/Complete_DataFrame.csv').dropna()
@@ -55,3 +61,23 @@ for string in data.DIRNAME:
 # plt.title( "Density of energy (photons)")
 # plt.savefig("Images/Density_of_energy.png")
 # plt.show()
+
+
+from scipy.stats import expon
+import matplotlib.pyplot as plt
+fig, ax = plt.subplots(1, 1)
+
+x = np.linspace(expon.ppf(0.01),
+                expon.ppf(0.99), 100)
+ax.plot(x, expon.pdf(x),
+       'r-', lw=5, alpha=0.6, label='expon pdf')
+
+rv = expon()
+ax.plot(x, rv.pdf(x), 'k-', lw=2, label='frozen pdf')
+vals = expon.ppf([0.001, 0.5, 0.999])
+np.allclose([0.001, 0.5, 0.999], expon.cdf(vals))
+
+r = expon.rvs(size=1000)
+ax.hist(r, normed=True, histtype='stepfilled', alpha=0.2)
+ax.legend(loc='best', frameon=False)
+plt.show()

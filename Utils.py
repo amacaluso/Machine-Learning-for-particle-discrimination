@@ -27,7 +27,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 from scipy.stats import gaussian_kde
 import seaborn as sns
-
+import scipy
 
 def ROC_analysis(y_true, y_prob, label, probability_tresholds = np.arange(0.1, 0.91, 0.05)):
     roc_matrix = pd.DataFrame()
