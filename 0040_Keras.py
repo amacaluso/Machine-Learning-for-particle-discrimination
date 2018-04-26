@@ -2,8 +2,7 @@
 
 exec(open("Utils.py").read(), globals())
 
-hidden_size = 200
-n_layers = 8
+
 
 training_set = pd.read_csv('DATA/reduced_training.csv').dropna()
 test_set = pd.read_csv('DATA/reduced_test.csv').dropna()
@@ -39,14 +38,14 @@ encoded_Y_test = encoder.transform(Y_test)
 
 ## MODELING
 
-hidden_size = 200
-deepness = 8
+hidden_size = 100
+n_layers = 500
 
 
 model = Sequential()
-model.add(Dense(2, input_dim = 29, kernel_initializer = 'normal', activation = 'relu'))
+model.add(Dense(50, input_dim = 251, kernel_initializer = 'normal', activation = 'relu'))
 
-for i in range( deepness-1 ):
+for i in range( n_layers-1 ):
     model.add(Dense(hidden_size, kernel_initializer='random_uniform', activation='relu'))
     # model.add(Dense(200, kernel_initializer='normal', activation='relu'))
     # model.add(Dense(200, kernel_initializer='normal', activation='relu'))
@@ -76,8 +75,12 @@ prediction_to_save = []
 for p in prediction:
     prediction_to_save.append(p[0])
 
-prediction_20_1000_df = pd.concat( [pd.Series(Y_test), pd.Series( prediction_to_save )], axis = 1 )
-prediction_20_1000_df.to_csv( "results/prediction_20_1000_df.csv")
+Y_test_s = pd.Series(Y_test, index = False)
+prediction_to_save_s = pd.Series(prediction_to_save, index = False)
+prediction_df = pd.DataFrame()
+prediction_df['Y'] = Y_test_s.values
+prediction_df['p1'] = prediction_to_save_s.values
+prediction_df.to_csv( "results/prediction_"+str(n_layers) + "_"+ str(hidden_size)+"_df.csv")
 
 
 

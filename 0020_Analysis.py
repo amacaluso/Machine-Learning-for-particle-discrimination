@@ -377,6 +377,56 @@ plt.show()
 
 
 
+string = "_50_100_"
+str_label = "(50, 100 )"
+
+prediction_nn = pd.read_csv( "results/prediction"+string+"df.csv")
+prediction_nn = prediction_nn.ix[:, 1:3]
+prediction_nn.columns = ["Y", "p1"]
+metrics = skl.metrics.roc_curve( prediction_nn.Y, prediction_nn.p1 )
+fpr_nn1, tpr_nn1, thresholds_nn1 = skl.metrics.roc_curve( prediction_nn.Y, prediction_nn.p1 )
+#auc_nn_1_5 = skl.metrics.roc_auc_score( prediction_nn.Y, prediction_nn.p1 )
+auc_nn1 = skl.metrics.roc_auc_score( prediction_nn.Y, prediction_nn.p1 )
+ROC_40_1000 = ROC_analysis( prediction_nn.Y, prediction_nn.p1, label = "Neural Net "+ str_label+", Complete df" )
+ROC_40_1000.to_csv( "results/ROC"+string+".csv", index=False)
+ROC_40_1000.ix[:, 1:7].round(2).to_html("results/ROC"+string+".html", index = False)
+
+
+
+
+
+string = "_200_1000_"
+str_label = "(200, 1000 )"
+
+prediction_nn = pd.read_csv( "results/prediction"+string+"df.csv")
+prediction_nn = prediction_nn.ix[:, 1:3]
+prediction_nn.columns = ["Y", "p1"]
+metrics = skl.metrics.roc_curve( prediction_nn.Y, prediction_nn.p1 )
+fpr_nn2, tpr_nn2, thresholds_nn2 = skl.metrics.roc_curve( prediction_nn.Y, prediction_nn.p1 )
+#auc_nn_1_5 = skl.metrics.roc_auc_score( prediction_nn.Y, prediction_nn.p1 )
+auc_nn2 = skl.metrics.roc_auc_score( prediction_nn.Y, prediction_nn.p1 )
+ROC_40_1000 = ROC_analysis( prediction_nn.Y, prediction_nn.p1, label = "Neural Net "+ str_label+", Complete df" )
+ROC_40_1000.to_csv( "results/ROC"+string+".csv", index=False)
+ROC_40_1000.ix[:, 1:7].round(2).to_html("results/ROC"+string+".html", index = False)
+
+
+
+plt.plot(fpr_nn1, tpr_nn1,lw = 2)
+plt.plot(fpr_nn2, tpr_nn2,lw = 2)
+#plt.subplots_adjust(bottom=0.2)
+plt.plot( [0,1], [0,1], color = 'yellow', lw = 2, linestyle = '--')
+plt.legend(('Neural Net (layers = 50, hidden size = 100), area = %0.2f' % auc_nn1,
+            'Neural Net (layers = 200, hidden size = 1000), area = %0.2f' % auc_nn2))
+plt.xlim([0.0, 1.0])
+plt.ylim([0.0, 1.05])
+plt.xlabel('False Positive Rate')
+plt.ylabel('True Positive Rate')
+plt.title('Receiver Operating Characteristic\n')
+plt.savefig("Images/ROC_Neural_Network_Complete_df.png")
+plt.show()
+
+
+
 
 ROC_gbm = ROC_analysis( Y_test, prediction_gbm, label = "Gradient Boosting Machine" )
 
