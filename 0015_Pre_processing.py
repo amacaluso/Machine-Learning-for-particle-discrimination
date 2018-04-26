@@ -2,7 +2,7 @@
 exec(open("Utils.py").read(), globals())
 
 
-RANDOM_SEED = int( np.random.randint( low = 1, high = 100, size = 1))
+RANDOM_SEED = 70
 
 ############################################################################
 data = pd.read_csv('DATA/random_balanced_df_with_Y.csv').dropna()

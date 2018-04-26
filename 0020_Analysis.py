@@ -203,8 +203,8 @@ ROC.to_csv( "results/ROC.csv", index=False)
 gbm = GradientBoostingClassifier(n_estimators = 100, max_depth = 25,
                                  learning_rate = 0.1)
 
-#parameters = {'n_estimators': [100, 150, 200, 300],
-#              'learning_rate': [0.1, 0.05, 0.01]
+parameters = {'n_estimators': [100, 150, 200, 300],
+              'learning_rate': [0.1, 0.05, 0.01]}
 #              'max_depth': [4, 6, 8],
 #             'min_samples_leaf': [20, 50,100,150],
 #              'max_features': [1.0, 0.3, 0.1]
@@ -216,11 +216,11 @@ gbm = GradientBoostingClassifier(n_estimators = 100, max_depth = 25,
 #               }
 #
 #
-#gbm = GridSearchCV( GradientBoostingClassifier(), parameters, n_jobs = 64)
+gbm = GridSearchCV( GradientBoostingClassifier(), parameters, n_jobs = 64)
 
 
 gbm = gbm.fit( X, Y )
-#gbm_model = gbm.best_estimator_
+gbm_model = gbm.best_estimator_
 gbm_model = gbm
 
 # importance = rf_model.feature_importances_
@@ -233,15 +233,21 @@ gbm_model = gbm
 importance_gbm = gbm_model.feature_importances_[ gbm_model.feature_importances_>0 ]
 variables_gbm = list( X.columns[ gbm_model.feature_importances_> 0 ] )
 importance_gbm = pd.Series( importance_gbm, index = variables_gbm)
-
+len(variables_gbm)
+scipy.stats.entropy(importance_gbm)
 
 importance_gbm = importance_gbm[ importance_gbm > 0.005]
 variables_gbm = list( X.columns[ gbm_model.feature_importances_>0.005 ] )
 importance_gbm= pd.Series( importance_gbm, index = variables_gbm)
 len( importance_gbm )
 
-plt.barh( importance_gbm.index, importance_gbm)
+plt.bar( importance_gbm.index, importance_gbm)
+plt.subplots_adjust(bottom=0.50)
 plt.xticks( rotation = 90 )
+#plt.margins(0.2)
+#plt.xlabel( "Variables", fontsize=10)
+plt.title( "Gradient Boosting Machine - Variable Importance ( >0.005)")
+plt.savefig("Images/Variable_Importance_GBM.png")
 plt.show()
 
 
@@ -253,10 +259,13 @@ for p in prob:
     prediction_gbm.append(p[1])
 prediction_gbm = np.array( prediction_gbm )
 
-ROC_gbm = ROC_analysis( Y_test, prediction_gbm, label = "Gradient Boosting Machine" )
+ROC_gbm = ROC_analysis( Y_test, prediction_gbm,
+                        label = "Gradient Boosting Machine",
+                        probability_tresholds = np.arange(0.1, 0.91, 0.1))
 
 
-ROC = pd.concat( [ROC_dt, ROC_rf], ignore_index = True)
+ROC_gbm.to_csv( "results/ROC_gbm.csv", index=False)
+ROC_gbm.ix[:, 1:7].round(2).to_html("results/ROC_gbm.html", index = False)
 
 
 
@@ -291,21 +300,32 @@ dt_metrics['thresholds'] = thresholds.copy()
 dt_metrics['fpr'] = fpr.copy()
 dt_metrics['tpr'] = tpr.copy()
 
+fpr, tpr, thresholds = skl.metrics.roc_curve( Y_test, prediction_gbm )
+gbm_metrics = pd.DataFrame()
+gbm_metrics['thresholds'] = thresholds.copy()
+gbm_metrics['fpr'] = fpr.copy()
+gbm_metrics['tpr'] = tpr.copy()
+
+
 auc_rf = skl.metrics.roc_auc_score( Y_test, prediction_rf )
 auc_dt = skl.metrics.roc_auc_score( Y_test, prediction_dt )
+auc_gbm = skl.metrics.roc_auc_score( Y_test, prediction_gbm )
 
 
-plt.figure(figsize = (15, 8))
-plt.plot(rf_metrics.fpr, rf_metrics.tpr,lw = 4)
-plt.plot(dt_metrics.fpr, dt_metrics.tpr,lw = 4)
-plt.plot( [0,1], [0,1], color = 'navy', lw = 2, linestyle = '--')
-plt.legend( ( 'Random Forest (area = %0.2f)' % auc_rf, 'Decision Tree (area = %0.2f)' % auc_dt) )
+#plt.figure(figsize = (15, 8))
+plt.plot(rf_metrics.fpr, rf_metrics.tpr,lw = 2)
+plt.plot(gbm_metrics.fpr, gbm_metrics.tpr,lw = 2)
+plt.plot(dt_metrics.fpr, dt_metrics.tpr,lw = 2)
+plt.plot( [0,1], [0,1], color = 'navy', lw = 1, linestyle = '--')
+plt.legend( ( 'Random Forest (area = %0.2f)' % auc_rf,
+              'Gradient Boosting Machine (area = %0.2f)' % auc_gbm,
+              'Decision Tree (area = %0.2f)' % auc_dt) )
 plt.xlim([0.0, 1.0])
 plt.ylim([0.0, 1.05])
 plt.xlabel('False Positive Rate')
 plt.ylabel('True Positive Rate')
 plt.title('Receiver Operating Characteristic\n')
-plt.savefig("Images/ROC_rf_vs_dt.png")
+plt.savefig("Images/ROC_rf_vs_GBM_vs_dt.png")
 plt.show()
 
 #############################################################################
@@ -346,7 +366,8 @@ metrics = skl.metrics.roc_curve( prediction_nn.Y, prediction_nn.p1 )
 fpr_nn1, tpr_nn1, thresholds_nn1 = skl.metrics.roc_curve( prediction_nn.Y, prediction_nn.p1 )
 #auc_nn_1_5 = skl.metrics.roc_auc_score( prediction_nn.Y, prediction_nn.p1 )
 auc_nn_1_5 = skl.metrics.roc_auc_score( prediction_nn.Y, prediction_nn.p1 )
-ROC_1_5 = ROC_analysis( prediction_nn.Y, prediction_nn.p1, label = "Neural Net (1, 5)" )
+ROC_1_5 = ROC_analysis( prediction_nn.Y, prediction_nn.p1, label = "Neural Net (1, 5)",
+                        probability_tresholds = np.arange(0.1, 0.91, 0.1))
 ROC_1_5.to_csv( "results/ROC_1_5.csv", index=False)
 ROC_1_5.ix[:, 1:7].round(2).to_html("results/ROC_1_5.html", index = False)
 
@@ -360,7 +381,8 @@ metrics = skl.metrics.roc_curve( prediction_nn.Y, prediction_nn.p1 )
 fpr_nn2, tpr_nn2, thresholds_nn2 = skl.metrics.roc_curve( prediction_nn.Y, prediction_nn.p1 )
 #auc_nn_1_5 = skl.metrics.roc_auc_score( prediction_nn.Y, prediction_nn.p1 )
 auc_nn_20_1000 = skl.metrics.roc_auc_score( prediction_nn.Y, prediction_nn.p1 )
-ROC_20_1000 = ROC_analysis( prediction_nn.Y, prediction_nn.p1, label = "Neural Net (20, 1000)")
+ROC_20_1000 = ROC_analysis( prediction_nn.Y, prediction_nn.p1, label = "Neural Net (20, 1000)",
+                            probability_tresholds = np.arange(0.1, 0.91, 0.1))
 ROC_20_1000.to_csv( "results/ROC_20_1000.csv", index=False)
 ROC_20_1000.ix[:, 1:7].round(2).to_html("results/ROC_20_1000.html", index = False)
 
@@ -373,7 +395,8 @@ metrics = skl.metrics.roc_curve( prediction_nn.Y, prediction_nn.p1 )
 fpr_nn3, tpr_nn3, thresholds_nn3 = skl.metrics.roc_curve( prediction_nn.Y, prediction_nn.p1 )
 #auc_nn_1_5 = skl.metrics.roc_auc_score( prediction_nn.Y, prediction_nn.p1 )
 auc_nn_8_200 = skl.metrics.roc_auc_score( prediction_nn.Y, prediction_nn.p1 )
-ROC_8_200 = ROC_analysis( prediction_nn.Y, prediction_nn.p1, label = "Neural Net (8, 200)")
+ROC_8_200 = ROC_analysis( prediction_nn.Y, prediction_nn.p1, label = "Neural Net (8, 200)",
+                          probability_tresholds = np.arange(0.1, 0.91, 0.1))
 ROC_8_200.to_csv( "results/ROC_8_200.csv", index=False)
 ROC_8_200.ix[:, 1:7].round(2).to_html("results/ROC_8_200.html", index = False)
 
