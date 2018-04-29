@@ -25,9 +25,11 @@ energy_df[ 'Frequencies'] = table_energy.values
 energy_df = energy_df.sort_values('energy')
 
 
-sns.kdeplot(pd.Series(energy))
+sns.kdeplot(pd.Series(energy), shade = True )
 plt.xlim(xmin=0)
 plt.title( "Density of energy (photons)")
+plt.vlines(x=[380, 7000, 10000, 17320, 40000],ymin=0, ymax=0.5, color='r')
+plt.savefig("Images/Density_of_energy.png")
 plt.show()
 
 
