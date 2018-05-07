@@ -27,7 +27,9 @@ import matplotlib.pyplot as plt
 import numpy as np
 from scipy.stats import gaussian_kde
 import seaborn as sns
-
+import scipy
+import sklearn as skl
+from sklearn import cross_validation, linear_model
 
 def ROC_analysis(y_true, y_prob, label, probability_tresholds = np.arange(0.1, 0.91, 0.05)):
     roc_matrix = pd.DataFrame()
@@ -41,3 +43,73 @@ def ROC_analysis(y_true, y_prob, label, probability_tresholds = np.arange(0.1, 0
     roc_matrix.columns = ["Model", "Treshold", "Accuracy", "AUC",
                           "Precision", "Recall", "Specificity", "F-score"]
     return roc_matrix
+
+
+def create_dataset(data,
+                   target_variable,
+                   explanatory_variable
+                   ):
+    #
+    data = data.dropna(subset=[target_variable])
+    dataset = pd.concat([data[target_variable], data[explanatory_variable]], axis=1)
+
+    return dataset
+
+
+def model_estimation(data,
+                     target_variable,
+                     explanatory_variable,
+                     test_data,
+                     model=skl.linear_model.LinearRegression()
+                     ):
+    data = data.dropna(subset=[target_variable])
+    fit = model.fit(data[explanatory_variable], data[target_variable])
+    predict = model.predict(test_data[explanatory_variable])
+    return predict
+
+
+
+def error_estimate( y_true, y_hat):
+
+    differenza = []
+
+    for i in range(len(Y_hat)):
+        differenza.append(Y_true[i] - Y_hat[i])
+
+    diff = []
+    diff = pd.concat(differenza[i]
+                     for i in range(len(differenza)))
+
+    diff_2 = []
+    diff_2 = np.power(diff, 2)
+
+    SSE = sum(diff_2)
+    MSE = SSE / n
+    Root_MSE = sqrt(MSE)
+
+    SE = np.sum(diff)
+
+    Y = []
+    Y = pd.concat(Y_true[j] for j in range(len(Y_true)))
+
+    Dev_Y = np.var(Y) * n
+    Var_Y = np.var(Y)
+    RSE = SSE / Dev_Y
+    RRSE = sqrt(RSE)
+
+    MAE = sum(abs(diff)) / n
+
+    differenza_media = []
+    media = np.mean(Y)
+
+    for i in range(len(Y_hat)):
+        differenza_media.append(Y_true[i] - media)
+
+    diff_media = []
+    diff_media = pd.concat(differenza_media[i]
+                           for i in range(len(differenza_media)))
+
+    RAE = sum(abs(diff)) / sum(abs(diff_media))
+
+    return [SE, SSE, MSE, Root_MSE, RSE, RRSE, MAE, RAE, Dev_Y, Var_Y]
+

@@ -1,19 +1,5 @@
 """ CARICAMENTO DATI """
-
-exec(open("Utils.py").read(), globals())
-
-
-
-training_set = pd.read_csv('DATA/reduced_training.csv').dropna()
-test_set = pd.read_csv('DATA/reduced_test.csv').dropna()
-
-target_variable = "Y"
-X = training_set.drop( target_variable, axis = 1).astype( np.float32 )
-Y = training_set[ target_variable ]
-
-X_test = test_set.drop( target_variable, axis = 1).astype( np.float32 )
-Y_test = test_set[ target_variable ]
-
+import tensorflow as tf
 from keras.models import Sequential
 from keras.layers import Dense
 from keras.wrappers.scikit_learn import KerasClassifier
@@ -24,6 +10,47 @@ from sklearn.preprocessing import StandardScaler
 from sklearn.pipeline import Pipeline
 from keras.callbacks import ModelCheckpoint
 import matplotlib.pyplot as plt
+
+import pandas as pd
+import numpy as np
+from sklearn.cross_validation import train_test_split
+exec(open("Utils.py").read(), globals())
+
+
+raw_data = pd.read_csv('DATA/random_balanced_df_with_Y.csv')  # Open raw .csv
+
+
+cols_to_remove = ['index', 'FILE', 'TTree', 'TIME', 'PID', 'EVENT_NUMBER',
+                  'EVENT_TYPE', 'DIRNAME', 'FLG_BRNAME01', 'FLG_EVSTATUS' ]
+
+
+raw_data = raw_data.drop( cols_to_remove, axis=1 )
+# kilgharrah.iasfbo.inaf.it
+# ------------------------------------------------------------------------------
+RANDOM_SEED = 70
+
+data = raw_data
+training_set, test_set = train_test_split( data, test_size = 0.2,
+                                           random_state = RANDOM_SEED)
+
+
+cols_to_remove = ['index', 'FILE', 'TTree', 'TIME', 'PID', 'EVENT_NUMBER',
+                  'EVENT_TYPE', 'DIRNAME', 'FLG_BRNAME01', 'FLG_EVSTATUS' ]
+
+
+training_set = training_set.drop( cols_to_remove, axis=1 )
+test_set = test_set.drop( cols_to_remove, axis=1 )
+
+target_variable = 'Y'
+
+X = training_set.drop( target_variable, axis = 1).astype( np.float32 )
+Y = training_set[ target_variable ]
+
+X_test = test_set.drop( target_variable, axis = 1).astype( np.float32 )
+Y_test = test_set[ target_variable ]
+
+
+
 
 
 # encode class values as integers
@@ -38,12 +65,12 @@ encoded_Y_test = encoder.transform(Y_test)
 
 ## MODELING
 
-hidden_size = 100
-n_layers = 500
+hidden_size = 3
+n_layers = 1
 
 
 model = Sequential()
-model.add(Dense(50, input_dim = 251, kernel_initializer = 'normal', activation = 'relu'))
+model.add(Dense(20, input_dim = 251, kernel_initializer = 'normal', activation = 'relu'))
 
 for i in range( n_layers-1 ):
     model.add(Dense(hidden_size, kernel_initializer='random_uniform', activation='relu'))
@@ -53,14 +80,14 @@ for i in range( n_layers-1 ):
     # model.add(Dense(200, kernel_initializer='normal', activation='relu'))
 
 model.add(Dense(1, kernel_initializer = 'normal', activation = 'sigmoid'))
-model.compile(loss = 'binary_crossentropy', optimizer='adam', metrics=['accuracy'])
+model.compile(loss = 'binary_crossentropy', optimizer='adam', metrics=['accuracy'], index = False)
 #return model
 # checkpoint
 filepath="weights-improvement-{epoch:02d}-{val_acc:.2f}.hdf5"
 checkpoint = ModelCheckpoint(filepath, verbose = 1, save_best_only = True, mode = 'auto', monitor = 'val_acc')
 callbacks_list = [checkpoint]
 
-model.fit(X, encoded_Y, epochs = 40,
+model.fit(X, encoded_Y, epochs = 10,
                     batch_size = 250, callbacks = callbacks_list, verbose = 1,  validation_split = 0.1)
 # history = model.fit(X, encoded_Y, batch_size=None, epochs=200, verbose=1,
  #                  validation_data = (X_test, encoded_Y_test))
@@ -75,8 +102,8 @@ prediction_to_save = []
 for p in prediction:
     prediction_to_save.append(p[0])
 
-Y_test_s = pd.Series(Y_test, index = False)
-prediction_to_save_s = pd.Series(prediction_to_save, index = False)
+Y_test_s = pd.Series(Y_test)
+prediction_to_save_s = pd.Series(prediction_to_save)
 prediction_df = pd.DataFrame()
 prediction_df['Y'] = Y_test_s.values
 prediction_df['p1'] = prediction_to_save_s.values
