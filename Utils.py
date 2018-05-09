@@ -5,6 +5,7 @@ Created on Tue Mar 27 22:02:48 2018
 
 @author: antonio
 """
+
 import pandas as pd
 import numpy as np
 # import matplotlib.pyplot as plt
@@ -12,19 +13,21 @@ from collections import Counter
 from sklearn import datasets
 from sklearn.model_selection import train_test_split
 from sklearn import tree
+import matplotlib.pyplot as plt
 from sklearn.model_selection import GridSearchCV
 from sklearn.ensemble import RandomForestClassifier
+from sklearn.ensemble import RandomForestRegressor
 from sklearn.ensemble import ExtraTreesClassifier
 from sklearn.ensemble import GradientBoostingClassifier
+from sklearn.ensemble import GradientBoostingRegressor
 from sklearn.model_selection import cross_val_score
 import numpy as np
 from scipy.stats import gaussian_kde
 #import tensorflow as tf
 import sklearn as skl
-import matplotlib.pyplot as plt
+#import matplotlib.pyplot as plt
 import re
-import matplotlib.pyplot as plt
-import numpy as np
+#import matplotlib.pyplot as plt
 from scipy.stats import gaussian_kde
 import seaborn as sns
 import scipy
@@ -69,47 +72,28 @@ def model_estimation(data,
 
 
 
-def error_estimate( y_true, y_hat):
+def regression_performance_estimate( Y_test, Y_hat):
 
-    differenza = []
+    n = len(Y_test)
+    residui = Y_test - Y_hat
+    residui_2 = np.power(residui, 2)
 
-    for i in range(len(Y_hat)):
-        differenza.append(Y_true[i] - Y_hat[i])
-
-    diff = []
-    diff = pd.concat(differenza[i]
-                     for i in range(len(differenza)))
-
-    diff_2 = []
-    diff_2 = np.power(diff, 2)
-
-    SSE = sum(diff_2)
+    SSE = sum(residui_2)
     MSE = SSE / n
-    Root_MSE = sqrt(MSE)
+    Root_MSE = np.sqrt(MSE)
+    SE = np.sum(residui)
 
-    SE = np.sum(diff)
-
-    Y = []
-    Y = pd.concat(Y_true[j] for j in range(len(Y_true)))
-
-    Dev_Y = np.var(Y) * n
-    Var_Y = np.var(Y)
+    Dev_Y = np.var(Y_test) * n
+    Var_Y = np.var(Y_test)
     RSE = SSE / Dev_Y
-    RRSE = sqrt(RSE)
+    RRSE = np.sqrt(RSE)
+    R_2 = 1-RSE
+    MAE = sum(abs(residui)) / n
 
-    MAE = sum(abs(diff)) / n
+    media = np.mean(Y_test)
+    err_assoluto = sum( abs( Y_test - Y_hat ) )
+    err_assoluto_medio = sum( abs( Y_test - media ) )
 
-    differenza_media = []
-    media = np.mean(Y)
-
-    for i in range(len(Y_hat)):
-        differenza_media.append(Y_true[i] - media)
-
-    diff_media = []
-    diff_media = pd.concat(differenza_media[i]
-                           for i in range(len(differenza_media)))
-
-    RAE = sum(abs(diff)) / sum(abs(diff_media))
+    RAE = err_assoluto / err_assoluto_medio
 
     return [SE, SSE, MSE, Root_MSE, RSE, RRSE, MAE, RAE, Dev_Y, Var_Y]
-

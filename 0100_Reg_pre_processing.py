@@ -1,6 +1,6 @@
 exec(open("Utils.py").read(), globals())
 
-RANDOM_SEED = 70
+RANDOM_SEED = 300
 
 ############################################################################
 data = pd.read_csv('DATA/DataFrame_with_Y.csv').dropna()
