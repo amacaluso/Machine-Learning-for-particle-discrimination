@@ -46,4 +46,4 @@ scipy.stats.expon(scale = 2).pdf(1000)
 
 data[ 'Y_REG' ] = Y_REG
 
-data.to_csv( "DATA/Regression_dataset.csv", index = False)
+#data.to_csv( "DATA/Regression_dataset.csv", index = False)

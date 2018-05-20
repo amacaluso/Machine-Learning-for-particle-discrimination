@@ -1,8 +1,7 @@
 exec(open("Utils.py").read(), globals())
-exec(open("0100_Reg_pre_processing.py").read(), globals())
-from sklearn import datasets, linear_model
-from sklearn.metrics import mean_squared_error, r2_score
+#exec(open("1010_REGRESSION_pre_processing.py").read(), globals())
 
+from sklearn.metrics import mean_squared_error, r2_score
 
 RANDOM_SEED = 300
 
@@ -11,7 +10,7 @@ training_set, test_set = train_test_split( data, test_size = 0.2,
                                            random_state = RANDOM_SEED)
 
 
-cols_to_remove = [u'index', u'FILE', u'TTree', u'TIME', u'PID', u'EVENT_NUMBER',
+cols_to_remove = [ u'index', u'FILE', u'TTree', u'TIME', u'PID', u'EVENT_NUMBER',
                   u'EVENT_TYPE', u'DIRNAME', u'FLG_BRNAME01', u'FLG_EVSTATUS', u'Y' ]
 
 
@@ -61,21 +60,27 @@ dt_parameters = {'max_depth': range(5, 50, 10),
                  'min_samples_split': range( 100, 500, 100),
                  'criterion': ['gini', 'entropy']}
 
-decision_tree = GridSearchCV( tree.DecisionTreeClassifier(), dt_parameters, n_jobs = 30 )
+
+decision_tree_cv = GridSearchCV( tree.DecisionTreeClassifier(), dt_parameters, n_jobs = 60 )
+decision_tree = decision_tree_cv.fit( X, Y )
 tree_model = decision_tree.best_estimator_
 
-decision_tree = decision_tree.fit( X, Y )
-tree_model = decision_tree
+#tree_model = decision_tree.fit( X, Y )
 
-importance_dt = tree_model.feature_importances_[tree_model.feature_importances_>0.01]
-variables_dt = list( X.columns[ tree_model.feature_importances_>0.01 ] )
-len( variables_dt )
-#scipy.stats.entropy(importance_dt)
+importance_dt = tree_model.feature_importances_[tree_model.feature_importances_>0]
+variables_dt = list( X.columns[ tree_model.feature_importances_>0 ] )
+print( len( variables_dt ) )
 
-plt.bar( variables_dt, importance_dt)
-plt.xticks(rotation=90)
-plt.title( "Decision Tree - Variable Importance")
-plt.show()
+
+# importance_dt = tree_model.feature_importances_[tree_model.feature_importances_>0.01]
+# variables_dt = list( X.columns[ tree_model.feature_importances_>0.01 ] )
+# print( len( variables_dt ) )
+
+
+# plt.bar( variables_dt, importance_dt)
+# plt.xticks(rotation=90)
+# plt.title( "Decision Tree - Variable Importance")
+# plt.show()
 
 Y_hat = tree_model.predict(X_test)
 
@@ -87,69 +92,55 @@ print("Mean squared error: %.2f"
 # Explained variance score: 1 is perfect prediction
 print('Variance score: %.2f' % r2_score(Y_test, Y_hat))
 
+results_dt = regression_performance_estimate( Y_test, Y_hat, model = 'Decision Tree')
 
 ###############################################################################
 ###############################################################################
 
 ####################### RANDOM FOREST #################################
-random_forest = RandomForestRegressor( criterion = "mse",
+rf_parameters = RandomForestRegressor( criterion = "mse",
                                        n_estimators = 10,
                                        max_depth = 25,
                                        min_samples_split = 100,
                                        max_features = 25, n_jobs = 3 )
 
-# parameters = {'n_estimators': range(100, 900, 400),
-#               'max_features': [ 10, 15, 25],
-#               'max_depth':  [20, 50, 100],
-#               'min_samples_split': range( 100, 900, 400)
-#               }
-# random_forest = GridSearchCV( RandomForestClassifier(), parameters, n_jobs = 2)
-# rf_model = random_forest.best_estimator_
+parameters = {'n_estimators': range(100, 900, 400),
+              'max_features': [ 10, 15, 25],
+              'max_depth':  [20, 50, 100],
+              'min_samples_split': range( 100, 900, 400)
+              }
+random_forest_cv = GridSearchCV( RandomForestClassifier(), rf_parameters, n_jobs = 60)
+random_forest = random_forest_cv.fit( X, Y )
+rf_model = random_forest_cv.best_estimator_
 
-random_forest = random_forest.fit( X, Y )
-rf_model = random_forest
-
-# importance = rf_model.feature_importances_
-# len( variables_rf )
-# plt.bar( variables_rf, importance_rf)
-# plt.xticks(rotation=90)
-# plt.show()
-
+#rf_model = random_forest.fit( X, Y )
 
 importance_rf = rf_model.feature_importances_[ rf_model.feature_importances_>0 ]
 variables_rf = list( X.columns[ rf_model.feature_importances_> 0 ] )
 importance_rf = pd.Series( importance_rf, index = variables_rf)
-len( importance_rf )
-#scipy.stats.entropy(importance_rf)
+print( len( importance_rf ) )
 
 importance_rf = importance_rf[ importance_rf > 0.01]
 variables_rf = list( X.columns[ rf_model.feature_importances_>0.01 ] )
 importance_rf = pd.Series( importance_rf, index = variables_rf)
-len( importance_rf )
+print len( importance_rf )
 
-# plt.barh( importance_rf.index, importance_rf)
+# plt.bar( importance_rf.index, importance_rf)
+# plt.subplots_adjust(bottom=0.50)
 # plt.xticks( rotation = 90 )
+# plt.title( "Random Forest - Variable Importance ( >0.01)")
+# plt.savefig("Images/Variable_Importance_RF.png")
 # plt.show()
-
-#plt.barh( importance_dt.index, importance_dt)
-plt.bar( importance_rf.index, importance_rf)
-plt.subplots_adjust(bottom=0.50)
-plt.xticks( rotation = 90 )
-#plt.margins(0.2)
-#plt.xlabel( "Variables", fontsize=10)
-plt.title( "Random Forest - Variable Importance ( >0.01)")
-plt.savefig("Images/Variable_Importance_RF.png")
-plt.show()
 
 
 """ Salvataggio dataframe ridotto """
 
 # RANDOM_ SEED = 70
-variables = variables_rf
-variables.append( target_variable )
+# variables = variables_rf
+# variables.append( target_variable )
 
-reduced_training = training_set[ variables ]
-reduced_test = test_set[ variables ]
+# reduced_training = training_set[ variables ]
+# reduced_test = test_set[ variables ]
 
 """ FINE """
 
@@ -164,7 +155,15 @@ print("Mean squared error: %.2f"
 print('Variance score: %.2f' % r2_score(Y_test, Y_hat))
 
 
-###########################################################################
-###########################################################################
+results_rf = regression_performance_estimate( Y_test, Y_hat, 'Random Forest')
 
 
+lm = pd.Series( results_linear_regression)
+dt = pd.Series( results_dt)
+rf = pd.Series( results_rf)
+
+df_results = pd.DataFrame( )
+df_results = df_results.append( [lm, dt, rf] , ignore_index = True)
+
+df_results.columns = [ 'model', 'SE', 'SSE', 'MSE', 'Root_MSE', 'RSE', 'RRSE', 'MAE', 'RAE', 'Dev_Y', 'Var_Y']
+df_results.to_csv( 'results/REG_results.csv', index = False)

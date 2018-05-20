@@ -8,7 +8,6 @@ Created on Tue Mar 27 22:02:48 2018
 
 import pandas as pd
 import numpy as np
-# import matplotlib.pyplot as plt
 from collections import Counter
 from sklearn import datasets
 from sklearn.model_selection import train_test_split
@@ -21,7 +20,6 @@ from sklearn.ensemble import ExtraTreesClassifier
 from sklearn.ensemble import GradientBoostingClassifier
 from sklearn.ensemble import GradientBoostingRegressor
 from sklearn.model_selection import cross_val_score
-import numpy as np
 from scipy.stats import gaussian_kde
 #import tensorflow as tf
 import sklearn as skl
@@ -72,7 +70,7 @@ def model_estimation(data,
 
 
 
-def regression_performance_estimate( Y_test, Y_hat):
+def regression_performance_estimate( Y_test, Y_hat,  model = 'LM'):
 
     n = len(Y_test)
     residui = Y_test - Y_hat
@@ -96,4 +94,4 @@ def regression_performance_estimate( Y_test, Y_hat):
 
     RAE = err_assoluto / err_assoluto_medio
 
-    return [SE, SSE, MSE, Root_MSE, RSE, RRSE, MAE, RAE, Dev_Y, Var_Y]
+    return [model, SE, SSE, MSE, Root_MSE, RSE, RRSE, MAE, RAE, Dev_Y, Var_Y]
