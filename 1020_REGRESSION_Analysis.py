@@ -1,5 +1,5 @@
 exec(open("Utils.py").read(), globals())
-#exec(open("1010_REGRESSION_pre_processing.py").read(), globals())
+exec(open("1010_REGRESSION_pre_processing.py").read(), globals())
 
 from sklearn.metrics import mean_squared_error, r2_score
 
@@ -10,7 +10,7 @@ training_set, test_set = train_test_split( data, test_size = 0.2,
                                            random_state = RANDOM_SEED)
 
 
-cols_to_remove = [ u'index', u'FILE', u'TTree', u'TIME', u'PID', u'EVENT_NUMBER',
+cols_to_remove = ['Unnamed: 0', u'index', u'FILE', u'TTree', u'TIME', u'PID', u'EVENT_NUMBER',
                   u'EVENT_TYPE', u'DIRNAME', u'FLG_BRNAME01', u'FLG_EVSTATUS', u'Y' ]
 
 
@@ -55,17 +55,17 @@ decision_tree = tree.DecisionTreeRegressor(criterion = "mse",
                                             max_depth = 45,
                                             min_samples_leaf = 50 )
 
-dt_parameters = {'max_depth': range(5, 50, 10),
-                 'min_samples_leaf': range(50, 400, 50),
-                 'min_samples_split': range( 100, 500, 100),
-                 'criterion': ['gini', 'entropy']}
+# dt_parameters = {'max_depth': range(5, 50, 10),
+#                  'min_samples_leaf': range(50, 400, 50),
+#                  'min_samples_split': range( 100, 500, 100),
+#                  'criterion': ['gini', 'entropy']}
+#
+#
+# decision_tree_cv = GridSearchCV( tree.DecisionTreeClassifier(), dt_parameters, n_jobs = 60 )
+# decision_tree = decision_tree_cv.fit( X, Y )
+# tree_model = decision_tree.best_estimator_
 
-
-decision_tree_cv = GridSearchCV( tree.DecisionTreeClassifier(), dt_parameters, n_jobs = 60 )
-decision_tree = decision_tree_cv.fit( X, Y )
-tree_model = decision_tree.best_estimator_
-
-#tree_model = decision_tree.fit( X, Y )
+tree_model = decision_tree.fit( X, Y )
 
 importance_dt = tree_model.feature_importances_[tree_model.feature_importances_>0]
 variables_dt = list( X.columns[ tree_model.feature_importances_>0 ] )
@@ -77,10 +77,10 @@ print( len( variables_dt ) )
 # print( len( variables_dt ) )
 
 
-# plt.bar( variables_dt, importance_dt)
-# plt.xticks(rotation=90)
-# plt.title( "Decision Tree - Variable Importance")
-# plt.show()
+plt.bar( variables_dt, importance_dt)
+plt.xticks(rotation=90)
+plt.title( "Decision Tree - Variable Importance")
+plt.show()
 
 Y_hat = tree_model.predict(X_test)
 
@@ -98,22 +98,22 @@ results_dt = regression_performance_estimate( Y_test, Y_hat, model = 'Decision T
 ###############################################################################
 
 ####################### RANDOM FOREST #################################
-rf_parameters = RandomForestRegressor( criterion = "mse",
+random_forest = RandomForestRegressor( criterion = "mse",
                                        n_estimators = 10,
                                        max_depth = 25,
                                        min_samples_split = 100,
                                        max_features = 25, n_jobs = 3 )
 
-parameters = {'n_estimators': range(100, 900, 400),
-              'max_features': [ 10, 15, 25],
-              'max_depth':  [20, 50, 100],
-              'min_samples_split': range( 100, 900, 400)
-              }
-random_forest_cv = GridSearchCV( RandomForestClassifier(), rf_parameters, n_jobs = 60)
-random_forest = random_forest_cv.fit( X, Y )
-rf_model = random_forest_cv.best_estimator_
+# parameters = {'n_estimators': range(100, 900, 400),
+#               'max_features': [ 10, 15, 25],
+#               'max_depth':  [20, 50, 100],
+#               'min_samples_split': range( 100, 900, 400)
+#               }
+# random_forest_cv = GridSearchCV( RandomForestClassifier(), parameters, n_jobs = 2)
+# random_forest = random_forest_cv.fit( X, Y )
+# rf_model = random_forest_cv.best_estimator_
 
-#rf_model = random_forest.fit( X, Y )
+rf_model = random_forest.fit( X, Y )
 
 importance_rf = rf_model.feature_importances_[ rf_model.feature_importances_>0 ]
 variables_rf = list( X.columns[ rf_model.feature_importances_> 0 ] )
@@ -125,12 +125,12 @@ variables_rf = list( X.columns[ rf_model.feature_importances_>0.01 ] )
 importance_rf = pd.Series( importance_rf, index = variables_rf)
 print len( importance_rf )
 
-# plt.bar( importance_rf.index, importance_rf)
-# plt.subplots_adjust(bottom=0.50)
-# plt.xticks( rotation = 90 )
-# plt.title( "Random Forest - Variable Importance ( >0.01)")
-# plt.savefig("Images/Variable_Importance_RF.png")
-# plt.show()
+plt.bar( importance_rf.index, importance_rf)
+plt.subplots_adjust(bottom=0.50)
+plt.xticks( rotation = 90 )
+plt.title( "Random Forest - Variable Importance ( >0.01)")
+plt.savefig("Images/Variable_Importance_RF.png")
+plt.show()
 
 
 """ Salvataggio dataframe ridotto """
