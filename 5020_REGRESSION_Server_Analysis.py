@@ -105,7 +105,7 @@ rf_parameters = RandomForestRegressor( criterion = "mse",
                                        max_features = 25, n_jobs = 3 )
 
 parameters = {'n_estimators': range(10, 900, 50),
-              'max_features': [ 10, 15, 25],
+              'max_features': [ 10, 15, 25, 30],
               'max_depth':  [20, 50, 100],
               'min_samples_split': range( 100, 900, 400)
               }
