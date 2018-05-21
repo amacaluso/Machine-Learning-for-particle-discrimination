@@ -1,18 +1,5 @@
 """ CARICAMENTO DATI """
-
 exec(open("Utils.py").read(), globals())
-
-
-
-training_set = pd.read_csv('DATA/reduced_training.csv').dropna()
-test_set = pd.read_csv('DATA/reduced_test.csv').dropna()
-
-target_variable = "Y"
-X = training_set.drop( target_variable, axis = 1).astype( np.float32 )
-Y = training_set[ target_variable ]
-
-X_test = test_set.drop( target_variable, axis = 1).astype( np.float32 )
-Y_test = test_set[ target_variable ]
 
 from keras.models import Sequential
 from keras.layers import Dense
@@ -26,6 +13,17 @@ from keras.callbacks import ModelCheckpoint
 import matplotlib.pyplot as plt
 
 
+training_set = pd.read_csv('DATA/reduced_training.csv').dropna()
+test_set = pd.read_csv('DATA/reduced_test.csv').dropna()
+
+target_variable = "Y"
+X = training_set.drop( target_variable, axis = 1).astype( np.float32 )
+Y = training_set[ target_variable ]
+
+X_test = test_set.drop( target_variable, axis = 1).astype( np.float32 )
+Y_test = test_set[ target_variable ]
+
+
 # encode class values as integers
 encoder = LabelEncoder()
 encoder.fit(Y)
@@ -37,33 +35,33 @@ encoded_Y_test = encoder.transform(Y_test)
 
 
 ## MODELING
-
-hidden_size = 100
-n_layers = 500
+hidden_size = 10
+n_layers = 3
 
 
 model = Sequential()
-model.add(Dense(50, input_dim = 251, kernel_initializer = 'normal', activation = 'relu'))
 
+# first layer
+model.add(Dense(10, input_dim = 29, kernel_initializer = 'normal', activation = 'relu'))
+
+# Others layer
 for i in range( n_layers-1 ):
     model.add(Dense(hidden_size, kernel_initializer='random_uniform', activation='relu'))
-    # model.add(Dense(200, kernel_initializer='normal', activation='relu'))
-    # model.add(Dense(200, kernel_initializer='normal', activation='relu'))
-    # model.add(Dense(200, kernel_initializer='normal', activation='relu'))
-    # model.add(Dense(200, kernel_initializer='normal', activation='relu'))
 
+#Output layer
 model.add(Dense(1, kernel_initializer = 'normal', activation = 'sigmoid'))
+
 model.compile(loss = 'binary_crossentropy', optimizer='adam', metrics=['accuracy'])
-#return model
-# checkpoint
+
+# return model
 filepath="weights-improvement-{epoch:02d}-{val_acc:.2f}.hdf5"
 checkpoint = ModelCheckpoint(filepath, verbose = 1, save_best_only = True, mode = 'auto', monitor = 'val_acc')
 callbacks_list = [checkpoint]
 
-model.fit(X, encoded_Y, epochs = 40,
-                    batch_size = 250, callbacks = callbacks_list, verbose = 1,  validation_split = 0.1)
-# history = model.fit(X, encoded_Y, batch_size=None, epochs=200, verbose=1,
- #                  validation_data = (X_test, encoded_Y_test))
+model.fit(X, encoded_Y,
+          epochs = 40, batch_size = 250,
+          callbacks = callbacks_list, verbose = 1,
+          validation_split = 0.1)
 
 score = model.evaluate( X_test, encoded_Y_test )
 score

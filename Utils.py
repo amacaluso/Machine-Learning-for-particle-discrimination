@@ -31,6 +31,9 @@ import seaborn as sns
 import scipy
 import sklearn as skl
 from sklearn import cross_validation, linear_model
+from random import randint
+
+
 
 def ROC_analysis(y_true, y_prob, label, probability_tresholds = np.arange(0.1, 0.91, 0.05)):
     roc_matrix = pd.DataFrame()

@@ -99,7 +99,7 @@ results_dt = regression_performance_estimate( Y_test, Y_hat, model = 'Decision T
 
 ####################### RANDOM FOREST #################################
 rf_parameters = RandomForestRegressor( criterion = "mse",
-                                       n_estimators = 10,
+                                       n_estimators = 100,
                                        max_depth = 25,
                                        min_samples_split = 100,
                                        max_features = 25, n_jobs = 3 )

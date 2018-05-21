@@ -63,10 +63,18 @@ encoder.fit(Y_test)
 encoded_Y_test = encoder.transform(Y_test)
 
 
+
+scores = []
+
+seeds  = [randint(0, 10000) for p in range(0, 10)]
+
+
+
+
 ## MODELING
 
 hidden_size = 3
-n_layers = 1
+n_layers = 2
 
 
 model = Sequential()
