@@ -1,8 +1,122 @@
 """ CARICAMENTO DATI """
+exec(open("Utils.py").read(), globals())
+exec(open("1010_REGRESSION_pre_processing.py").read(), globals())
+
+from sklearn.metrics import mean_squared_error, r2_score
+
+RANDOM_SEED = 300
+
+data = pd.read_csv( "DATA/Regression_dataset.csv")
+training_set, test_set = train_test_split( data, test_size = 0.2,
+                                           random_state = RANDOM_SEED)
+
+
+cols_to_remove = ['Unnamed: 0', u'index', u'FILE', u'TTree', u'TIME', u'PID', u'EVENT_NUMBER',
+                  u'EVENT_TYPE', u'DIRNAME', u'FLG_BRNAME01', u'FLG_EVSTATUS', u'Y' ]
+
+
+training_set = training_set.drop( cols_to_remove, axis = 1 )
+test_set = test_set.drop( cols_to_remove, axis=1 )
+
+target_variable = 'Y_REG'
+
+X = training_set.drop( target_variable, axis = 1).astype( np.float )
+Y = training_set[ target_variable ]
+
+X_test = test_set.drop( target_variable, axis = 1).astype( np.float32 )
+Y_test = test_set[ target_variable ]
+
+x_names = X.columns
+
+
+from keras.models import Sequential
+from keras.layers import Dense
+from keras.wrappers.scikit_learn import KerasClassifier
+from sklearn.model_selection import cross_val_score
+from sklearn.preprocessing import LabelEncoder
+from sklearn.model_selection import StratifiedKFold
+from sklearn.preprocessing import StandardScaler
+from sklearn.pipeline import Pipeline
+from keras.callbacks import ModelCheckpoint
+import matplotlib.pyplot as plt
+
+# example of making predictions for a regression problem
+from keras.models import Sequential
+from keras.layers import Dense
+from sklearn.datasets import make_regression
+from sklearn.preprocessing import MinMaxScaler
+
+## MODELING
+hidden_size = 10
+n_layers = 5
+
+scalarX, scalarY = MinMaxScaler(), MinMaxScaler()
+scalarX.fit(X)
+scalarY.fit(Y.reshape( 108167,1))
+X = scalarX.transform(X)
+Y = scalarY.transform(Y.reshape(108167,1))
+
+
+model = Sequential()
+model.add(Dense(10, input_dim = 251, kernel_initializer = 'normal', activation = 'relu'))
+
+for i in range( n_layers-1 ):
+    model.add(Dense(hidden_size, activation='relu'))
+
+model.add(Dense(1, activation = 'linear'))
+
+model.compile( loss = 'mse', optimizer = 'adam' )
+
+#breaks here
+model.fit(X, Y, nb_epoch = 20, batch_size = 2000 )
+
+model = Sequential()
+model.add(Dense(4, input_dim=251, activation='relu'))
+model.add(Dense(4, activation='relu'))
+model.add(Dense(1, activation='linear'))
+model.compile(loss='mse', optimizer='adam')
+model.fit(X, Y, epochs=10, verbose=0, batch_size = 1000)
+
+
+score = model.evaluate( X_test, Y_test )
+score
+
+
+Y_hat = model.predict(X_test)
+
+# The mean squared error
+print("Mean squared error: %.2f"
+      % mean_squared_error(Y_test, Y_hat))
+# Explained variance score: 1 is perfect prediction
+print('Variance score: %.2f' % r2_score(Y_test, Y_hat))
+
+
+
+results_MLP = regression_performance_estimate( Y_test, Y_hat)
+
+
+
+
+model = Sequential()
+model.add(Dense(4, input_dim=251, activation='relu'))
+model.add(Dense(4, activation='relu'))
+model.add(Dense(1, activation='linear'))
+model.compile(loss='mse', optimizer='adam')
+model.fit(X, Y, epochs=100, verbose=0)
+# new instances where we do not know the answer
+Xnew, a = make_regression(n_samples=3, n_features=2, noise=0.1, random_state=1)
+Xnew = scalarX.transform(Xnew)
+# make a prediction
+ynew = model.predict(Xnew)
+# show the inputs and predicted outputs
+for i in range(len(Xnew)):
+	print("X=%s, Predicted=%s" % (Xnew[i], ynew[i]))
+
+
 
 exec(open("Utils.py").read(), globals())
 
-
+RANDOM_SEED = 50
 data = pd.read_csv( "DATA/Regression_dataset.csv")
 
 training_set, test_set = train_test_split( data, test_size = 0.2,
@@ -27,20 +141,10 @@ from keras.callbacks import ModelCheckpoint
 import matplotlib.pyplot as plt
 
 
-# encode class values as integers
-# encoder = LabelEncoder()
-# encoder.fit(Y)
-# encoded_Y = encoder.transform(Y)
-
-# encoder = LabelEncoder()
-# encoder.fit(Y_test)
-# encoded_Y_test = encoder.transform(Y_test)
-
-
 ## MODELING
 
-hidden_size = 100
-n_layers = 500
+hidden_size = 10
+n_layers = 5
 
 
 model = Sequential()
@@ -48,20 +152,17 @@ model.add(Dense(50, input_dim = 251, kernel_initializer = 'normal', activation =
 
 for i in range( n_layers-1 ):
     model.add(Dense(hidden_size, kernel_initializer='random_uniform', activation='relu'))
-    # model.add(Dense(200, kernel_initializer='normal', activation='relu'))
-    # model.add(Dense(200, kernel_initializer='normal', activation='relu'))
-    # model.add(Dense(200, kernel_initializer='normal', activation='relu'))
-    # model.add(Dense(200, kernel_initializer='normal', activation='relu'))
+
 
 model.add(Dense(1, kernel_initializer = 'normal', activation = 'sigmoid'))
-model.compile( loss='mean_squared_error', optimizer='adam', metrics=['accuracy'])
-#return model
-# checkpoint
-filepath="weights-improvement-{epoch:02d}-{val_acc:.2f}.hdf5"
-checkpoint = ModelCheckpoint(filepath, verbose = 1, save_best_only = True, mode = 'auto', monitor = 'val_acc')
-callbacks_list = [checkpoint]
+model.compile( loss = 'mean_squared_error', optimizer = 'adam' )
 
-model.fit(X, encoded_Y, epochs = 40,
+
+#breaks here
+model.fit(X, Y,  nb_epoch=20, batch_size=160)
+
+
+model.fit(X, Y, epochs = 40,
                     batch_size = 250, callbacks = callbacks_list, verbose = 1,  validation_split = 0.1)
 # history = model.fit(X, encoded_Y, batch_size=None, epochs=200, verbose=1,
  #                  validation_data = (X_test, encoded_Y_test))
@@ -188,10 +289,7 @@ sgd = SGD(lr=0.1, decay=1e-6, momentum=0.9, nesterov=True)
 model.compile(loss='binary_crossentropy',
               optimizer=sgd,
               metrics=['accuracy'])
-#breaks here
-model.fit(X, encoded_Y,
-          nb_epoch=20,
-          batch_size=160)
+
 
 
 
