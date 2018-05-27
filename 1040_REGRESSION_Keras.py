@@ -28,7 +28,7 @@ Y_test = test_set[ target_variable ]
 
 x_names = X.columns
 
-
+# modulo keras
 from keras.models import Sequential
 from keras.layers import Dense
 from keras.wrappers.scikit_learn import KerasClassifier
@@ -39,22 +39,29 @@ from sklearn.preprocessing import StandardScaler
 from sklearn.pipeline import Pipeline
 from keras.callbacks import ModelCheckpoint
 import matplotlib.pyplot as plt
-
-# example of making predictions for a regression problem
-from keras.models import Sequential
-from keras.layers import Dense
 from sklearn.datasets import make_regression
 from sklearn.preprocessing import MinMaxScaler
 
+
 ## MODELING
+hidden_size = [10 , 20]
+n_layers = [2, 4]
+seeds  = [randint(0, 10000) for p in range(0, 10)]
+activations = [ 'tanh', 'relu', 'sigmoid']
+batch_sizes = [ 100, 1000, 1500, 5000]
+nb_epochs = [40, 200, 2000 ]
+optimizers = [ 'sdg', 'adam']
+
 hidden_size = 10
 n_layers = 5
 
+
+n_train = X.shape[0]
 scalarX, scalarY = MinMaxScaler(), MinMaxScaler()
 scalarX.fit(X)
-scalarY.fit(Y.reshape( 108167,1))
+scalarY.fit(Y.reshape( n_train, 1))
 X = scalarX.transform(X)
-Y = scalarY.transform(Y.reshape(108167,1))
+Y = scalarY.transform(Y.reshape(n_train,1))
 
 
 model = Sequential()
@@ -64,25 +71,23 @@ for i in range( n_layers-1 ):
     model.add(Dense(hidden_size, activation='relu'))
 
 model.add(Dense(1, activation = 'linear'))
-
 model.compile( loss = 'mse', optimizer = 'adam' )
 
 #breaks here
 model.fit(X, Y, nb_epoch = 20, batch_size = 2000 )
 
-model = Sequential()
-model.add(Dense(4, input_dim=251, activation='relu'))
-model.add(Dense(4, activation='relu'))
-model.add(Dense(1, activation='linear'))
-model.compile(loss='mse', optimizer='adam')
-model.fit(X, Y, epochs=10, verbose=0, batch_size = 1000)
-
-
+n_test = X_test.shape[0]
+scalarX, scalarY = MinMaxScaler(), MinMaxScaler()
+scalarX.fit(X_test)
+scalarY.fit(Y_test.reshape( n_test, 1))
+X_test = scalarX.transform(X_test)
+Y_test = scalarY.transform(Y_test.reshape(n_test,1))
 score = model.evaluate( X_test, Y_test )
 score
 
 
-Y_hat = model.predict(X_test)
+Y_hat = [ y[0] for y in Y_hat]
+
 
 # The mean squared error
 print("Mean squared error: %.2f"

@@ -10,7 +10,7 @@ training_set, test_set = train_test_split( data, test_size = 0.2,
                                            random_state = RANDOM_SEED)
 
 
-cols_to_remove = [ u'index', u'FILE', u'TTree', u'TIME', u'PID', u'EVENT_NUMBER',
+cols_to_remove = [ u'Unnamed: 0', u'index', u'FILE', u'TTree', u'TIME', u'PID', u'EVENT_NUMBER',
                   u'EVENT_TYPE', u'DIRNAME', u'FLG_BRNAME01', u'FLG_EVSTATUS', u'Y' ]
 
 
