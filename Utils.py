@@ -32,6 +32,14 @@ import scipy
 import sklearn as skl
 from sklearn import cross_validation, linear_model
 from random import randint
+import itertools
+
+
+
+def expand_grid(data_dict):
+    rows = itertools.product(*data_dict.values())
+    return pd.DataFrame.from_records(rows, columns=data_dict.keys())
+
 
 
 
