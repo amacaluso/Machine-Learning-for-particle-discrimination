@@ -166,4 +166,4 @@ df_results = pd.DataFrame( )
 df_results = df_results.append( [lm, dt, rf] , ignore_index = True)
 
 df_results.columns = [ 'model', 'SE', 'SSE', 'MSE', 'Root_MSE', 'RSE', 'RRSE', 'MAE', 'RAE', 'Dev_Y', 'Var_Y']
-df_results.to_csv( 'results/REG_results.csv', index = False)
+df_results.to_csv( 'results/REG_ML_results.csv', index = False)

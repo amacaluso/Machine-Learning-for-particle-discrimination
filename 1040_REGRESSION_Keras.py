@@ -53,7 +53,7 @@ all_results = []
 seeds  = [randint(0, 10000) for p in range(0, 10)]
 
 ## MODELING
-hidden_size = [10 , 20 , 100]
+hidden_size = [10 , 100, 1000]
 first_hidden_layer = [10, 20]
 n_layers = [2, 4, 6]
 activations = [ 'tanh', 'relu']
