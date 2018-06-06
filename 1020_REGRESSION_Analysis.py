@@ -1,8 +1,9 @@
 exec(open("Utils.py").read(), globals())
-exec(open("1010_REGRESSION_pre_processing.py").read(), globals())
+#exec(open("1010_REGRESSION_pre_processing.py").read(), globals())
 
 from sklearn.metrics import mean_squared_error, r2_score
 
+RANDOM_SEEDS = [ 300, 10, 500, 8, 36, 22 ]
 RANDOM_SEED = 300
 
 data = pd.read_csv( "DATA/Regression_dataset.csv")
@@ -156,6 +157,44 @@ print('Variance score: %.2f' % r2_score(Y_test, Y_hat))
 
 
 results_rf = regression_performance_estimate( Y_test, Y_hat, 'Random Forest')
+
+
+
+from sklearn.linear_model import LassoCV
+from sklearn.linear_model import RidgeCV
+
+
+lasso = LassoCV(alphas=[0.0001, 0.0003, 0.0006, 0.001, 0.003, 0.006, 0.01, 0.03, 0.06, 0.1, 0.3, 0.6, 1],
+                max_iter=50000, cv = 10)
+# lasso = RidgeCV(alphas=[0.0001, 0.0003, 0.0006, 0.001, 0.003, 0.006, 0.01, 0.03, 0.06, 0.1,
+#                         0.3, 0.6, 1], cv=10)
+
+lasso.fit(X, Y)
+Y_hat = model.predict(X_test)
+
+# The coefficients
+print('Coefficients: \n', model.coef_)
+# The mean squared error
+print("Mean squared error: %.2f"
+      % mean_squared_error(Y_test, Y_hat))
+# Explained variance score: 1 is perfect prediction
+print('Variance score: %.2f' % r2_score(Y_test, Y_hat))
+
+results_linear_regression = regression_performance_estimate( Y_test, Y_hat)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 lm = pd.Series( results_linear_regression)

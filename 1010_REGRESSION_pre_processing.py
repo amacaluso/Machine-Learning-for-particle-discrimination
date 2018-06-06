@@ -1,6 +1,5 @@
 exec(open("Utils.py").read(), globals())
 
-RANDOM_SEED = 300
 
 ############################################################################
 data = pd.read_csv('DATA/DataFrame_with_Y.csv').dropna()
@@ -47,3 +46,12 @@ scipy.stats.expon(scale = 2).pdf(1000)
 data[ 'Y_REG' ] = Y_REG
 
 #data.to_csv( "DATA/Regression_dataset.csv", index = False)
+
+data.Y_REG
+scipy.stats.entropy( data.Y_REG)
+
+freq = data.Y_REG.value_counts()
+freq = freq.sort_index()
+freq.plot( kind = 'bar', title = 'Histogram of photons energy', rot = 60)
+plt.show()
+

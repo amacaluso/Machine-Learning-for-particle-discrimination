@@ -50,16 +50,19 @@ all_results = []
 
 #sgd = optimizers.SGD(lr=0.01, decay=1e-6, momentum=0.9, nesterov=True)
 
-seeds  = [randint(0, 10000) for p in range(0, 10)]
+seeds  = [randint(0, 10000) for p in range(0, 4)]
+seeds = [2896, 8028, 4775, 2293]
 
 ## MODELING
-hidden_size = [10 , 100, 1000]
-first_hidden_layer = [10, 20]
-n_layers = [2, 4, 6]
+hidden_size = [10 , 100, 150]
+first_hidden_layer = [10, 20, 40]
+n_layers = [ 1, 4, 6, 10]
 activations = [ 'tanh', 'relu']
-batch_sizes = [ 1000, 5000]
-nb_epochs = [400, 800, 2000 ]
+batch_sizes = [ 200]
+nb_epochs = [ 80 ]
 optimizers = [ 'adam']
+
+
 
 
 
@@ -76,7 +79,7 @@ parameters = expand_grid(
     }
 )
 
-
+parameters.to_csv("results/parameters_and_settings_Net.csv")
 
 # n_train = X.shape[0]
 # scalarX, scalarY = MinMaxScaler(), MinMaxScaler()
@@ -129,7 +132,9 @@ for i in range(0, n_param):
                               'n_layer', 'activation', 'batch_size', 'epoch',
                               'optimizer', 'model', 'SE', 'SSE', 'MSE', 'Root_MSE',
                               'RSE', 'RRSE', 'MAE', 'RAE', 'Dev_Y', 'Var_Y']
-        df_results.to_csv('results/REG_MLP_results.csv', index=False)
+        results_file = pd.read_csv( "results/REG_MLP_results.csv")
+        results_file = pd.concat([results_file, df_results], axis=0)
+        results_file.to_csv('results/REG_MLP_results.csv', index=False)
 
 
 
