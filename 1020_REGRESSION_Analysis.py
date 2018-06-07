@@ -163,14 +163,13 @@ results_rf = regression_performance_estimate( Y_test, Y_hat, 'Random Forest')
 from sklearn.linear_model import LassoCV
 from sklearn.linear_model import RidgeCV
 
-
 lasso = LassoCV(alphas=[0.0001, 0.0003, 0.0006, 0.001, 0.003, 0.006, 0.01, 0.03, 0.06, 0.1, 0.3, 0.6, 1],
-                max_iter=50000, cv = 10)
+                max_iter=50000, cv = 10, n_jobs= 60)
 # lasso = RidgeCV(alphas=[0.0001, 0.0003, 0.0006, 0.001, 0.003, 0.006, 0.01, 0.03, 0.06, 0.1,
 #                         0.3, 0.6, 1], cv=10)
 
-lasso.fit(X, Y)
-Y_hat = model.predict(X_test)
+model_lasso = lasso.fit(X, Y)
+Y_hat = model_lasso.predict(X_test)
 
 # The coefficients
 print('Coefficients: \n', model.coef_)

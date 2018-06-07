@@ -51,14 +51,14 @@ all_results = []
 #sgd = optimizers.SGD(lr=0.01, decay=1e-6, momentum=0.9, nesterov=True)
 
 seeds  = [randint(0, 10000) for p in range(0, 4)]
-seeds = [2896, 8028, 4775, 2293]
+seeds = [2, 5, 12, 36, 200, 1234]
 
 ## MODELING
 hidden_size = [10 , 100, 150]
 first_hidden_layer = [10, 20, 40]
 n_layers = [ 1, 4, 6, 10]
 activations = [ 'tanh', 'relu']
-batch_sizes = [ 200]
+batch_sizes = [ 5000]
 nb_epochs = [ 80 ]
 optimizers = [ 'adam']
 
