@@ -6,7 +6,7 @@ from sklearn.metrics import mean_squared_error, r2_score
 data = pd.read_csv( "DATA/Regression_dataset.csv")
 
 df_results = pd.DataFrame()
-RANDOM_SEEDS = [ 300, 10, 500, 8, 36, 22 ]
+RANDOM_SEEDS = [ 8, 10, 22, 36, 100, 300, 500 ]
 
 for RANDOM_SEED in RANDOM_SEEDS:
     print RANDOM_SEED
@@ -45,9 +45,9 @@ for RANDOM_SEED in RANDOM_SEEDS:
                                                 random_state = RANDOM_SEED,
                                                 max_depth = 45,
                                                 min_samples_leaf = 50 )
-    dt_parameters = {'max_depth': range(5, 50, 10),
-                     'min_samples_leaf': range(50, 400, 50),
-                     'min_samples_split': range( 100, 500, 100),
+    dt_parameters = {'max_depth': [5], #range(5, 50, 10),
+                     'min_samples_leaf': [100], #range(50, 400, 50),
+                     'min_samples_split': [500], #[,range( 100, 500, 100),
                      'criterion': ['mse']}
     decision_tree_cv = GridSearchCV( tree.DecisionTreeRegressor(), dt_parameters, n_jobs = 60 )
     decision_tree = decision_tree_cv.fit( X, Y )
@@ -81,10 +81,15 @@ for RANDOM_SEED in RANDOM_SEEDS:
                                            max_depth = 25,
                                            min_samples_split = 100,
                                            max_features = 25, n_jobs = 3 )
-    parameters = {'n_estimators': range(10, 900, 50),
-                  'max_features': [ 10, 15, 25, 30],
-                  'max_depth':  [20, 50, 100],
-                  'min_samples_split': range( 100, 900, 400)
+#    parameters = {'n_estimators': range(100, 900, 50),
+#                  'max_features': [  15, 30],
+#                  'max_depth':  [20, 50, 100],
+#                  'min_samples_split': range( 100, 1000)
+#                  }
+    parameters = {'n_estimators': [10], #range(100, 900, 50),
+                  'max_features': [15], #[  15, 30],
+                  'max_depth':  [20], #[20, 50, 100],
+                  'min_samples_split': [5000]# range( 100, 1000)
                   }
     random_forest_cv = GridSearchCV( RandomForestRegressor(), parameters, n_jobs = 128)
     random_forest = random_forest_cv.fit( X, Y )
@@ -125,7 +130,7 @@ for RANDOM_SEED in RANDOM_SEEDS:
     lm = pd.Series( results_linear_regression)
     dt = pd.Series( results_dt)
     rf = pd.Series( results_rf)
-    df_results = df_results.append( [lm, dt, rf] , ignore_index = True)
+    df_results = pd.concat( [lm, dt, rf] , ignore_index = True)
     results_file = pd.read_csv("results/REG_results.csv")
     results_file = pd.concat([results_file, df_results], axis=0)
     results_file.to_csv('results/REG_results.csv', index=False)
