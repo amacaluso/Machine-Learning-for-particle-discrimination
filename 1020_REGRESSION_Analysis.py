@@ -164,10 +164,8 @@ from sklearn.linear_model import LassoCV
 from sklearn.linear_model import RidgeCV
 
 
-lasso = LassoCV(alphas=[0.0001, 0.001, 0.006,
-                        0.01, 0.06, 0.1, 0.3,
-                        0.6, 1],
-                max_iter=50000, cv = 10, n_jobs = 24)
+lasso = LassoCV(alphas=[0.0001, 0.0003, 0.0006, 0.001, 0.003, 0.006, 0.01, 0.03, 0.06, 0.1, 0.3, 0.6, 1],
+                max_iter=50000, cv = 10)
 # lasso = RidgeCV(alphas=[0.0001, 0.0003, 0.0006, 0.001, 0.003, 0.006, 0.01, 0.03, 0.06, 0.1,
 #                         0.3, 0.6, 1], cv=10)
 
@@ -193,32 +191,18 @@ results_linear_regression = regression_performance_estimate( Y_test, Y_hat)
 
 
 
-corr = X.corr()
-
-# plot the heatmap
-sns.heatmap(corr,
-        xticklabels=corr.columns,
-        yticklabels=corr.columns)
-plt.show()
-
-def correlation_matrix(df):
-    from matplotlib import pyplot as plt
-    from matplotlib import cm as cm
-
-    fig = plt.figure()
-    ax1 = fig.add_subplot(111)
-    cmap = cm.get_cmap('jet', 30)
-    cax = ax1.imshow(df.corr(), interpolation="nearest", cmap=cmap)
-    ax1.grid(True)
-    plt.title('Feature Correlation')
-    #labels=['Sex','Length','Diam','Height','Whole','Shucked','Viscera','Shell','Rings',]
-    #ax1.set_xticklabels(labels,fontsize=6)
-    #ax1.set_yticklabels(labels,fontsize=6)
-    # Add colorbar, make sure to specify tick locations to match desired ticklabels
-    fig.colorbar(cax, ticks=[-1, -.25, -.5, -.75, .25, .5, .75, 1])
-    plt.show()
-
-correlation_matrix(X)
 
 
 
+
+
+
+lm = pd.Series( results_linear_regression)
+dt = pd.Series( results_dt)
+rf = pd.Series( results_rf)
+
+df_results = pd.DataFrame( )
+df_results = df_results.append( [lm, dt, rf] , ignore_index = True)
+
+df_results.columns = [ 'model', 'SE', 'SSE', 'MSE', 'Root_MSE', 'RSE', 'RRSE', 'MAE', 'RAE', 'Dev_Y', 'Var_Y']
+df_results.to_csv( 'results/REG_ML_results.csv', index = False)
