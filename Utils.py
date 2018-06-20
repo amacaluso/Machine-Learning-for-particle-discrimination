@@ -33,7 +33,7 @@ import sklearn as skl
 from sklearn import cross_validation, linear_model
 from random import randint
 import itertools
-
+import os
 
 
 def expand_grid(data_dict):
