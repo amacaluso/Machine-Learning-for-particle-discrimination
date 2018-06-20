@@ -1,8 +1,5 @@
 exec(open("Utils.py").read(), globals())
 
-
-
-
 Y_1 = ['G_100', 'G_1000', 'G_10000', 'G_141', 'G_1414', 'G_17320', 'G_200',
        'G_2000', 'G_25', 'G_250', 'G_283', 'G_3162', 'G_39', 'G_400',
        'G_40000', 'G_50', 'G_500', 'G_59', 'G_632', 'G_65', 'G_700',
@@ -33,9 +30,7 @@ df.to_csv("DATA/Complete_DataFrame_no_duplicates.csv", index = False )
 ''' CLASSIFICAZIONE: definizione variabile target e salvataggio file '''
 
 directory = 'DATA/CLASSIFICATION/'
-if not os.path.exists(directory):
-    os.makedirs(directory)
-
+create_dir( directory)
 
 nrows = df.shape[0]
 Y = pd.Series( np.repeat(0, nrows) )
@@ -49,11 +44,6 @@ for col in df.columns[0:260]:
 
 colnames.append('Y')
 df.columns = colnames
-
-# for i in range(nrows):
-#     print i
-#     if df.ix[i, 'EVENT_TYPE'] in Y_1:
-#         df.ix[i, 'Y'] = 1
 
 df.loc[df['EVENT_TYPE'].isin(Y_1), 'Y'] = 1
 df.Y.value_counts()
@@ -94,8 +84,7 @@ balanced_df.to_csv( directory + "balanced_df.csv", index = False )
 data = pd.read_csv('DATA/CLASSIFICATION/DataFrame_with_Y.csv').dropna()
 
 directory = 'DATA/REGRESSION/'
-if not os.path.exists(directory):
-    os.makedirs(directory)
+create_dir(directory)
 
 data = data[ data['Y'] == 1 ]
 data.shape
@@ -117,32 +106,3 @@ data.to_csv( directory + "dataset.csv", index = False)
 
 # scipy.stats.entropy( data.Y_REG)
 
-freq = data.Y_REG.value_counts()
-freq = freq.sort_index()
-freq.plot( kind = 'bar', title = 'Histogram of photons energy', rot = 60)
-plt.show()
-
-
-
-
-
-energy = []
-for string in data.DIRNAME:
-    photon = bool(re.findall('MEV', string))
-    if photon == True:
-        num = re.findall('\d+', string)
-        energy.append(int(num[0]))
-
-table_energy = pd.Series(energy).value_counts()
-
-energy_df = pd.DataFrame()
-energy_df[ 'energy'] = table_energy.index
-energy_df[ 'Frequencies'] = table_energy.values
-energy_df = energy_df.sort_values('energy')
-
-sns.kdeplot(pd.Series(energy), shade = True )
-plt.xlim(xmin=0)
-plt.title( "Density of energy (photons)")
-plt.vlines(x=[380, 7000, 10000, 17320, 40000],ymin=0, ymax=0.5, color='r')
-plt.savefig("Images/Density_of_energy.png")
-plt.show()

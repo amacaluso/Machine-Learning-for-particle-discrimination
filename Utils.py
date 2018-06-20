@@ -106,3 +106,14 @@ def regression_performance_estimate( Y_test, Y_hat,  model = 'LM'):
     RAE = err_assoluto / err_assoluto_medio
 
     return [model, SE, SSE, MSE, Root_MSE, RSE, RRSE, MAE, RAE, Dev_Y, Var_Y]
+
+
+
+def create_dir (path):
+    if not os.path.exists(path):
+        print 'The directory does not exist and will be created'
+        os.makedirs(path)
+    else:
+        print 'The directory already exists'
+
+
