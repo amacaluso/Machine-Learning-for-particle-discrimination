@@ -124,6 +124,8 @@ plt.show()
 
 
 
+
+
 energy = []
 for string in data.DIRNAME:
     photon = bool(re.findall('MEV', string))
