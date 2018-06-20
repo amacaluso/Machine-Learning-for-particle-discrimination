@@ -278,6 +278,33 @@ df_results.to_csv('results/REG_results.csv', index=False)
 
 
 
+from sklearn.linear_model import LassoCV
+from sklearn.linear_model import RidgeCV
+
+lasso = LassoCV(alphas=[ 0.01,  0.6, 1],
+                max_iter=50000, cv = 10, n_jobs = 24)
+# lasso = RidgeCV(alphas=[0.0001, 0.0003, 0.0006, 0.001, 0.003, 0.006, 0.01, 0.03, 0.06, 0.1,
+#                         0.3, 0.6, 1], cv=10)
+
+model_lasso = lasso.fit(X, Y)
+Y_hat = model_lasso.predict(X_test)
+
+# The coefficients
+print('Coefficients: \n', model.coef_)
+# The mean squared error
+print("Mean squared error: %.2f"
+      % mean_squared_error(Y_test, Y_hat))
+# Explained variance score: 1 is perfect prediction
+print('Variance score: %.2f' % r2_score(Y_test, Y_hat))
+
+results_linear_regression = regression_performance_estimate( Y_test,
+                                                             Y_hat,
+                                                             'lasso')
+results_linear_regression.to_csv('results/lasso.csv', index = False)
+
+
+
+
 
 
 

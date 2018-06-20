@@ -122,6 +122,7 @@ complete_dataframe.to_csv("DATA/ALL_DATA.csv")
 df = complete_dataframe.copy()   
 
 
+
 ## Appartenenza ai files delle particelle
 ## Elimino le particelle duplicate in entrambi i file
 groups = pd.crosstab(df.ix[ : , 0:2 ].FILE,
