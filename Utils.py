@@ -117,3 +117,16 @@ def create_dir (path):
         print 'The directory already exists'
 
 
+def correlation_matrix(df, path):
+    from matplotlib import pyplot as plt
+    from matplotlib import cm as cm
+    fig = plt.figure()
+    ax1 = fig.add_subplot(111)
+    cmap = cm.get_cmap('jet', 30)
+    cax = ax1.imshow(df.corr(), interpolation="nearest", cmap=cmap)
+    ax1.grid(True)
+    plt.title('Feature Correlation')
+    fig.colorbar(cax, ticks=[-.75, -.5, -.25, 0 , .25, .5, .75,1])
+    plt.savefig( path, dpi=200)
+    plt.show()
+    print 'Correlation plot has been saved on ' + path

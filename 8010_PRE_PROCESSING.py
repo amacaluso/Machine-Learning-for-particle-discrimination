@@ -6,7 +6,6 @@ Y_1 = ['G_100', 'G_1000', 'G_10000', 'G_141', 'G_1414', 'G_17320', 'G_200',
        'G_7071', 'G_84']
 
 
-
 # ALL DATA
 complete_dataframe = pd.read_csv("DATA/ALL_DATA.csv")
 df = complete_dataframe.copy()
@@ -97,7 +96,7 @@ for string in data.DIRNAME:
     if photon == True:
         num = re.findall('\d+', string)
         Y_REG.append(int(num[0]))
-        print string, num[0]
+        #print string, num[0]
 
 # scipy.stats.expon(scale = 2).pdf(1000)
 data[ 'Y_REG' ] = Y_REG
