@@ -68,6 +68,11 @@ balanced_df = pd.concat([df_Y_1.sample(n = n_samples),
 nrows = balanced_df.shape[0]
 balanced_df.columns
 
+cols_to_remove = [u'FILE', u'TTree', u'TIME', u'PID', u'EVENT_NUMBER',
+                  u'EVENT_TYPE', u'DIRNAME', u'FLG_BRNAME01', u'FLG_EVSTATUS']
+# , u'DIRNAME', u'FLG_BRNAME01', u'FLG_EVSTATUS', u'Y'
+
+balanced_df = balanced_df.drop( cols_to_remove, axis = 1 )
 balanced_df.to_csv( directory + "balanced_df.csv", index = False )
 
 
@@ -75,11 +80,7 @@ balanced_df.to_csv( directory + "balanced_df.csv", index = False )
 
 
 
-
-
 ''' REGRESSION: definizione variabile target e salvataggio file '''
-
-
 data = pd.read_csv('DATA/CLASSIFICATION/DataFrame_with_Y.csv').dropna()
 
 directory = 'DATA/REGRESSION/'
@@ -100,6 +101,9 @@ for string in data.DIRNAME:
 
 # scipy.stats.expon(scale = 2).pdf(1000)
 data[ 'Y_REG' ] = Y_REG
+
+
+data = data.drop( cols_to_remove, axis = 1 )
 
 data.to_csv( directory + "dataset.csv", index = False)
 
