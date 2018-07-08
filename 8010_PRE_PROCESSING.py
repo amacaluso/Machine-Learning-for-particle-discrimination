@@ -22,7 +22,7 @@ for i in range(len(groups.index)):
 
 df.EVENT_TYPE.value_counts()
 
-df.to_csv("DATA/Complete_DataFrame_no_duplicates.csv", index = False )
+# df.to_csv("DATA/Complete_DataFrame_no_duplicates.csv", index = False )
 ########################################################
 
 
@@ -51,7 +51,7 @@ df.Y.value_counts()
 groups_Y = pd.crosstab(df.EVENT_TYPE, df.Y)
 
 groups_Y.to_csv(directory + "target_variable.csv")
-df.to_csv( directory + "DataFrame_with_Y.csv", index = False )
+# df.to_csv( directory + "DataFrame_with_Y.csv", index = False )
 
 n_samples = np.sum(groups_Y.ix[:, 0])
 labels_Y0 = []
@@ -62,35 +62,39 @@ for label in groups_Y.index[groups_Y.ix[:, 0] > 0]:
 df_Y_0 = df[df.EVENT_TYPE.isin(labels_Y0)]
 df_Y_1 = df[df.EVENT_TYPE.isin(Y_1)]
 
-balanced_df = pd.concat([df_Y_1.sample(n = n_samples),
-                         df_Y_0])
 
-nrows = balanced_df.shape[0]
-balanced_df.columns
-
-cols_to_remove = [u'FILE', u'TTree', u'TIME', u'PID', u'EVENT_NUMBER',
-                  u'EVENT_TYPE', u'DIRNAME', u'FLG_BRNAME01', u'FLG_EVSTATUS']
-# , u'DIRNAME', u'FLG_BRNAME01', u'FLG_EVSTATUS', u'Y'
-
-balanced_df = balanced_df.drop( cols_to_remove, axis = 1 )
-balanced_df.to_csv( directory + "balanced_df.csv", index = False )
+df_Y_0.to_csv("DATA/data_background.csv", index = False )
 
 
+df_Y_1.EVENT_TYPE.value_counts()
 
 
-
-
-''' REGRESSION: definizione variabile target e salvataggio file '''
-data = pd.read_csv('DATA/CLASSIFICATION/DataFrame_with_Y.csv').dropna()
-
-directory = 'DATA/REGRESSION/'
-create_dir(directory)
-
-data = data[ data['Y'] == 1 ]
-data.shape
+# balanced_df = pd.concat([df_Y_1.sample(n = n_samples),
+#                          df_Y_0])
+#
+# nrows = balanced_df.shape[0]
+# balanced_df.columns
+#
+# cols_to_remove = [u'FILE', u'TTree', u'TIME', u'PID', u'EVENT_NUMBER',
+#                   u'EVENT_TYPE', u'DIRNAME', u'FLG_BRNAME01', u'FLG_EVSTATUS']
+# # , u'DIRNAME', u'FLG_BRNAME01', u'FLG_EVSTATUS', u'Y'
+#
+# balanced_df = balanced_df.drop( cols_to_remove, axis = 1 )
+# balanced_df.to_csv( directory + "balanced_df.csv", index = False )
 
 
 
+# ''' REGRESSION: definizione variabile target e salvataggio file '''
+# data = pd.read_csv('DATA/CLASSIFICATION/DataFrame_with_Y.csv').dropna()
+#
+# directory = 'DATA/REGRESSION/'
+# create_dir(directory)
+#
+# data = data[ data['Y'] == 1 ]
+# data.shape
+
+
+data = df_Y_1.copy()
 Y_REG = []
 for string in data.DIRNAME:
     photon = bool(re.findall('MEV', string))
@@ -103,9 +107,50 @@ for string in data.DIRNAME:
 data[ 'Y_REG' ] = Y_REG
 
 
-data = data.drop( cols_to_remove, axis = 1 )
-
-data.to_csv( directory + "dataset.csv", index = False)
-
+# data = data.drop( cols_to_remove, axis = 1 )
+# data.to_csv( directory + "dataset.csv", index = False)
 # scipy.stats.entropy( data.Y_REG)
 
+table_energy = data.Y_REG.value_counts()
+table_energy = table_energy.sort_index()
+table_energy.plot( kind = 'bar', title = 'Histogram of photons energy', rot = 60)
+#plt.savefig(dir_images + "histogram_energy.png")
+plt.show()
+
+
+
+energy = []
+for string in data.DIRNAME:
+    photon = bool(re.findall('MEV', string))
+    if photon == True:
+        num = re.findall('\d+', string)
+        energy.append(int(num[0]))
+
+
+energy_df = pd.DataFrame()
+energy_df[ 'energy'] = table_energy.index
+energy_df[ 'Frequencies'] = table_energy.values
+energy_df = energy_df.sort_values('energy')
+
+#sns.kdeplot(energy_df.energy, shade = True )
+df_sub = data.Y_REG #[data.Y_REG<350]
+sns.kdeplot( df_sub, shade = True )
+
+plt.xlim(xmin=0)
+plt.title( "Density of energy (photons)")
+#plt.vlines(x=[380, 7000, 10000, 17320, 40000],ymin=0, ymax=0.5, color='r')
+#plt.savefig(dir_images + "Density_of_energy.png")
+plt.show()
+
+
+v = np.random.exponential( 1000, size = 3000)
+sns.kdeplot( v, shade = True )
+plt.xlim(xmin=0)
+plt.title( "Density of energy (photons)")
+#plt.vlines(x=[380, 7000, 10000, 17320, 40000],ymin=0, ymax=0.5, color='r')
+#plt.savefig(dir_images + "Density_of_energy.png")
+plt.show()
+
+np.min(v)
+np.mean(v)
+np.median(v)
