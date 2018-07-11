@@ -2,6 +2,7 @@ exec(open("Utils.py").read(), globals())
 
 directory = 'DATA/'
 dir_images = 'Images/'
+create_dir(dir_images)
 
 dir_regression = 'DATA/REGRESSION/'
 create_dir( dir_regression )
