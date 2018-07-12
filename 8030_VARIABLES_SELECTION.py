@@ -4,7 +4,7 @@ exec(open("Utils.py").read(), globals())
 directory = 'DATA/CLASSIFICATION/'
 data = pd.read_csv( directory + "dataset.csv" )
 
-SEED = 2
+SEED = 555
 print data.shape
 
 
@@ -113,13 +113,13 @@ df_importance[ 'RANDOM_FOREST' ] = importance_rf
 
 gbm = GradientBoostingClassifier()
 
-parameters = {'n_estimators': [100, 150, 200, 300],
+parameters_gbm = {'n_estimators': [100, 150, 200, 300],
               'learning_rate': [0.1, 0.05, 0.01],
               'max_depth': [4, 6, 8],
               'min_samples_leaf': [20, 50],
               'max_features': [1.0, 0.3, 0.1]
               }
-gbm = GridSearchCV( GradientBoostingClassifier(), parameters, n_jobs = 2)
+gbm = GridSearchCV( GradientBoostingClassifier(), parameters_gbm, n_jobs = 2)
 gbm = gbm.fit( X, Y )
 gbm_model = gbm
 
@@ -128,21 +128,30 @@ importance_gbm = gbm_model.best_estimator_.feature_importances_
 df_importance[ 'GBM' ] = importance_gbm
 ##################################################
 
-from sklearn.linear_model import ElasticNet
-alpha = 0.1
-enet = ElasticNet(alpha=alpha, rho=0.7)
-y_pred_enet = enet.fit(X_train, y_train)
-from sklearn.linear_model import ElasticNet
+
+##################################################
+''' Elastic Net '''
+from sklearn.linear_model import SGDClassifier
 from sklearn.model_selection import GridSearchCV
 
 # Use grid search to tune the parameters:
 
-parametersGrid = {"max_iter": [1, 5, 10],
-                  "alpha": [0.0001, 0.001, 0.01, 0.1, 1, 10, 100],
-                  "l1_ratio": np.arange(0.0, 1.0, 0.1)}
 
-eNet = ElasticNet()
-eNet = GridSearchCV(eNet, parametersGrid, scoring='accuracy', cv=10)
-eNet = grid.fit(X_train, Y_train)
+eNet = SGDClassifier()
 
-eNet_model = eNet
+eNet_parameters = { "l1_ratio": np.arange(0.001, 1, 0.001),
+                    'loss': ["log"],
+                    'penalty': ["elasticnet"]}
+
+
+eNet = GridSearchCV(eNet, eNet_parameters, scoring='accuracy', cv=5, n_jobs = 2)
+eNet = eNet.fit(X, Y)
+eNet_model = eNet.best_estimator_
+
+print( eNet_model.score(X, Y) )
+
+coeff_eNet = eNet_model.coef_[0]
+df_importance[ 'Elastic_Net' ] = coeff_eNet
+##############################################
+
+df_importance.to_csv( 'results/importance.csv', index = False)
