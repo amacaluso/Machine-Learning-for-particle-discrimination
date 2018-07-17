@@ -4,20 +4,21 @@ exec(open("Utils.py").read(), globals())
 directory = 'DATA/CLASSIFICATION/'
 data = pd.read_csv( directory + "dataset.csv" )
 
-SEED = 555
+SEED = 123
 print data.shape
 
 
-cols_to_remove = [ u'FILE', u'TTree', u'TIME', u'PID',
-                   u'EVENT_NUMBER', u'EVENT_TYPE', u'DIRNAME',
-                   u'FLG_BRNAME01', u'FLG_EVSTATUS' ]
-data = data.drop( cols_to_remove, axis = 1 )
+# cols_to_remove = [ u'FILE', u'TTree', u'TIME', u'PID',
+#                    u'EVENT_NUMBER', u'EVENT_TYPE', u'DIRNAME',
+#                    u'FLG_BRNAME01', u'FLG_EVSTATUS' ]
+#
+# data = data.drop( cols_to_remove, axis = 1 )
 
 
 variable_sub_dataset, modeling_dataset = train_test_split( data, test_size = 0.9,
                                                            random_state = SEED)
 target_variable = 'Y'
-col_energy = 'Y_REG'
+col_energy = 'ENERGY'
 
 
 X = variable_sub_dataset.drop( [target_variable, col_energy], axis = 1)#.astype('float32')

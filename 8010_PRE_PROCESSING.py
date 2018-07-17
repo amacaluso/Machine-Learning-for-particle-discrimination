@@ -71,7 +71,7 @@ for string in data_reg.DIRNAME:
         #print string, num[0]
 
 # scipy.stats.expon(scale = 2).pdf(1000)
-data_reg[ 'Y_REG' ] = Y_REG
+data_reg[ 'ENERGY' ] = Y_REG
 
 
 data_reg = data_reg.drop( cols_to_remove, axis = 1 )
@@ -79,9 +79,9 @@ data_reg.to_csv( dir_regression + "dataset.csv", index = False)
 
 
 data = df_Y_1.copy()
-data[ 'Y_REG' ] = Y_REG
+data[ 'ENERGY' ] = Y_REG
 
-table_energy = data.Y_REG.value_counts()
+table_energy = data.ENERGY.value_counts()
 table_energy = table_energy.sort_index()
 table_energy.plot( kind = 'bar', title = 'Histogram of photons energy', rot = 60)
 plt.savefig(dir_images + "histogram_energy.png")
@@ -95,7 +95,7 @@ energy_df = energy_df.sort_values('energy')
 
 #sns.kdeplot(energy_df.energy, shade = True )
 limit = 45000
-df_sub = data.Y_REG [data.Y_REG < limit]
+df_sub = data.ENERGY [data.ENERGY < limit]
 sns.kdeplot( df_sub, shade = True )
 
 plt.xlim(xmin=0)
@@ -112,20 +112,20 @@ nc = int( round(n/n_classes))
 
 max_energy = np.max(energy_df.energy)
 nc_max = int( n - (nc * (n_classes-1)) )
-df_photons = data.ix[data.Y_REG == max_energy, : ].sample( n = nc_max, replace = True)
+df_photons = data.ix[data.ENERGY == max_energy, : ].sample( n = nc_max, replace = True)
 
 
 for energy in energy_df.energy:
     #energy = energy_df.energy[1]
     print energy
     if energy != max_energy:
-        current_df = data[ data.Y_REG == energy].sample( n = nc )
+        current_df = data[ data.ENERGY == energy].sample( n = nc )
         df_photons = df_photons.append( current_df )
 
-df_Y_0['Y_REG'] = pd.Series( np.repeat(0, df_Y_0.shape[0]) )
+df_Y_0['ENERGY'] = pd.Series( np.repeat(0, df_Y_0.shape[0]) )
 
 df_classification = df_Y_0.append( df_photons )
-df_classification.drop( cols_to_remove, axis = 1 )
+df_classification = df_classification.drop( cols_to_remove, axis = 1 )
 df_classification.to_csv( dir_classification + 'dataset.csv', index = False )
 
 

@@ -5,10 +5,10 @@ dir_images = 'results/Images/'
 create_dir( dir_images )
 
 
-dir_reg = 'DATA/REGRESSION/'
+dir_reg = 'DATA/CLASSIFICATION/'
 data = pd.read_csv( dir_reg + "dataset.csv" )
 
-data.EVENT_TYPE.value_counts()
+data.ENERGY.value_counts()
 
 cols_to_remove = [ u'FILE', u'TTree', u'TIME', u'PID',
                    u'EVENT_NUMBER', u'EVENT_TYPE', u'DIRNAME',
