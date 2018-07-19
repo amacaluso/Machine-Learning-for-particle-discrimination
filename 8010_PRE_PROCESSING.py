@@ -41,7 +41,11 @@ df.loc[df['EVENT_TYPE'].isin(Y_1), 'Y'] = 1
 df.Y.value_counts()
 
 groups_Y = pd.crosstab(df.EVENT_TYPE, df.Y)
-groups_Y.to_csv(directory + 'target_variable.csv', index = False)
+
+#### Save encoding target variable ####
+#groups_Y.to_csv(directory + 'target_variable.csv', index = False)
+#######################################
+
 
 # df.to_csv( directory + "DataFrame_with_Y.csv", index = False )
 n_samples = np.sum(groups_Y.ix[:, 0])
@@ -53,8 +57,10 @@ for label in groups_Y.index[groups_Y.ix[:, 0] > 0]:
 df_Y_0 = df[df.EVENT_TYPE.isin(labels_Y0)]
 df_Y_1 = df[df.EVENT_TYPE.isin(Y_1)]
 
-df_Y_0.to_csv(directory + 'data_background.csv', index = False )
-df_Y_1.to_csv(directory + 'data_photons.csv', index = False )
+#### SALVATAGGIO FILE ####
+# df_Y_0.to_csv(directory + 'data_background.csv', index = False )
+# df_Y_1.to_csv(directory + 'data_photons.csv', index = False )
+##########################
 
 cols_to_remove = [u'FILE', u'TTree', u'TIME', u'PID', u'EVENT_NUMBER',
                   u'EVENT_TYPE', u'DIRNAME', u'FLG_BRNAME01', u'FLG_EVSTATUS']
@@ -75,8 +81,10 @@ data_reg[ 'ENERGY' ] = Y_REG
 
 
 data_reg = data_reg.drop( cols_to_remove, axis = 1 )
-data_reg.to_csv( dir_regression + "dataset.csv", index = False)
 
+#### Saving dataset for classification ####
+# data_reg.to_csv( dir_regression + "dataset.csv", index = False)
+###########################################
 
 data = df_Y_1.copy()
 data[ 'ENERGY' ] = Y_REG
@@ -122,53 +130,20 @@ for energy in energy_df.energy:
         current_df = data[ data.ENERGY == energy].sample( n = nc )
         df_photons = df_photons.append( current_df )
 
-df_Y_0['ENERGY'] = pd.Series( np.repeat(0, df_Y_0.shape[0]) )
+df_Y_0['ENERGY'] = pd.Series( np.repeat(0, df_Y_0.shape[0]), index = df_Y_0.index )
 
 df_classification = df_Y_0.append( df_photons )
 df_classification = df_classification.drop( cols_to_remove, axis = 1 )
-df_classification.to_csv( dir_classification + 'dataset.csv', index = False )
 
+#### Saving dataset for classification ####
+# df_classification.to_csv( dir_classification + 'dataset.csv', index = False )
+###########################################
 
 
 v = np.random.exponential( 1000, size = 3000)
 sns.kdeplot( v, shade = True )
 plt.xlim(xmin=0)
 plt.title( "Density of energy (photons)")
-#plt.vlines(x=[380, 7000, 10000, 17320, 40000],ymin=0, ymax=0.5, color='r')
-#plt.savefig(dir_images + "Density_of_energy.png")
 plt.show()
 
-np.min(v)
-np.mean(v)
-np.median(v)
 
-# df.to_csv("DATA/Complete_DataFrame_no_duplicates.csv", index = False )
-########################################################
-
-# df_Y_1.EVENT_TYPE.value_counts()
-# df_Y_1.shape
-
-# balanced_df = pd.concat([df_Y_1.sample(n = n_samples),
-#                          df_Y_0])
-#
-# nrows = balanced_df.shape[0]
-# balanced_df.columns
-#
-# , u'DIRNAME', u'FLG_BRNAME01', u'FLG_EVSTATUS', u'Y'
-#
-# balanced_df = balanced_df.drop( cols_to_remove, axis = 1 )
-# balanced_df.to_csv( directory + "balanced_df.csv", index = False )
-
-
-
-# ''' REGRESSION: definizione variabile target e salvataggio file '''
-# data = pd.read_csv('DATA/CLASSIFICATION/DataFrame_with_Y.csv').dropna()
-#
-# directory = 'DATA/REGRESSION/'
-# create_dir(directory)
-#
-# data = data[ data['Y'] == 1 ]
-# data.shape
-
-# ''' CLASSIFICAZIONE: definizione variabile target e salvataggio file '''
-# create_dir( directory)

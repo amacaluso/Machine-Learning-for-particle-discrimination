@@ -5,14 +5,9 @@ directory = 'DATA/CLASSIFICATION/'
 data = pd.read_csv( directory + "dataset.csv" )
 
 SEED = 123
+njobs = 20
 print data.shape
 
-
-# cols_to_remove = [ u'FILE', u'TTree', u'TIME', u'PID',
-#                    u'EVENT_NUMBER', u'EVENT_TYPE', u'DIRNAME',
-#                    u'FLG_BRNAME01', u'FLG_EVSTATUS' ]
-#
-# data = data.drop( cols_to_remove, axis = 1 )
 
 
 variable_sub_dataset, modeling_dataset = train_test_split( data, test_size = 0.9,
@@ -40,7 +35,7 @@ from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import mean_squared_error, r2_score
 
 grid_values = {'penalty': ['l1'],
-               'C': np.arange(0.0001, 1, 0.005)}
+               'C': np.arange(0.0001, 1, 0.0005)}
 
 log_reg = LogisticRegression()
 
@@ -68,7 +63,7 @@ dt_parameters = {'max_depth': range(5, 50, 10),
                  'min_samples_split': range( 100, 500, 100),
                  'criterion': ['gini', 'entropy']}
 
-decision_tree = GridSearchCV( tree.DecisionTreeClassifier(), dt_parameters, n_jobs = 2 )
+decision_tree = GridSearchCV( tree.DecisionTreeClassifier(), dt_parameters, n_jobs = njobs )
 decision_tree = decision_tree.fit( X, Y )
 tree_model = decision_tree
 
@@ -96,7 +91,7 @@ parameters = {'n_estimators': range(100, 900, 100),
               'max_depth':  [5, 10, 15],
               'min_samples_split': range( 100, 900, 400)
               }
-random_forest = GridSearchCV( RandomForestClassifier(), parameters, n_jobs = 2)
+random_forest = GridSearchCV( RandomForestClassifier(), parameters, n_jobs = njobs)
 random_forest = random_forest.fit( X, Y )
 rf_model = random_forest
 
@@ -120,7 +115,7 @@ parameters_gbm = {'n_estimators': [100, 150, 200, 300],
               'min_samples_leaf': [20, 50],
               'max_features': [1.0, 0.3, 0.1]
               }
-gbm = GridSearchCV( GradientBoostingClassifier(), parameters_gbm, n_jobs = 2)
+gbm = GridSearchCV( GradientBoostingClassifier(), parameters_gbm, n_jobs = njobs)
 gbm = gbm.fit( X, Y )
 gbm_model = gbm
 
@@ -156,3 +151,10 @@ df_importance[ 'Elastic_Net' ] = coeff_eNet
 ##############################################
 
 df_importance.to_csv( 'results/importance.csv', index = False)
+
+
+df_importance[ 'LASSO' ] = np.around(df_importance[ 'LASSO' ], 2)
+df_importance[ 'DECISION_TREE' ] = np.around(df_importance[ 'DECISION_TREE' ], 4)
+df_importance[ 'RANDOM_FOREST' ] = np.around(df_importance[ 'RANDOM_FOREST' ], 4)
+df_importance[ 'GBM' ] = np.around(df_importance[ 'GBM' ], 4)
+df_importance[ 'Elastic_Net' ] = np.around(df_importance[ 'Elastic_Net' ], 2)

@@ -1,9 +1,6 @@
 exec(open("Utils.py").read(), globals())
 
-
 dir_images = 'results/Images/'
-create_dir( dir_images )
-
 
 dir_reg = 'DATA/CLASSIFICATION/'
 data = pd.read_csv( dir_reg + "dataset.csv" )
