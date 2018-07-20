@@ -43,7 +43,7 @@ df.Y.value_counts()
 groups_Y = pd.crosstab(df.EVENT_TYPE, df.Y)
 
 #### Save encoding target variable ####
-#groups_Y.to_csv(directory + 'target_variable.csv', index = False)
+groups_Y.to_csv(directory + 'target_variable.csv', index = False)
 #######################################
 
 
@@ -58,8 +58,8 @@ df_Y_0 = df[df.EVENT_TYPE.isin(labels_Y0)]
 df_Y_1 = df[df.EVENT_TYPE.isin(Y_1)]
 
 #### SALVATAGGIO FILE ####
-# df_Y_0.to_csv(directory + 'data_background.csv', index = False )
-# df_Y_1.to_csv(directory + 'data_photons.csv', index = False )
+df_Y_0.to_csv(directory + 'data_background.csv', index = False )
+df_Y_1.to_csv(directory + 'data_photons.csv', index = False )
 ##########################
 
 cols_to_remove = [u'FILE', u'TTree', u'TIME', u'PID', u'EVENT_NUMBER',
@@ -83,7 +83,7 @@ data_reg[ 'ENERGY' ] = Y_REG
 data_reg = data_reg.drop( cols_to_remove, axis = 1 )
 
 #### Saving dataset for classification ####
-# data_reg.to_csv( dir_regression + "dataset.csv", index = False)
+data_reg.to_csv( dir_regression + "dataset.csv", index = False)
 ###########################################
 
 data = df_Y_1.copy()
@@ -136,7 +136,7 @@ df_classification = df_Y_0.append( df_photons )
 df_classification = df_classification.drop( cols_to_remove, axis = 1 )
 
 #### Saving dataset for classification ####
-# df_classification.to_csv( dir_classification + 'dataset.csv', index = False )
+df_classification.to_csv( dir_classification + 'dataset.csv', index = False )
 ###########################################
 
 
