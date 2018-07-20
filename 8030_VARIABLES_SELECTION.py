@@ -5,7 +5,7 @@ directory = 'DATA/CLASSIFICATION/'
 data = pd.read_csv( directory + "dataset.csv" )
 
 SEED = 123
-njobs = 20
+njobs = 2
 print data.shape
 
 
@@ -135,7 +135,7 @@ from sklearn.model_selection import GridSearchCV
 
 eNet = SGDClassifier()
 
-eNet_parameters = { "l1_ratio": np.arange(0.001, 1, 0.001),
+eNet_parameters = { "l1_ratio": np.arange(0.001, 1, 0.005),
                     'loss': ["log"],
                     'penalty': ["elasticnet"]}
 
@@ -148,6 +148,33 @@ print( eNet_model.score(X, Y) )
 
 coeff_eNet = eNet_model.coef_[0]
 df_importance[ 'Elastic_Net' ] = coeff_eNet
+
+
+# print( lr.best_estimator_)
+print( lr.best_params_ )
+print( lr.best_score_)
+print len(coeff_eNet[ abs(coeff_eNet)>1])
+print len(coeff_eNet[ abs(coeff_eNet)>0.5])
+print len(coeff_eNet[ abs(coeff_eNet)>0.1])
+print len(coeff_eNet[ abs(coeff_eNet)>0])
+
+np.percentile( coeff_eNet , np.arange(0.05, 1, 0.05))
+np.max( coeff_eNet , np.arange(0.25, 1, 0.25))
+
+#Y = ((X-min_X)/(max_X-min_X))*max_Y-min_Y + min_Y
+
+max_prev = np.max(coeff_eNet)
+min_prev = np.min(coeff_eNet)
+
+norm_coeff_eNet = normalization(abs(coeff_eNet))
+
+sns.kdeplot( norm_coeff_eNet, shade = True )
+plt.show()
+
+sns.kdeplot( coeff_eNet, shade = True )
+plt.show()
+
+
 ##############################################
 
 df_importance[ 'LASSO' ] = np.around(df_importance[ 'LASSO' ], 2)
