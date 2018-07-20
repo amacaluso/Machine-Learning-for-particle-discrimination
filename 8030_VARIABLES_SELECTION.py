@@ -184,3 +184,13 @@ df_importance[ 'GBM' ] = np.around(df_importance[ 'GBM' ], 4)
 df_importance[ 'Elastic_Net' ] = np.around(df_importance[ 'Elastic_Net' ], 2)
 
 df_importance.to_csv( 'results/importance.csv', index = False)
+
+
+
+df_n_importance = df_importance.copy()
+
+df_n_importance[ 'LASSO' ] = normalization( df_n_importance[ 'LASSO' ], new_max = 1, new_min = -1 )
+df_n_importance[ 'DECISION_TREE' ] = np.around(df_n_importance[ 'DECISION_TREE' ], 4)
+df_n_importance[ 'RANDOM_FOREST' ] = np.around(df_n_importance[ 'RANDOM_FOREST' ], 4)
+df_n_importance[ 'GBM' ] = np.around(df_n_importance[ 'GBM' ], 4)
+df_n_importance[ 'Elastic_Net' ] = np.around(df_n_importance[ 'Elastic_Net' ], 2)

@@ -135,5 +135,5 @@ def correlation_matrix(df, path):
 def normalization( vector, new_max = 1, new_min = 0):
     max_prev = np.max(vector)
     min_prev = np.min(vector)
-    new_vector = ((vector - min_prev) / (max_prev - min_prev)) * (new_max-new_min) - new_min
+    new_vector = (vector - min_prev) / (max_prev - min_prev) * (new_max-new_min) + new_min
     return [new_vector]
