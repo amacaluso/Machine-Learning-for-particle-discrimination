@@ -1,5 +1,46 @@
 exec(open("Utils.py").read(), globals())
 
+dir_images = 'Images/'
+
+dir_reg = 'DATA/CLASSIFICATION/'
+data = pd.read_csv( dir_reg + "pre_training_set.csv" )
+
+variables = data.columns[ 0:251 ]
+
+X = data[ variables ]
+#calcolare su tutti i dati
+correlation_matrix( df = X, path = dir_images + 'Correlation_plot.png')
+
+correlation = X.corr()
+
+I = correlation.shape[0]
+J = correlation.shape[1]
+correlation = correlation.fillna(0)
+
+np.max( np.max(correlation[correlation<1]))
+
+for i in range(I):
+    i = 0
+    for j in range(J):
+        row_corr = correlation.ix[i, :]
+        row_corr.nlargest( 10 )
+        np.percentile
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 directory = 'DATA/CLASSIFICATION/'
 data = pd.read_csv( directory + "dataset.csv" )
