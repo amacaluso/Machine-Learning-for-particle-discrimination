@@ -9,37 +9,63 @@ variables = data.columns[ 0:251 ]
 
 X = data[ variables ]
 X = X.fillna( method = 'ffill')
-#correlation_matrix( df = X, path = dir_images + 'Correlation_plot.png')
+# correlation_matrix( df = X, path = dir_images + 'Correlation_plot.png')
 
-cor_matrix = X.corr()
+cor_matrix = X.corr().fillna( 0 )# method = 'ffill')
+abs(cor_matrix)
+cor_matrix[ 'BIG_CL_X' ]
 
-X_scaled = X.transpose().copy()
-#X_scaled.to_csv( 'clustering.csv', index = True)
-#calcolare su tutti i dati
-from sklearn import preprocessing
-
-for col in X_scaled.columns:
-    mean = np.mean( X_scaled[col])
-    std = np.std( X_scaled[col])
-    X_scaled[col] = (X_scaled[col] - mean)/std
-
-
-from matplotlib import pyplot as plt
-from scipy.cluster.hierarchy import dendrogram, linkage
-
-
-D = linkage( X_scaled, method = 'single', metric='euclidean' )
-
-plt.figure(figsize=(25, 10))
-plt.title('Hierarchical Clustering Dendrogram')
-plt.xlabel('sample index')
-plt.ylabel('distance')
-dendrogram(
-    D,
-    leaf_rotation=90.,  # rotates the x axis labels
-    leaf_font_size=8.,  # font size for the x axis labels
-)
+sns.kdeplot( cor_matrix[ col ], shade = True )
 plt.show()
+
+groups = []
+k = 15
+threshold = 0.4
+
+for col in cor_matrix.columns:
+    FLG = any( col in g for g in groups)
+    if FLG == True:
+        ''' Variable''', col, ''' already exist in a group'''
+    else:
+        # col = cor_matrix.columns[5]
+        group = cor_matrix[ col ].nlargest(k + 1)[ cor_matrix[ col ]!= 1 ]
+        group = group[ group > threshold ].index
+        groups.append(group)
+
+
+gs = []
+for g in groups:
+    if len(g) >2 :
+        gs.append(g)
+
+# lasciare la variabile dentro il gruppo dove ha la correlazione maggiore
+# X_scaled = X.transpose().copy()
+# # X_scaled.to_csv( 'clustering.csv', index = True)
+# # calcolare su tutti i dati
+# from sklearn import preprocessing
+#
+# for col in X_scaled.columns:
+#     mean = np.mean( X_scaled[col])
+#     std = np.std( X_scaled[col])
+#     X_scaled[col] = (X_scaled[col] - mean)/std
+#
+#
+# from matplotlib import pyplot as plt
+# from scipy.cluster.hierarchy import dendrogram, linkage
+#
+#
+# D = linkage( X_scaled, method = 'single', metric = 'euclidean' )
+#
+# plt.figure(figsize=(25, 10))
+# plt.title('Hierarchical Clustering Dendrogram')
+# plt.xlabel('sample index')
+# plt.ylabel('distance')
+# dendrogram(
+#     D,
+#     leaf_rotation=90.,  # rotates the x axis labels
+#     leaf_font_size=8.,  # font size for the x axis labels
+# )
+# plt.show()
 
 
 
