@@ -8,26 +8,38 @@ data = pd.read_csv( dir_reg + "pre_training_set.csv" )
 variables = data.columns[ 0:251 ]
 
 X = data[ variables ]
+X = X.fillna( method = 'ffill')
+#correlation_matrix( df = X, path = dir_images + 'Correlation_plot.png')
+
+cor_matrix = X.corr()
+
+X_scaled = X.transpose().copy()
+#X_scaled.to_csv( 'clustering.csv', index = True)
 #calcolare su tutti i dati
-correlation_matrix( df = X, path = dir_images + 'Correlation_plot.png')
+from sklearn import preprocessing
 
-correlation = X.corr()
-
-I = correlation.shape[0]
-J = correlation.shape[1]
-correlation = correlation.fillna(0)
-
-np.max( np.max(correlation[correlation<1]))
-
-for i in range(I):
-    i = 0
-    for j in range(J):
-        row_corr = correlation.ix[i, :]
-        row_corr.nlargest( 10 )
-        np.percentile
+for col in X_scaled.columns:
+    mean = np.mean( X_scaled[col])
+    std = np.std( X_scaled[col])
+    X_scaled[col] = (X_scaled[col] - mean)/std
 
 
+from matplotlib import pyplot as plt
+from scipy.cluster.hierarchy import dendrogram, linkage
 
+
+D = linkage( X_scaled, method = 'single', metric='euclidean' )
+
+plt.figure(figsize=(25, 10))
+plt.title('Hierarchical Clustering Dendrogram')
+plt.xlabel('sample index')
+plt.ylabel('distance')
+dendrogram(
+    D,
+    leaf_rotation=90.,  # rotates the x axis labels
+    leaf_font_size=8.,  # font size for the x axis labels
+)
+plt.show()
 
 
 
