@@ -12,31 +12,48 @@ X = X.fillna( method = 'ffill')
 # correlation_matrix( df = X, path = dir_images + 'Correlation_plot.png')
 
 cor_matrix = X.corr().fillna( 0 )# method = 'ffill')
-abs(cor_matrix)
-cor_matrix[ 'BIG_CL_X' ]
+cor_matrix = abs(cor_matrix)
 
-sns.kdeplot( cor_matrix[ col ], shade = True )
-plt.show()
+# cor_matrix[ 'BIG_CL_X' ]
+# sns.kdeplot( cor_matrix[ col ], shade = True )
+# plt.show()
 
 groups = []
 k = 15
 threshold = 0.4
+check = 0
 
 for col in cor_matrix.columns:
     FLG = any( col in g for g in groups)
     if FLG == True:
-        ''' Variable''', col, ''' already exist in a group'''
+        print ''' Variable''', col, ''' already exist in a group'''
+        check +=1
     else:
         # col = cor_matrix.columns[5]
         group = cor_matrix[ col ].nlargest(k + 1)[ cor_matrix[ col ]!= 1 ]
         group = group[ group > threshold ].index
         groups.append(group)
-
+print check
 
 gs = []
 for g in groups:
     if len(g) >2 :
         gs.append(g)
+
+groups = gs
+unique = set(x for l in gs for x in l)
+
+assign_df = pd.DataFrame()
+
+for cluster in groups:
+    cluster = groups[1]
+    for el in cluster:
+        el = cluster[0]
+        check_list = [item for item in cluster if item != el]
+        np.max( cor_matrix[ cor_matrix.index == el][check_list])
+        max = np.max(cor_matrix[cor_matrix.index == el][check_list].max())
+        groups[cluster]
+
 
 # lasciare la variabile dentro il gruppo dove ha la correlazione maggiore
 # X_scaled = X.transpose().copy()
