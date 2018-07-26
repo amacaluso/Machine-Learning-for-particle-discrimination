@@ -27,33 +27,76 @@ for col in cor_matrix.columns:
     FLG = any( col in g for g in groups)
     if FLG == True:
         print ''' Variable''', col, ''' already exist in a group'''
-        check +=1
     else:
         # col = cor_matrix.columns[5]
         group = cor_matrix[ col ].nlargest(k + 1)[ cor_matrix[ col ]!= 1 ]
         group = group[ group > threshold ].index
         groups.append(group)
+        check += 1
 print check
 
 gs = []
 for g in groups:
     if len(g) >2 :
         gs.append(g)
-
 groups = gs
+
 unique = set(x for l in gs for x in l)
+
+for v in unique:
+    print v
 
 assign_df = pd.DataFrame()
 
 for cluster in groups:
-    cluster = groups[1]
+    # cluster = groups[1]
     for el in cluster:
-        el = cluster[0]
+        #el = cluster[0]
         check_list = [item for item in cluster if item != el]
         np.max( cor_matrix[ cor_matrix.index == el][check_list])
         max = np.max(cor_matrix[cor_matrix.index == el][check_list].max())
-        groups[cluster]
+        assign_df = assign_df.append( [[el, max]])
 
+cols = ['VAR', 'COR_MAX']
+assign_df.columns = cols
+
+df = assign_df
+
+for el in set(df.VAR):
+    #el = [set(df.VAR)][1]
+    current_df = pd.DataFrame(df[df.VAR == el ].max()).transpose()
+    df = df[df.VAR != el]
+    df = df.append(current_df)
+
+
+
+for i in range( len(groups)):
+    #i = 1
+    group = groups[i]
+    for el in group:
+        #el = group[1]
+        cor_max = df[df.VAR == el ].COR_MAX
+        if round(cor_max - np.max(cor_matrix[el][group].max()), 4)== 0.0000:
+            continue
+        else:
+            group = group[group != el]
+            groups[i] = group
+
+len( groups)
+
+check = 0
+indexes = []
+for j in range(len(groups)):
+    if len(groups[j]) >2 :
+        check +=1
+    else:
+        print(g)
+        groups[ groups.index == j]
+
+
+
+unique = set(x for l in groups for x in l)
+len(unique)
 
 # lasciare la variabile dentro il gruppo dove ha la correlazione maggiore
 # X_scaled = X.transpose().copy()
