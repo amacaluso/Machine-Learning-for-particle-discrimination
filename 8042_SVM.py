@@ -1,108 +1,40 @@
 exec(open("Utils.py").read(), globals())
-
+from sklearn import svm
+SEED = 123
 dir_images = 'Images/'
 
-dir_reg = 'DATA/CLASSIFICATION/'
-data = pd.read_csv( dir_reg + "pre_training_set.csv" )
+dir = 'DATA/CLASSIFICATION/'
+data = pd.read_csv( dir + "modeling_dataset.csv" )
 
 variables = data.columns[ 0:251 ]
 
-X = data[ variables ]
-X = X.fillna( method = 'ffill')
+training_data, test_set = train_test_split( data, test_size = 0.2,
+                                            random_state = SEED)
+
+training_set, validation_set = train_test_split( training_data, test_size = 0.1,
+                                                 random_state = SEED)
+
+print training_set.shape
+print validation_set.shape
+print test_set.shape
+
+
+X_tr = training_set[ variables ]
+X_tr = X.fillna( method = 'ffill')
+
+X_val = validation_set[ variables ]
+X_val = X.fillna( method = 'ffill')
+
+X_ts = test_set[ variables ]
+X_ts = X.fillna( method = 'ffill')
+
+svm_params = {'kernel': ('linear', 'poly', 'rbf', 'sigmoid'),
+              'C': [1, 5, 9, 13, 19],
+              'gamma': [0.01, 0.04, 0.1, 0.4]
+              }
+
 # correlation_matrix( df = X, path = dir_images + 'Correlation_plot.png')
 
-cor_matrix = X.corr().fillna( 0 )# method = 'ffill')
-cor_matrix = abs(cor_matrix)
-
-# cor_matrix[ 'BIG_CL_X' ]
-# sns.kdeplot( cor_matrix[ col ], shade = True )
-# plt.show()
-
-groups = []
-k = 10
-threshold = 0.5
-check = 0
-
-for col in cor_matrix.columns:
-    FLG = any( col in g for g in groups)
-    if FLG == True:
-        print ''' Variable''', col, ''' already exist in a group'''
-    else:
-        # col = cor_matrix.columns[5]
-        group = cor_matrix[ col ].nlargest(k + 1)[ cor_matrix[ col ]!= 1 ]
-        group = group[ group > threshold ].index
-        groups.append(group)
-        check += 1
-print check
-
-gs = []
-for g in groups:
-    if len(g) >2 :
-        gs.append(g)
-groups = gs
-
-unique = set(x for l in groups for x in l)
-len( unique )
-
-assign_df = pd.DataFrame()
-
-for cluster in groups:
-    # cluster = groups[1]
-    for el in cluster:
-        #el = cluster[0]
-        check_list = [item for item in cluster if item != el]
-        np.max( cor_matrix[ cor_matrix.index == el][check_list])
-        max = np.max(cor_matrix[cor_matrix.index == el][check_list].max())
-        assign_df = assign_df.append( [[el, max]])
-
-cols = ['VAR', 'COR_MAX']
-assign_df.columns = cols
-
-df = assign_df
-
-for el in set(df.VAR):
-    #el = [set(df.VAR)][1]
-    current_df = pd.DataFrame(df[df.VAR == el ].max()).transpose()
-    df = df[df.VAR != el]
-    df = df.append(current_df)
-
-
-for i in range( len(groups)):
-    #i = 1
-    group = groups[i]
-    for el in group:
-        #el = group[1]
-        cor_max = df[df.VAR == el ].COR_MAX
-        if round(cor_max - np.max(cor_matrix[el][group].max()), 4)== 0.0000:
-            continue
-        else:
-            group = group[group != el]
-            groups[i] = group
-
-unique = set(x for l in groups for x in l)
-len( groups )
-len( unique )
-
-
-check = 0
-indexes = []
-for j in range(len(groups)):
-    if len(groups[j]) >2 :
-        check +=1
-    else:
-        print(g)
-        groups[ groups.index == j]
-
-pca_groups = []
-
-for group in groups:
-    if len(group)>2:
-        print 'length is ', len(group)
-        print group
-        pca_groups.append(group)
-
-unique = set(x for l in groups for x in l)
-len(unique)
 
 # lasciare la variabile dentro il gruppo dove ha la correlazione maggiore
 # X_scaled = X.transpose().copy()
