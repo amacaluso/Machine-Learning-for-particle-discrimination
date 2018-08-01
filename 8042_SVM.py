@@ -6,13 +6,6 @@ dir_images = 'Images/'
 dir = 'DATA/CLASSIFICATION/'
 data = pd.read_csv( dir + "modeling_dataset.csv" )
 
-variables = data.columns[ 0:251 ]
-
-training_data, test_set = train_test_split( data, test_size = 0.2,
-                                            random_state = SEED)
-
-training_set, validation_set = train_test_split( training_data, test_size = 0.1,
-                                                 random_state = SEED)
 
 print training_set.shape
 print validation_set.shape

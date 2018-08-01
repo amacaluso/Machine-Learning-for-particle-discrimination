@@ -1,20 +1,18 @@
 exec(open("Utils.py").read(), globals())
 
+SEED = 231
+exec(open("8015_SPLITTING_DATA.py").read(), globals())
 
-directory = 'DATA/CLASSIFICATION/'
-data = pd.read_csv( directory + "dataset.csv" )
 
-SEED = 123
+dir_var_sel = 'results/VARIABLE_SELECTION/'
+create_dir(dir_var_sel)
+
+dir_data = 'DATA/CLASSIFICATION/'
+variable_sub_dataset = pd.read_csv( dir_data + "pre_training_set_" + str(SEED) + ".csv" )
+
 njobs = 2
-print data.shape
+print 'The dimension of dataset for variable selection is', variable_sub_dataset.shape
 
-
-
-variable_sub_dataset, modeling_dataset = train_test_split( data, test_size = 0.9,
-                                                           random_state = SEED)
-
-variable_sub_dataset.to_csv( directory + 'pre_training_set.csv', index = False)
-modeling_dataset.to_csv( directory + 'modeling_dataset.csv', index = False)
 
 
 target_variable = 'Y'
@@ -23,7 +21,7 @@ col_energy = 'ENERGY'
 
 X = variable_sub_dataset.drop( [target_variable, col_energy], axis = 1)#.astype('float32')
 X = X.fillna( method = 'ffill')
-print pd.isnull(X).sum() > 0
+# print pd.isnull(X).sum() > 0
 
 
 Y = variable_sub_dataset[ target_variable ]
@@ -188,7 +186,7 @@ df_importance[ 'RANDOM_FOREST' ] = np.around(df_importance[ 'RANDOM_FOREST' ], 4
 df_importance[ 'GBM' ] = np.around(df_importance[ 'GBM' ], 4)
 df_importance[ 'Elastic_Net' ] = np.around(df_importance[ 'Elastic_Net' ], 2)
 
-df_importance.to_csv( 'results/importance.csv', index = False)
+df_importance.to_csv( dir_var_sel + 'importance.csv', index = False)
 
 
 importance_ranked = pd.DataFrame()
@@ -199,4 +197,4 @@ importance_ranked['RANDOM_FOREST'] = abs(df_importance.RANDOM_FOREST).rank()
 importance_ranked['GBM'] = abs(df_importance.GBM).rank()
 importance_ranked['E_NET'] = abs(df_importance.Elastic_Net).rank()
 
-importance_ranked.to_csv( 'results/importance_ranked.csv', index = False)
+importance_ranked.to_csv( dir_var_sel + 'importance_ranked.csv', index = False)
