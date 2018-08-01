@@ -137,3 +137,39 @@ def normalization( vector, new_max = 1, new_min = 0):
     min_prev = np.min(vector)
     new_vector = (vector - min_prev) / (max_prev - min_prev) * (new_max-new_min) + new_min
     return [new_vector]
+
+
+
+
+def load_data_for_modeling( SEED, predictors = None ):
+    try:
+        training_set = pd.read_csv( dir_data + 'training_set_' + str(SEED) + '.csv' )
+        validation_set = pd.read_csv( dir_data + 'validation_set_' + str(SEED) + '.csv' )
+        test_set = pd.read_csv( dir_data + 'test_set_' + str(SEED) + '.csv' )
+
+        target_label = 'Y'
+        energy_label = 'ENERGY'
+        if predictors is None:
+            predictors = training_set.columns.drop( [target_label, energy_label])
+            print 'all predictors will be used'
+
+
+        X_tr = training_set[ predictors ].fillna( method = 'ffill')
+        X_val = validation_set[ predictors ].fillna( method = 'ffill')
+        X_ts = test_set[ predictors ].fillna( method = 'ffill')
+
+        Y_tr = training_set[ target_label ]
+        Y_val = validation_set[ target_label ]
+        Y_ts = test_set[ target_label ]
+        print 'All objects have been loaded'
+        return [ training_set, validation_set, test_set,
+                 X_tr, X_val, X_ts,
+                 Y_tr, Y_val, Y_ts]
+    except NameError:
+        print 'Something went wrong'
+
+
+
+
+
+
