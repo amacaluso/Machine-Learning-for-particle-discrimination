@@ -11,6 +11,8 @@ import numpy as np
 from collections import Counter
 from sklearn import datasets
 from sklearn.model_selection import train_test_split
+from sklearn.feature_selection import SelectKBest, mutual_info_classif, f_classif
+from sklearn.linear_model import LogisticRegression
 from sklearn import tree
 import matplotlib.pyplot as plt
 from sklearn.model_selection import GridSearchCV
@@ -172,4 +174,35 @@ def load_data_for_modeling( SEED, predictors = None ):
 
 
 
+def extract_predictors( method = 'LASSO' , n_var = 10):
+    # method = 'LASSO'
+    # n_var = 10
+    if method == 'ISIS':
+        df_predictors = pd.read_csv('results/VARIABLE_SELECTION/ISIS.csv' )
+        if n_var <= 10:
+            predictors = df_predictors.N_predictors_10[ df_predictors.N_predictors_10.notnull()]
+        elif n_var > 10 and n_var <= 20:
+            predictors = df_predictors.N_predictors_20[df_predictors.N_predictors_20.notnull()]
+        elif n_var > 20 and n_var <= 30:
+            predictors = df_predictors.N_predictors_30[df_predictors.N_predictors_30.notnull()]
+        elif n_var > 30 and n_var <= 50:
+            predictors = df_predictors.N_predictors_50[df_predictors.N_predictors_50.notnull()]
+        elif n_var > 50 and n_var <= 70:
+            predictors = df_predictors.N_predictors_70[df_predictors.N_predictors_70.notnull()]
+        elif n_var > 70 and n_var <= 100:
+            predictors = df_predictors.N_predictors_100[df_predictors.N_predictors_100.notnull()]
+        elif n_var > 100:
+            predictors = df_predictors.N_predictors_200[df_predictors.N_predictors_200.notnull()]
+        print 'The number of useful predictors for ISIS with nsis equal to', n_var,  'is', len(predictors)
+    else:
+        df_predictors = pd.read_csv('results/VARIABLE_SELECTION/supervised_selection_model.csv' )
+        minimum = min(df_predictors[method])
+        if minimum > n_var:
+            predictors = df_predictors[df_predictors[ method ]<= minimum][method]
+        else:
+            predictors = df_predictors[df_predictors[method] <= n_var][method]
+
+    if len(predictors) != n_var:
+        print 'WARNING: extracted variable are', len(predictors), 'instead of', n_var
+    return predictors
 

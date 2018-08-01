@@ -17,8 +17,8 @@ Y_val, Y_ts = load_data_for_modeling( SEED, predictors)
 
 
 ############################################################
+''' MODELING '''
 
-## MODELING
 kernel_all = ['linear', 'poly', 'rbf']
 C_all =  [1, 5, 13, 19]
 gamma_all = [0.01, 0.1, 0.4]

@@ -1,7 +1,7 @@
 exec(open("Utils.py").read(), globals())
 
 SEED = 231
-exec(open("8015_SPLITTING_DATA.py").read(), globals())
+#exec(open("8015_SPLITTING_DATA.py").read(), globals())
 
 
 dir_var_sel = 'results/VARIABLE_SELECTION/'
@@ -13,11 +13,8 @@ variable_sub_dataset = pd.read_csv( dir_data + "pre_training_set_" + str(SEED) +
 njobs = 2
 print 'The dimension of dataset for variable selection is', variable_sub_dataset.shape
 
-
-
 target_variable = 'Y'
 col_energy = 'ENERGY'
-
 
 X = variable_sub_dataset.drop( [target_variable, col_energy], axis = 1)#.astype('float32')
 X = X.fillna( method = 'ffill')
@@ -198,3 +195,10 @@ importance_ranked['GBM'] = abs(df_importance.GBM).rank()
 importance_ranked['E_NET'] = abs(df_importance.Elastic_Net).rank()
 
 importance_ranked.to_csv( dir_var_sel + 'importance_ranked.csv', index = False)
+
+
+# importance_modeling = pd.read_csv('results/VARIABLE_SELECTION/importance_ranked.csv')
+# univariate_var_sel = pd.read_csv('results/VARIABLE_SELECTION/univariate_var_sel.csv')
+# SUPERVISED_VAR_SEL = importance_modeling.merge( univariate_var_sel, on = 'VARIABLE' )
+# SUPERVISED_VAR_SEL.to_csv( dir_var_sel + 'supervised_selection_model.csv', index = False)
+

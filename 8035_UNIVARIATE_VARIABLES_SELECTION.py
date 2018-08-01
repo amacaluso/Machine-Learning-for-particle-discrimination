@@ -1,33 +1,32 @@
 exec(open("Utils.py").read(), globals())
 
+SEED = 231
+#exec(open("8015_SPLITTING_DATA.py").read(), globals())
 
-directory = 'DATA/CLASSIFICATION/'
-data = pd.read_csv( directory + "dataset.csv" )
+dir_var_sel = 'results/VARIABLE_SELECTION/'
+create_dir(dir_var_sel)
 
-SEED = 123
+dir_data = 'DATA/CLASSIFICATION/'
+variable_sub_dataset = pd.read_csv( dir_data + "pre_training_set_" + str(SEED) + ".csv" )
+
 njobs = 2
-print data.shape
+print 'The dimension of dataset for variable selection is', variable_sub_dataset.shape
+
+target_variable = 'Y'
+col_energy = 'ENERGY'
+predictors = variable_sub_dataset.columns.drop([target_variable, col_energy])
+
+X = variable_sub_dataset[predictors]#.astype('float32')
+X = X.fillna( method = 'ffill')
+# print pd.isnull(X).sum() > 0
+
+Y = variable_sub_dataset[ target_variable ]
 
 variable_score = pd.DataFrame()
 
-
-variable_sub_dataset, modeling_dataset = train_test_split( data, test_size = 0.9,
-                                                           random_state = SEED)
-
-# variable_sub_dataset.to_csv( directory + 'pre_training_set.csv', index = False)
-# modeling_dataset.to_csv( directory + 'modeling_dataset.csv', index = False)
-from sklearn.feature_selection import SelectKBest, mutual_info_classif, f_classif
-from sklearn.linear_model import LogisticRegression
-
 log = LogisticRegression()
 
-variables = variable_sub_dataset.columns[ 0:251 ]
-variable_score[ 'VARIABLE' ] = variables
-
-X = variable_sub_dataset[ variables ]
-X = X.fillna( method = 'ffill')
-
-Y = variable_sub_dataset['Y']
+variable_score[ 'VARIABLE' ] = predictors
 
 F_value, p_value = f_classif(X, Y)
 variable_score[ 'ANOVA_pvalue' ] = p_value
@@ -36,13 +35,11 @@ IG = np.around( mutual_info_classif(X, Y), 3)
 variable_score[ 'INFORMATION_GAIN' ] = IG
 
 
-
 indexes_var = np.percentile( IG, 90)
-
-variables[ np.where( p_value<0.1) ]
+predictors[ np.where( p_value>0.01) ]
 
 accuracy = []
-for var in variables:
+for var in predictors:
     # var = variables[ 2 ]
     x = pd.DataFrame(X[ var ])
     pred = log.fit( x, Y ).predict_proba(x)
@@ -54,9 +51,15 @@ for var in variables:
     prediction_log = (prediction_log>0.5)*1
     current_accuracy = np.around( skl.metrics.accuracy_score(Y, prediction_log), 2 )
     accuracy.append(current_accuracy)
-    print( var, current_accuracy)
+    #print( var, current_accuracy)
 
 variable_score[ 'LR_ACCURACY' ] = accuracy
 univariate_var_sel = variable_score.copy()
 
-univariate_var_sel.to_csv( 'results/univariate_var_sel.csv', index = False)
+univariate_var_sel.columns
+
+univariate_var_sel['INFORMATION_GAIN'] = univariate_var_sel['INFORMATION_GAIN'].rank()
+univariate_var_sel['LR_ACCURACY'] = univariate_var_sel['LR_ACCURACY'].rank()
+
+univariate_var_sel.to_csv( 'results/VARIABLE_SELECTION/univariate_var_sel.csv', index = False)
+
