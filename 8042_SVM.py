@@ -10,7 +10,7 @@ dir_data = 'DATA/CLASSIFICATION/'
 #  'E_NET', 'INFORMATION_GAIN', 'LR_ACCURACY']
 # ISIS
 
-predictors = extract_predictors( 'ISIS', 20)
+predictors = extract_predictors( 'ISIS', 20)[0:5]
 training_set, validation_set, test_set, \
 X_tr, X_val, X_ts, Y_tr, \
 Y_val, Y_ts = load_data_for_modeling( SEED, predictors)
@@ -20,9 +20,9 @@ Y_val, Y_ts = load_data_for_modeling( SEED, predictors)
 dir =  'results/MODELING/CLASSIFICATION/SVM/'
 create_dir( dir )
 ## MODELING
-kernel_all = ['linear', 'rbf'] #, 'poly']
+kernel_all = ['rbf'] #, 'linear','poly']
 C_all =  [1]
-gamma_all = [0.1, 0.4, 1, 2, 5]
+gamma_all = [0.1, 0.4, 1, 2, 5, 10]
 
 
 svm_parameters = expand_grid(
@@ -37,8 +37,8 @@ svm_parameters['validation_error'] = range( n_params )
 svm_parameters.to_csv( dir  + 'VALIDATION_SVM.csv')
 
 
-n_tr = 1000
-n_val = 300
+n_tr = len(Y_tr)
+n_val = len(Y_val)
 
 indexes_training = np.random.randint(0, len(Y_tr), n_tr )
 indexes_val = np.random.randint(0, len(Y_val), n_val )
