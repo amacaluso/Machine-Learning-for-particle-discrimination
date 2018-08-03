@@ -1,6 +1,6 @@
 exec(open("Utils.py").read(), globals())
 
-SEED = 231
+SEED = 543
 #exec(open("8015_SPLITTING_DATA.py").read(), globals())
 
 dir_var_sel = 'results/VARIABLE_SELECTION/'
@@ -61,5 +61,5 @@ univariate_var_sel.columns
 univariate_var_sel['INFORMATION_GAIN'] = univariate_var_sel['INFORMATION_GAIN'].rank()
 univariate_var_sel['LR_ACCURACY'] = univariate_var_sel['LR_ACCURACY'].rank()
 
-univariate_var_sel.to_csv( 'results/VARIABLE_SELECTION/univariate_var_sel.csv', index = False)
+univariate_var_sel.to_csv( 'results/VARIABLE_SELECTION/univariate_var_sel_' + str(SEED) + '.csv', index = False)
 

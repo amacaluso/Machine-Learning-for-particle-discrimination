@@ -174,7 +174,7 @@ def load_data_for_modeling( SEED, predictors = None ):
 
 
 
-def extract_predictors( method = 'LASSO' , n_var = 10):
+def extract_predictors( method = 'LASSO' , n_var = 10, SEED = 231):
     # method = 'LASSO'
     # n_var = 10
     if method == 'ISIS':
@@ -198,10 +198,11 @@ def extract_predictors( method = 'LASSO' , n_var = 10):
         df_predictors = pd.read_csv('results/VARIABLE_SELECTION/supervised_selection_model.csv' )
         minimum = min(df_predictors[method])
         if minimum > n_var:
-            predictors = df_predictors[df_predictors[ method ]<= minimum][method]
+            indexes = df_predictors[df_predictors[ method ]<= minimum][method].index
+            predictors = df_predictors.ix[indexes, 'VARIABLE']
         else:
-            predictors = df_predictors[df_predictors[method] <= n_var][method]
-
+            indexes = df_predictors[df_predictors[ method ]<= n_var][method].index
+            predictors = df_predictors.ix[indexes, 'VARIABLE']
     if len(predictors) != n_var:
         print 'WARNING: extracted variable are', len(predictors), 'instead of', n_var
     return predictors
