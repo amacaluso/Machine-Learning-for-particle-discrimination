@@ -16,6 +16,7 @@ Y_1 = ['G_100', 'G_1000', 'G_10000', 'G_141', 'G_1414', 'G_17320', 'G_200',
        'G_7071', 'G_84']
 
 
+
 # ALL DATA
 complete_dataframe = pd.read_csv("DATA/ALL_DATA.csv")
 df = complete_dataframe.copy()

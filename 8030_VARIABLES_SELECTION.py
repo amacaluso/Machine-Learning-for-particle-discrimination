@@ -7,6 +7,7 @@ SEED = 231
 dir_var_sel = 'results/VARIABLE_SELECTION/'
 create_dir(dir_var_sel)
 
+
 dir_data = 'DATA/CLASSIFICATION/'
 variable_sub_dataset = pd.read_csv( dir_data + "pre_training_set_" + str(SEED) + ".csv" )
 

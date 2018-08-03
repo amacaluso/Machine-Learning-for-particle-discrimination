@@ -53,6 +53,7 @@ for var in predictors:
     accuracy.append(current_accuracy)
     #print( var, current_accuracy)
 
+
 variable_score[ 'LR_ACCURACY' ] = accuracy
 univariate_var_sel = variable_score.copy()
 

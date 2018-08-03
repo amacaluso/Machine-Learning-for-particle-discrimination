@@ -31,6 +31,7 @@ svm_parameters = expand_grid(
      'gamma': gamma_all } )
 
 
+
 n_params = svm_parameters.shape[0]
 from sklearn import svm
 svm_parameters['validation_error'] = range( n_params )

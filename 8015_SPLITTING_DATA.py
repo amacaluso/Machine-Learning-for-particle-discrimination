@@ -4,6 +4,7 @@ dir_data = 'DATA/CLASSIFICATION/'
 data = pd.read_csv( dir_data + "dataset.csv" )
 
 
+
 try:
    SEED
 except NameError:

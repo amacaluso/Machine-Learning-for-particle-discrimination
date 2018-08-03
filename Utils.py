@@ -207,3 +207,4 @@ def extract_predictors( method = 'LASSO' , n_var = 10, SEED = 231):
         print 'WARNING: extracted variable are', len(predictors), 'instead of', n_var
     return predictors
 
+
