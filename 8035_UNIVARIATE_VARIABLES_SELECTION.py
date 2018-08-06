@@ -1,9 +1,9 @@
 exec(open("Utils.py").read(), globals())
 
-SEED = 543
+SEED = 231
 #exec(open("8015_SPLITTING_DATA.py").read(), globals())
 
-dir_var_sel = 'results/VARIABLE_SELECTION/'
+dir_var_sel = 'results/VARIABLE_SELECTION/' + str(SEED) + '/'
 create_dir(dir_var_sel)
 
 dir_data = 'DATA/CLASSIFICATION/'
