@@ -35,5 +35,3 @@ training_set.to_csv( dir_dest + 'training_set.csv', index = False)
 validation_set.to_csv( dir_dest + 'validation_set.csv', index = False)
 test_set.to_csv( dir_data + 'test_set.csv', index = False)
 
-
-

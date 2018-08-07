@@ -1,17 +1,17 @@
 exec(open("Utils.py").read(), globals())
 
-SEED = 231
+SEED = 123
 #exec(open("8015_SPLITTING_DATA.py").read(), globals())
 
 
-dir_var_sel = 'results/VARIABLE_SELECTION/'
+dir_var_sel = 'results/VARIABLE_SELECTION/' + str(SEED) + '/'
 create_dir(dir_var_sel)
 
 
-dir_data = 'DATA/CLASSIFICATION/'
-variable_sub_dataset = pd.read_csv( dir_data + "pre_training_set_" + str(SEED) + ".csv" )
+dir_data = 'DATA/CLASSIFICATION/' + str(SEED) +'/'
+variable_sub_dataset = pd.read_csv( dir_data + "pre_training_set.csv" )
 
-njobs = 1
+njobs = 10
 print 'The dimension of dataset for variable selection is', variable_sub_dataset.shape
 
 target_variable = 'Y'
@@ -40,7 +40,7 @@ grid_values = {'penalty': ['l1'],
 
 log_reg = LogisticRegression()
 
-lr_cv = GridSearchCV(log_reg, param_grid = grid_values)
+lr_cv = GridSearchCV(log_reg, param_grid = grid_values,  n_jobs = njobs)
 lr = lr_cv.fit(X, Y)
 
 coeff_lasso = lr.best_estimator_.coef_[0]
@@ -58,7 +58,7 @@ grid_values = {'penalty': ['l2'],
 
 log_reg = LogisticRegression()
 
-lr_cv = GridSearchCV(log_reg, param_grid = grid_values)
+lr_cv = GridSearchCV(log_reg, param_grid = grid_values,  n_jobs = njobs)
 lr = lr_cv.fit(X, Y)
 
 
@@ -169,19 +169,19 @@ df_importance[ 'RANDOM_FOREST' ] = np.around(df_importance[ 'RANDOM_FOREST' ], 4
 df_importance[ 'GBM' ] = np.around(df_importance[ 'GBM' ], 4)
 df_importance[ 'Elastic_Net' ] = np.around(df_importance[ 'Elastic_Net' ], 2)
 
-df_importance.to_csv( dir_var_sel + '_importance_RAW_' + str(SEED)+ '.csv', index = False)
+#df_importance.to_csv( dir_var_sel + 'importance_RAW.csv', index = False)
 
 
 importance_ranked = pd.DataFrame()
 importance_ranked['VARIABLE'] = df_importance.Variable
 importance_ranked['LASSO'] =  abs(df_importance.LASSO).rank()
-importance_ranked['RIDGE'] =  abs(df_importance.LASSO).rank()
+importance_ranked['RIDGE'] =  abs(df_importance.RIDGE).rank()
 importance_ranked['DECISION_TREE'] = abs(df_importance.DECISION_TREE).rank()
 importance_ranked['RANDOM_FOREST'] = abs(df_importance.RANDOM_FOREST).rank()
 importance_ranked['GBM'] = abs(df_importance.GBM).rank()
 importance_ranked['E_NET'] = abs(df_importance.Elastic_Net).rank()
 
-importance_ranked.to_csv( dir_var_sel + 'importance_ranked_' + str(SEED) +'.csv', index = False)
+importance_ranked.to_csv( dir_var_sel + 'importance_ranked.csv', index = False)
 
 
 # importance_modeling = pd.read_csv('results/VARIABLE_SELECTION/importance_ranked.csv')
