@@ -133,7 +133,7 @@ eNet_parameters = { "l1_ratio": np.arange(0.001, 1, 0.005),
                     'penalty': ["elasticnet"]}
 
 
-eNet = GridSearchCV(eNet, eNet_parameters, scoring='accuracy', cv=5, n_jobs = 2)
+eNet = GridSearchCV(eNet, eNet_parameters, scoring='accuracy', cv=5, n_jobs = njobs)
 eNet = eNet.fit(X, Y)
 eNet_model = eNet.best_estimator_
 
