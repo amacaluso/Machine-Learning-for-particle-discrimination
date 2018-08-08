@@ -1,6 +1,6 @@
 exec(open("Utils.py").read(), globals())
 
-SEED = 231
+SEED = 789
 #exec(open("8015_SPLITTING_DATA.py").read(), globals())
 
 dir_var_sel = 'results/VARIABLE_SELECTION/' + str(SEED) + '/'
