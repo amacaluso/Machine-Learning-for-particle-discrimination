@@ -6,8 +6,9 @@ SEED = 231
 dir_var_sel = 'results/VARIABLE_SELECTION/' + str(SEED) + '/'
 create_dir(dir_var_sel)
 
-dir_data = 'DATA/CLASSIFICATION/'
-variable_sub_dataset = pd.read_csv( dir_data + "pre_training_set_" + str(SEED) + ".csv" )
+dir_data = 'DATA/CLASSIFICATION/' + str(SEED) +'/'
+variable_sub_dataset = pd.read_csv( dir_data + "pre_training_set.csv" )
+
 
 njobs = 2
 print 'The dimension of dataset for variable selection is', variable_sub_dataset.shape
@@ -62,5 +63,5 @@ univariate_var_sel.columns
 univariate_var_sel['INFORMATION_GAIN'] = univariate_var_sel['INFORMATION_GAIN'].rank()
 univariate_var_sel['LR_ACCURACY'] = univariate_var_sel['LR_ACCURACY'].rank()
 
-univariate_var_sel.to_csv( 'results/VARIABLE_SELECTION/univariate_var_sel_' + str(SEED) + '.csv', index = False)
+univariate_var_sel.to_csv( dir_var_sel + 'univariate_var_sel.csv', index = False)
 

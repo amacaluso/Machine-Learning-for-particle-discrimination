@@ -1,7 +1,14 @@
 source( 'Utils.R')
 ensureLibrary( 'SIS' )
 
-data = read.csv("DATA/CLASSIFICATION/pre_training_set.csv")
+SEED = 789
+
+dir_source = paste0( "DATA/CLASSIFICATION/", SEED, "/")
+dir_dest = paste0("results/VARIABLE_SELECTION/", SEED, "/")
+dir.create( dir_dest )
+
+
+data = read.csv( file = paste0( dir_source, "pre_training_set.csv"))
 data = na.omit( data )
 
 X_raw = remove_columns_by_names( data, c('Y', 'ENERGY'))
@@ -14,7 +21,7 @@ x_names = colnames(X)
 X = apply(X, 2, function(y) (y - mean(y)) /sd(y))
 Y = data[ , 'Y' ]
 
-N_VAR = c(10, 20, 30, 50, 70, 100, 200)
+N_VAR = c(10, 20, 30, 40, 50) #, 60, 70, 100, 200)
 df_variable = data.frame(matrix( nrow = max(N_VAR)))[, -1]
 
 for (n_var in N_VAR)
@@ -33,4 +40,4 @@ row_NA = min(which(df_variable[ colname ] == 'NA'))
 
 df_variable = df_variable[ 1:row_NA-1,]
 
-write.csv( df_variable, file = 'results/ISIS.csv', row.names = F)
+write.csv( df_variable, file = paste0(dir_dest, 'ISIS.csv'), row.names = F)

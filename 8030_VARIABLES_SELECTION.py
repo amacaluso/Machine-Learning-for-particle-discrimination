@@ -11,7 +11,7 @@ create_dir(dir_var_sel)
 dir_data = 'DATA/CLASSIFICATION/' + str(SEED) +'/'
 variable_sub_dataset = pd.read_csv( dir_data + "pre_training_set.csv" )
 
-njobs = 10
+njobs = 1
 print 'The dimension of dataset for variable selection is', variable_sub_dataset.shape
 
 target_variable = 'Y'
@@ -162,14 +162,14 @@ df_importance[ 'Elastic_Net' ] = coeff_eNet
 
 ##############################################
 
-df_importance[ 'LASSO' ] = np.around(df_importance[ 'LASSO' ], 2)
-df_importance[ 'RIDGE' ] = np.around(df_importance[ 'RIDGE' ], 2)
-df_importance[ 'DECISION_TREE' ] = np.around(df_importance[ 'DECISION_TREE' ], 4)
-df_importance[ 'RANDOM_FOREST' ] = np.around(df_importance[ 'RANDOM_FOREST' ], 4)
-df_importance[ 'GBM' ] = np.around(df_importance[ 'GBM' ], 4)
-df_importance[ 'Elastic_Net' ] = np.around(df_importance[ 'Elastic_Net' ], 2)
+# df_importance[ 'LASSO' ] = np.around(df_importance[ 'LASSO' ], 2)
+# df_importance[ 'RIDGE' ] = np.around(df_importance[ 'RIDGE' ], 2)
+# df_importance[ 'DECISION_TREE' ] = np.around(df_importance[ 'DECISION_TREE' ], 4)
+# df_importance[ 'RANDOM_FOREST' ] = np.around(df_importance[ 'RANDOM_FOREST' ], 4)
+# df_importance[ 'GBM' ] = np.around(df_importance[ 'GBM' ], 4)
+# df_importance[ 'Elastic_Net' ] = np.around(df_importance[ 'Elastic_Net' ], 2)
 
-#df_importance.to_csv( dir_var_sel + 'importance_RAW.csv', index = False)
+# df_importance.to_csv( dir_var_sel + 'importance_RAW.csv', index = False)
 
 
 importance_ranked = pd.DataFrame()

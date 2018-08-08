@@ -3,7 +3,7 @@ exec(open("Utils.py").read(), globals())
 dir_data = 'DATA/CLASSIFICATION/'
 data = pd.read_csv( dir_data + "dataset.csv" )
 
-
+SEED = 789
 
 try:
    SEED

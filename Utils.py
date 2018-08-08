@@ -174,28 +174,25 @@ def load_data_for_modeling( SEED, predictors = None ):
 
 
 
-def extract_predictors( method = 'LASSO' , n_var = 10, SEED = 231):
+def extract_predictors( method = 'RANDOM_FOREST' , n_var = 10, SEED = 231):
     # method = 'LASSO'
     # n_var = 10
+    # SEED = 231
     if method == 'ISIS':
-        df_predictors = pd.read_csv('results/VARIABLE_SELECTION/ISIS.csv' )
+        df_predictors = pd.read_csv('results/VARIABLE_SELECTION/' + str(SEED) + '/ISIS.csv' )
         if n_var <= 10:
             predictors = df_predictors.N_predictors_10[ df_predictors.N_predictors_10.notnull()]
         elif n_var > 10 and n_var <= 20:
             predictors = df_predictors.N_predictors_20[df_predictors.N_predictors_20.notnull()]
         elif n_var > 20 and n_var <= 30:
             predictors = df_predictors.N_predictors_30[df_predictors.N_predictors_30.notnull()]
-        elif n_var > 30 and n_var <= 50:
+        elif n_var > 30 and n_var <= 40:
+            predictors = df_predictors.N_predictors_40[df_predictors.N_predictors_40.notnull()]
+        elif n_var > 40:
             predictors = df_predictors.N_predictors_50[df_predictors.N_predictors_50.notnull()]
-        elif n_var > 50 and n_var <= 70:
-            predictors = df_predictors.N_predictors_70[df_predictors.N_predictors_70.notnull()]
-        elif n_var > 70 and n_var <= 100:
-            predictors = df_predictors.N_predictors_100[df_predictors.N_predictors_100.notnull()]
-        elif n_var > 100:
-            predictors = df_predictors.N_predictors_200[df_predictors.N_predictors_200.notnull()]
         print 'The number of useful predictors for ISIS with nsis equal to', n_var,  'is', len(predictors)
     else:
-        df_predictors = pd.read_csv('results/VARIABLE_SELECTION/supervised_selection_model.csv' )
+        df_predictors = pd.read_csv('results/VARIABLE_SELECTION/'  + str(SEED) + '/importance_ranked.csv' )
         minimum = min(df_predictors[method])
         if minimum > n_var:
             indexes = df_predictors[df_predictors[ method ]<= minimum][method].index
