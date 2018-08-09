@@ -1,24 +1,24 @@
 exec(open("Utils.py").read(), globals())
 from sklearn import svm
-SEED = 231
-dir_images = 'Images/'
-dir_data = 'DATA/CLASSIFICATION/'
+SEED = 123
 
+dir_images = 'Images/'
+dir_source = 'DATA/CLASSIFICATION/' + str(SEED) + '/'
+dir_dest = 'results/MODELING/CLASSIFICATION/SVM'+ str(SEED) + '/'
+create_dir( dir_dest )
 
 # GET PREDICTOR
 # ['LASSO', 'DECISION_TREE', 'RANDOM_FOREST', 'GBM',
 #  'E_NET', 'INFORMATION_GAIN', 'LR_ACCURACY']
 # ISIS
 
-predictors = extract_predictors( 'ISIS', 20)
+predictors = extract_predictors( 'LR_ACCURACY', 10, 231)
 training_set, validation_set, test_set, \
 X_tr, X_val, X_ts, Y_tr, \
 Y_val, Y_ts = load_data_for_modeling( SEED, predictors)
 
 
 ############################################################
-dir =  'results/MODELING/CLASSIFICATION/SVM/'
-create_dir( dir )
 ## MODELING
 kernel_all = ['rbf', 'linear','poly']
 C_all =  [0.5, 1, 3, 5, 10]

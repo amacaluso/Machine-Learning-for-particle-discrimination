@@ -144,10 +144,11 @@ def normalization( vector, new_max = 1, new_min = 0):
 
 
 def load_data_for_modeling( SEED, predictors = None ):
+    dir_data = "DATA/CLASSIFICATION/"  + str(SEED) + "/"
     try:
-        training_set = pd.read_csv( dir_data + 'training_set_' + str(SEED) + '.csv' )
-        validation_set = pd.read_csv( dir_data + 'validation_set_' + str(SEED) + '.csv' )
-        test_set = pd.read_csv( dir_data + 'test_set_' + str(SEED) + '.csv' )
+        training_set = pd.read_csv( dir_data + 'training_set.csv' )
+        validation_set = pd.read_csv( dir_data + 'validation_set.csv' )
+        test_set = pd.read_csv( dir_data + 'test_set.csv' )
 
         target_label = 'Y'
         energy_label = 'ENERGY'
@@ -174,8 +175,8 @@ def load_data_for_modeling( SEED, predictors = None ):
 
 
 
-def extract_predictors( method = 'RANDOM_FOREST' , n_var = 10, SEED = 231):
-    # method = 'LASSO'
+def extract_predictors( method = 'RANDOM_FOREST' , n_var = 40, SEED = 231):
+    # method = 'INFORMATION_GAIN'
     # n_var = 10
     # SEED = 231
     if method == 'ISIS':
@@ -191,6 +192,15 @@ def extract_predictors( method = 'RANDOM_FOREST' , n_var = 10, SEED = 231):
         elif n_var > 40:
             predictors = df_predictors.N_predictors_50[df_predictors.N_predictors_50.notnull()]
         print 'The number of useful predictors for ISIS with nsis equal to', n_var,  'is', len(predictors)
+    elif method in ['INFORMATION_GAIN', 'LR_ACCURACY']:
+        df_predictors = pd.read_csv('results/VARIABLE_SELECTION/' + str(SEED) + '/univariate_var_sel.csv')
+        minimum = min(df_predictors[method])
+        if minimum > n_var:
+            indexes = df_predictors[df_predictors[method] <= minimum][method].index
+            predictors = df_predictors.ix[indexes, 'VARIABLE']
+        else:
+            indexes = df_predictors[df_predictors[ method ]<= n_var][method].index
+            predictors = df_predictors.ix[indexes, 'VARIABLE']
     else:
         df_predictors = pd.read_csv('results/VARIABLE_SELECTION/'  + str(SEED) + '/importance_ranked.csv' )
         minimum = min(df_predictors[method])

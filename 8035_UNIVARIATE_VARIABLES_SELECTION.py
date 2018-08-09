@@ -32,7 +32,7 @@ variable_score[ 'VARIABLE' ] = predictors
 F_value, p_value = f_classif(X, Y)
 variable_score[ 'ANOVA_pvalue' ] = p_value
 
-IG = np.around( mutual_info_classif(X, Y), 3)
+IG = mutual_info_classif(X, Y)
 variable_score[ 'INFORMATION_GAIN' ] = IG
 
 
@@ -50,7 +50,7 @@ for var in predictors:
         prediction_log.append( p[1] )
     prediction_log = np.array(prediction_log)
     prediction_log = (prediction_log>0.5)*1
-    current_accuracy = np.around( skl.metrics.accuracy_score(Y, prediction_log), 2 )
+    current_accuracy = skl.metrics.accuracy_score(Y, prediction_log)
     accuracy.append(current_accuracy)
     #print( var, current_accuracy)
 

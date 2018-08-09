@@ -3,7 +3,7 @@ exec(open("Utils.py").read(), globals())
 dir_data = 'DATA/CLASSIFICATION/'
 data = pd.read_csv( dir_data + "dataset.csv" )
 
-SEED = 789
+SEED = 456
 
 try:
    SEED
@@ -33,5 +33,5 @@ training_set, validation_set = train_test_split( training_data, test_size = 0.1,
 
 training_set.to_csv( dir_dest + 'training_set.csv', index = False)
 validation_set.to_csv( dir_dest + 'validation_set.csv', index = False)
-test_set.to_csv( dir_data + 'test_set.csv', index = False)
+test_set.to_csv( dir_dest + 'test_set.csv', index = False)
 
