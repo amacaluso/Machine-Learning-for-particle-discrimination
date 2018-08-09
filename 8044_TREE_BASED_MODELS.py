@@ -1,16 +1,27 @@
 exec(open("Utils.py").read(), globals())
-from sklearn import svm
-SEED = 231
-dir_images = 'Images/'
-dir_data = 'DATA/CLASSIFICATION/'
+exec(open("Utils_parallel.py").read(), globals())
 
+
+SEED = 231
+njob = 1
+
+dir_images = 'Images/'
+dir_source = 'DATA/CLASSIFICATION/' + str(SEED) + '/'
+dir_dest = 'results/MODELING/CLASSIFICATION/TREE_BASED/'+ str(SEED) + '/'
+create_dir( dir_dest )
 
 # GET PREDICTOR
 # ['LASSO', 'DECISION_TREE', 'RANDOM_FOREST', 'GBM',
 #  'E_NET', 'INFORMATION_GAIN', 'LR_ACCURACY']
 # ISIS
 
-predictors = extract_predictors( 'ISIS', 10)
+method = 'INFORMATION_GAIN'
+nvar = 5
+
+predictors = extract_predictors( method, nvar, SEED)
+
+eff_nvar = len(predictors)
+
 training_set, validation_set, test_set, \
 X_tr, X_val, X_ts, Y_tr, \
 Y_val, Y_ts = load_data_for_modeling( SEED, predictors)
@@ -25,31 +36,54 @@ Y_val, Y_ts = load_data_for_modeling( SEED, predictors)
 
 ############# DECISION TREE ################################
 
-tree_dir = 'result/TREE'
-create_dir( tree_dir )
-decision_tree = tree.DecisionTreeClassifier(criterion = "entropy",
-                                            min_samples_split = 100,
-                                            random_state = SEED,
-                                            max_depth = 45,
-                                            min_samples_leaf = 50 )
+tree_dir_dest = dir_dest + 'TREE/'
+create_dir( tree_dir_dest )
+parameters = create_parameters_dt( method, nvar, eff_nvar, SEED)
 
-# dt_parameters = {'max_depth': range(5, 50, 10),
-#                  'min_samples_leaf': range(50, 400, 50),
-#                  'min_samples_split': range( 100, 500, 100),
-#                  'criterion': ['gini', 'entropy']}
-#
-# decision_tree = GridSearchCV( tree.DecisionTreeClassifier(), dt_parameters, n_jobs = 2 )
-# tree_model = decision_tree.best_estimator_
+inputs = range( len(parameters))
+tr_val_error = Parallel(n_jobs = njob)(delayed(parallel_tree)(i) for i in inputs)
 
-decision_tree = decision_tree.fit( X_tr, Y_tr )
-tree_model = decision_tree
+train_accuracy = []; valid_accuracy = []
 
-importance_dt = tree_model.feature_importances_[tree_model.feature_importances_>0]
-variables_dt = list( X.columns[ tree_model.feature_importances_>0 ] )
+for accuracy in tr_val_error:
+    train_accuracy.append( accuracy[0])
+    valid_accuracy.append(accuracy[1] )
+
+parameters['validation_accuracy'] = valid_accuracy
+parameters['training_accuracy'] = train_accuracy
+
+parameters.to_csv(tree_dir_dest + 'validation.csv', index = False)
+update_validation( MODEL = 'TREE', PARAMETERS = parameters )
+
+
+ix_max = parameters.validation_accuracy.nlargest(1).index
+min_samples_split = parameters.ix[ix_max, 'min_samples_split'].values[0]
+criterion = parameters.ix[ix_max, 'criterion'].values[0]
+max_depth = parameters.ix[ix_max, 'max_depth'].values[0]
+min_samples_leaf = parameters.ix[ix_max, 'min_samples_leaf'].values[0]
+
+decision_tree = tree.DecisionTreeClassifier(max_depth = max_depth,
+                                            min_samples_leaf = min_samples_leaf,
+                                            min_samples_split = min_samples_split,
+                                            criterion = criterion)
+
+final_tree = decision_tree.fit( X_tr, Y_tr )
+probs = final_tree.predict_proba(X_ts)
+
+prediction = []; [prediction.append( p[1]) for p in probs]
+ROC = ROC_analysis( Y_ts, prediction, label = "TREE",
+                    probability_tresholds=np.arange(0.1, 0.91, 0.1))
+update_metrics(ROC, SEED, method, eff_nvar )
+
+
+
+importance_dt = final_tree.feature_importances_[final_tree.feature_importances_>0]
+variables_dt = list( X_tr.columns[ final_tree.feature_importances_>0 ] )
 
 plt.bar( variables_dt, importance_dt)
-plt.xticks(rotation=90)
-plt.title( "Decision Tree - Variable Importance")
+plt.xticks(rotation = 45)
+plt.title( "Decision Tree - " + 'Variable selection: ' + method + ' (SEED = ' + str(SEED) + ')')
+plt.savefig( tree_dir_dest + "Variable_Importance.png")
 plt.show()
 
 ######################################################################

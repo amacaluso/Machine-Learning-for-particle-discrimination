@@ -8,6 +8,7 @@ Created on Tue Mar 27 22:02:48 2018
 
 import pandas as pd
 import numpy as np
+import datetime
 from collections import Counter
 from sklearn import datasets
 from sklearn.model_selection import train_test_split
@@ -215,3 +216,99 @@ def extract_predictors( method = 'RANDOM_FOREST' , n_var = 40, SEED = 231):
     return predictors
 
 
+
+def create_parameters_dt( method, nvar, eff_nvar, SEED,
+                          max_depth_all = [5, 20, 50, 100],
+                          min_samples_leaf_all = [ 50, 100, 200, 500, 1000],
+                          min_samples_split_all = [ 50, 100, 200, 500, 1000],
+                          criterion_all =  ['gini', 'entropy']):
+
+    parameters = expand_grid(
+        {'max_depth': max_depth_all,
+         'min_samples_leaf': min_samples_leaf_all,
+         'min_samples_split': min_samples_split_all,
+         'criterion': criterion_all} )
+
+    n_params = parameters.shape[0]
+    from sklearn import svm
+    parameters['method_var_sel'] = np.repeat( method, n_params)
+    parameters['nvar'] = np.repeat( nvar, n_params)
+    parameters['effective_nvar'] = np.repeat( eff_nvar, n_params)
+    parameters['SEED'] = np.repeat( SEED, n_params)
+    return parameters
+
+
+
+def update_validation( MODEL, PARAMETERS,
+                       path = 'results/MODELING/CLASSIFICATION/parameters.csv'):
+    #MODEL = 'TREE'
+    #PARAMETERS = parameters
+    data = datetime.datetime.now()
+
+    all_parameters = pd.read_csv( path )
+    all_parameters['KEY'] = all_parameters['Model'] + '_' + \
+                            all_parameters['method_var_sel'] + '_' + \
+                            all_parameters['SEED'].astype(str)
+
+    Model = pd.Series(np.repeat( MODEL, len(PARAMETERS)))
+    Time = pd.Series(np.repeat(data, len(PARAMETERS)))
+    df = pd.concat( [Model, Time, PARAMETERS ], axis = 1 )
+    df.columns = ['Model'] + ['Time'] + PARAMETERS.columns.tolist()
+
+    df['KEY'] = df['Model'] + '_' + \
+                df['method_var_sel'] + '_' + \
+                df['SEED'].astype(str)
+    KEY = df.KEY.unique()[0]
+    # all_parameters = df
+
+    if df.KEY.unique() in all_parameters.KEY.unique():
+        KEY = df.KEY.unique()[0]
+        all_parameters = all_parameters.drop(all_parameters[(all_parameters.KEY == KEY)].index)
+        all_parameters = pd.concat( [all_parameters, df])
+        print 'The parameters have been updated'
+    else:
+        all_parameters = pd.concat( [all_parameters, df])
+        print 'The parameters have been added'
+
+    all_parameters.to_csv(path, index = False)
+    return 'Validation data has been saved in', path
+
+
+def update_metrics(ROC_MATRIX, SEED, METHOD, NVAR,
+                    path='results/MODELING/CLASSIFICATION/metrics.csv'):
+    # ROC_MATRIX = ROC
+    # SEED
+    # METHOD = method
+    # NVAR = eff_nvar
+    data = datetime.datetime.now()
+    # path = 'results/MODELING/CLASSIFICATION/metrics.csv'
+
+    ALL_METRICS = pd.read_csv( path )
+    ALL_METRICS['KEY'] = ALL_METRICS['Model'] + '_' + \
+                         ALL_METRICS['Method'] + '_' + \
+                         ALL_METRICS['n_variables'].astype(str) + '_' +\
+                         ALL_METRICS['SEED'].astype(str)
+
+    Time = pd.Series(np.repeat(data, len(ROC_MATRIX)))
+    series_seed = pd.Series(np.repeat(SEED, len(ROC_MATRIX)))
+    method = pd.Series(np.repeat(METHOD, len(ROC_MATRIX)))
+    nvar = pd.Series(np.repeat(NVAR, len(ROC_MATRIX)))
+    df = pd.concat([ROC_MATRIX, method, nvar, Time, series_seed], axis=1)
+    df.columns = ROC_MATRIX.columns.tolist() + ['Method'] + ['n_variables'] + ['Time'] + ['SEED']
+
+    df['KEY'] = df['Model'] + '_' + \
+                df['Method'] + '_' + \
+                df['n_variables'].astype(str) + '_' +\
+                df['SEED'].astype(str)
+
+    KEY = df.KEY.unique()[0]
+
+    if KEY in ALL_METRICS.KEY.unique():
+        ALL_METRICS = ALL_METRICS.drop(ALL_METRICS[(ALL_METRICS.KEY == KEY)].index)
+        ALL_METRICS = pd.concat([ALL_METRICS, df])
+        print 'Metrics have been updated'
+    else:
+        ALL_METRICS = pd.concat([ALL_METRICS, df])
+        print 'Metrics have been added'
+
+    ALL_METRICS.to_csv(path, index = False)

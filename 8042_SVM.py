@@ -1,10 +1,11 @@
 exec(open("Utils.py").read(), globals())
 from sklearn import svm
-SEED = 123
+
+SEED = 231
 
 dir_images = 'Images/'
 dir_source = 'DATA/CLASSIFICATION/' + str(SEED) + '/'
-dir_dest = 'results/MODELING/CLASSIFICATION/SVM'+ str(SEED) + '/'
+dir_dest = 'results/MODELING/CLASSIFICATION/SVM/'+ str(SEED) + '/'
 create_dir( dir_dest )
 
 # GET PREDICTOR
@@ -12,7 +13,13 @@ create_dir( dir_dest )
 #  'E_NET', 'INFORMATION_GAIN', 'LR_ACCURACY']
 # ISIS
 
-predictors = extract_predictors( 'LR_ACCURACY', 10, 231)
+method = 'LR_ACCURACY'
+nvar = 10
+
+predictors = extract_predictors( method, nvar, SEED)
+
+eff_nvar = len(predictors)
+
 training_set, validation_set, test_set, \
 X_tr, X_val, X_ts, Y_tr, \
 Y_val, Y_ts = load_data_for_modeling( SEED, predictors)
