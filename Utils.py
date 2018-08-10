@@ -238,18 +238,81 @@ def create_parameters_dt( method, nvar, eff_nvar, SEED,
     return parameters
 
 
+def create_parameters_rf( method, nvar, eff_nvar, SEED,
+                          n_estimators_all = [50, 100, 200, 500, 700, 1000, 1500, 2000],
+                          max_features_all = np.arange(2, 30, 5 ).tolist(),
+                          max_depth_all = np.arange(3, 24, 5).tolist(),
+                          min_samples_split_all =  [100, 500, 1000]):
+
+    parameters = expand_grid(
+        {'n_estimators': n_estimators_all,
+         'max_features': max_features_all,
+         'max_depth': max_depth_all,
+         'min_samples_split': min_samples_split_all} )
+
+    n_params = parameters.shape[0]
+    from sklearn import svm
+    parameters['method_var_sel'] = np.repeat( method, n_params)
+    parameters['nvar'] = np.repeat( nvar, n_params)
+    parameters['effective_nvar'] = np.repeat( eff_nvar, n_params)
+    parameters['SEED'] = np.repeat( SEED, n_params)
+    return parameters
+
+
+def create_parameters_gbm( method, nvar, eff_nvar, SEED,
+                           n_estimators_all=[50, 300],
+                           max_depth_all=np.arange(3, 9, 5).tolist(),
+                           learning_rate_all = [ 0.001, 0.1] ):
+    parameters = expand_grid(
+        {'n_estimators': n_estimators_all,
+         'max_depth': max_depth_all,
+         'learning_rate': learning_rate_all} )
+
+    n_params = parameters.shape[0]
+    from sklearn import svm
+    parameters['method_var_sel'] = np.repeat( method, n_params)
+    parameters['nvar'] = np.repeat( nvar, n_params)
+    parameters['effective_nvar'] = np.repeat( eff_nvar, n_params)
+    parameters['SEED'] = np.repeat( SEED, n_params)
+    return parameters
+
+
+
+
+
+
+
+
+def create_variable_score( model, SEED, VARIABLES, SCORE, method_var_sel, n_var):
+    # model = 'TREE'
+    # method_var_sel = method
+    # n_var = eff_nvar
+    # VARIABLES = X_tr.columns
+    # SCORE = importance_dt
+    n = len( VARIABLES )
+    VARIABLES = pd.Series(VARIABLES.tolist())
+    SCORE = pd.Series(SCORE.tolist())
+    model_array = pd.Series (np.repeat( model, n ).tolist())
+    method_array = pd.Series (np.repeat( method_var_sel, n ).tolist())
+    nvar_array = pd.Series (np.repeat( n_var, n ).tolist())
+    SEED_array = pd.Series (np.repeat( SEED, n ).tolist() )
+
+    importance = pd.concat( [model_array, SEED_array, method_array,
+                                nvar_array, VARIABLES, SCORE ], axis=1)
+    importance.columns = ['MODEL', 'SEED', 'VAR_SELECTION',
+                          'N_VAR', 'VARIABLE', 'SCORE']
+    return importance
+
+
+
+
 
 def update_validation( MODEL, PARAMETERS,
-                       path = 'results/MODELING/CLASSIFICATION/parameters.csv'):
-    #MODEL = 'TREE'
-    #PARAMETERS = parameters
+                       path = 'results/MODELING/CLASSIFICATION/'):
+    # MODEL = 'RANDOM_FOREST'
+    # PARAMETERS = parameters
+    path = path + 'parameters.csv'
     data = datetime.datetime.now()
-
-    all_parameters = pd.read_csv( path )
-    all_parameters['KEY'] = all_parameters['Model'] + '_' + \
-                            all_parameters['method_var_sel'] + '_' + \
-                            all_parameters['SEED'].astype(str)
-
     Model = pd.Series(np.repeat( MODEL, len(PARAMETERS)))
     Time = pd.Series(np.repeat(data, len(PARAMETERS)))
     df = pd.concat( [Model, Time, PARAMETERS ], axis = 1 )
@@ -258,20 +321,26 @@ def update_validation( MODEL, PARAMETERS,
     df['KEY'] = df['Model'] + '_' + \
                 df['method_var_sel'] + '_' + \
                 df['SEED'].astype(str)
+
     KEY = df.KEY.unique()[0]
-    # all_parameters = df
 
-    if df.KEY.unique() in all_parameters.KEY.unique():
-        KEY = df.KEY.unique()[0]
-        all_parameters = all_parameters.drop(all_parameters[(all_parameters.KEY == KEY)].index)
-        all_parameters = pd.concat( [all_parameters, df])
-        print 'The parameters have been updated'
-    else:
-        all_parameters = pd.concat( [all_parameters, df])
-        print 'The parameters have been added'
+    try:
+        all_parameters = pd.read_csv( path )
+        all_parameters['KEY'] = all_parameters['Model'] + '_' + \
+                                all_parameters['method_var_sel'] + '_' + \
+                                all_parameters['SEED'].astype(str)
+        if KEY in all_parameters.KEY.unique():
+            all_parameters = all_parameters.drop(all_parameters[(all_parameters.KEY == KEY)].index)
+            all_parameters = pd.concat([all_parameters, df])
+            print 'The parameters have been updated'
+        else:
+            all_parameters = pd.concat([all_parameters, df])
+            print 'The parameters have been added'
+        all_parameters.to_csv(path, index=False)
+    except:
+        print 'There is no file parameters, it will be created'
+        df.to_csv(path, index=False)
 
-    all_parameters.to_csv(path, index = False)
-    return 'Validation data has been saved in', path
 
 
 def update_metrics(ROC_MATRIX, SEED, METHOD, NVAR,
@@ -282,12 +351,6 @@ def update_metrics(ROC_MATRIX, SEED, METHOD, NVAR,
     # NVAR = eff_nvar
     data = datetime.datetime.now()
     # path = 'results/MODELING/CLASSIFICATION/metrics.csv'
-
-    ALL_METRICS = pd.read_csv( path )
-    ALL_METRICS['KEY'] = ALL_METRICS['Model'] + '_' + \
-                         ALL_METRICS['Method'] + '_' + \
-                         ALL_METRICS['n_variables'].astype(str) + '_' +\
-                         ALL_METRICS['SEED'].astype(str)
 
     Time = pd.Series(np.repeat(data, len(ROC_MATRIX)))
     series_seed = pd.Series(np.repeat(SEED, len(ROC_MATRIX)))
@@ -303,12 +366,55 @@ def update_metrics(ROC_MATRIX, SEED, METHOD, NVAR,
 
     KEY = df.KEY.unique()[0]
 
-    if KEY in ALL_METRICS.KEY.unique():
-        ALL_METRICS = ALL_METRICS.drop(ALL_METRICS[(ALL_METRICS.KEY == KEY)].index)
-        ALL_METRICS = pd.concat([ALL_METRICS, df])
-        print 'Metrics have been updated'
-    else:
-        ALL_METRICS = pd.concat([ALL_METRICS, df])
-        print 'Metrics have been added'
+    try:
+        ALL_METRICS = pd.read_csv( path )
+        ALL_METRICS['KEY'] = ALL_METRICS['Model'] + '_' + \
+                             ALL_METRICS['Method'] + '_' + \
+                             ALL_METRICS['n_variables'].astype(str) + '_' +\
+                             ALL_METRICS['SEED'].astype(str)
 
-    ALL_METRICS.to_csv(path, index = False)
+        if KEY in ALL_METRICS.KEY.unique():
+            ALL_METRICS = ALL_METRICS.drop(ALL_METRICS[(ALL_METRICS.KEY == KEY)].index)
+            ALL_METRICS = pd.concat([ALL_METRICS, df])
+            print 'Metrics have been updated'
+        else:
+            ALL_METRICS = pd.concat([ALL_METRICS, df])
+            print 'Metrics have been added'
+
+        ALL_METRICS.to_csv(path, index = False)
+    except:
+        print 'There is no file metrics, it will be created'
+        df.to_csv(path, index=False)
+
+
+
+
+
+def update_var_score( importance, path = 'results/MODELING/CLASSIFICATION/'):
+    #model = importance.MODEL.unique()[0]
+    #path = tree_dir_dest + 'variable_score.csv'
+    #importance.to_csv( path, index = False)
+
+    path = path + 'variable_score.csv'
+    importance['KEY'] = importance['MODEL'] + '_' + \
+                        importance['SEED'].astype(str) + '_' + \
+                        importance['VAR_SELECTION'] + '_' + \
+                        importance['N_VAR'].astype(str)
+
+    KEY = importance.KEY.unique()[0]
+
+    try:
+        ALL_IMPORTANCE = pd.read_csv(path)
+        if KEY in ALL_IMPORTANCE.KEY.unique():
+            ALL_IMPORTANCE = ALL_IMPORTANCE.drop(ALL_IMPORTANCE[(ALL_IMPORTANCE.KEY == KEY)].index)
+            ALL_IMPORTANCE = pd.concat([ALL_IMPORTANCE, importance])
+            print 'Importance have been updated'
+        else:
+            ALL_IMPORTANCE = pd.concat([ALL_IMPORTANCE, importance])
+            print 'Importance have been added'
+
+        ALL_IMPORTANCE.to_csv(path, index = False)
+    except:
+        print 'There is no file metrics, it will be created'
+        importance.to_csv(path, index=False)
+
