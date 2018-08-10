@@ -66,3 +66,53 @@ def parallel_gbm(i):
     prediction_tr = fitted_gbm.predict(X_tr)
     accuracy_tr = skl.metrics.accuracy_score(Y_tr, prediction_tr)
     return [accuracy, accuracy_tr]
+
+def parallel_SVM(i):
+    kernel = parameters.ix[ i, 'kernel']
+    C = parameters.ix[i, 'C']
+    gamma = parameters.ix[i, 'gamma']
+    SVM = svm.SVC( C = C, gamma = gamma, kernel= kernel)
+    fitted_svm = SVM.fit(X_tr, Y_tr)
+    prediction = fitted_svm.predict(X_val)
+    accuracy = skl.metrics.accuracy_score(Y_val, prediction)
+    prediction_tr = fitted_svm.predict(X_tr)
+    accuracy_tr = skl.metrics.accuracy_score(Y_tr, prediction_tr)
+    return [accuracy, accuracy_tr]
+
+
+def parallel_regularized(i):
+    penalty = parameters.ix[ i, 'penalty']
+    C = parameters.ix[i, 'C']
+    log_regression =  LogisticRegression( penalty = penalty, C = C)
+    fitted_regularized = log_regression.fit(X_tr, Y_tr)
+    prediction = fitted_regularized.predict(X_val)
+    accuracy = skl.metrics.accuracy_score(Y_val, prediction)
+    prediction_tr = fitted_regularized.predict(X_tr)
+    accuracy_tr = skl.metrics.accuracy_score(Y_tr, prediction_tr)
+    return [accuracy, accuracy_tr]
+
+
+
+
+def parallel_bernoulliNB(i):
+    alpha = parameters.ix[ i, 'alpha']
+    bernoulli_NB =  BernoulliNB(alpha = alpha)
+    fitted_BNB = bernoulli_NB.fit(X_tr, Y_tr)
+    prediction = fitted_BNB.predict(X_val)
+    accuracy = skl.metrics.accuracy_score(Y_val, prediction)
+    prediction_tr = fitted_BNB.predict(X_tr)
+    accuracy_tr = skl.metrics.accuracy_score(Y_tr, prediction_tr)
+    return [accuracy, accuracy_tr]
+
+
+
+def parallel_KNN(i):
+    n_neighbors = parameters.ix[ i, 'n_neighbors']
+    p = parameters.ix[i, 'p']
+    knn =  KNeighborsClassifier(n_neighbors = n_neighbors, p = p)
+    fitted_knn = knn.fit(X_tr, Y_tr)
+    prediction = fitted_knn.predict(X_val)
+    accuracy = skl.metrics.accuracy_score(Y_val, prediction)
+    prediction_tr = fitted_knn.predict(X_tr)
+    accuracy_tr = skl.metrics.accuracy_score(Y_tr, prediction_tr)
+    return [accuracy, accuracy_tr]

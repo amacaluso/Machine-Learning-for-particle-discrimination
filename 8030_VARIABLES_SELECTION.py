@@ -32,8 +32,7 @@ df_importance[ 'Variable' ] = x_names
 # variable_sub_dataset.to_csv( 'dataset_reduced.csv', index = False)
 
 #################### LASSO ##########################
-from sklearn.linear_model import LogisticRegression
-from sklearn.metrics import mean_squared_error, r2_score
+
 
 grid_values = {'penalty': ['l1'],
                'C': np.arange(0.0001, 1, 0.0005)}

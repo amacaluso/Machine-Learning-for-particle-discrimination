@@ -1,11 +1,17 @@
 exec(open("Utils.py").read(), globals())
+exec(open("Utils_parallel.py").read(), globals())
 from sklearn import svm
 
+
 SEED = 231
+njob = 1
+method = 'LR_ACCURACY'
+nvar = 5
+
 
 dir_images = 'Images/'
 dir_source = 'DATA/CLASSIFICATION/' + str(SEED) + '/'
-dir_dest = 'results/MODELING/CLASSIFICATION/SVM/'+ str(SEED) + '/'
+dir_dest = 'results/MODELING/CLASSIFICATION/' + 'SVM/'
 create_dir( dir_dest )
 
 # GET PREDICTOR
@@ -13,128 +19,75 @@ create_dir( dir_dest )
 #  'E_NET', 'INFORMATION_GAIN', 'LR_ACCURACY']
 # ISIS
 
-method = 'LR_ACCURACY'
-nvar = 10
-
 predictors = extract_predictors( method, nvar, SEED)
-
 eff_nvar = len(predictors)
 
 training_set, validation_set, test_set, \
 X_tr, X_val, X_ts, Y_tr, \
 Y_val, Y_ts = load_data_for_modeling( SEED, predictors)
 
-
 ############################################################
 ## MODELING
-kernel_all = ['rbf', 'linear','poly']
-C_all =  [0.5, 1, 3, 5, 10]
-gamma_all = [0.1, 0.4, 1, 2, 5]
 
+'''SUPPORT VECTOR MACHINE'''
 
-svm_parameters = expand_grid(
-    {'C': C_all,
-     'kernel': kernel_all,
-     'gamma': gamma_all } )
+parameters = create_parameters_svm( method, nvar, eff_nvar, SEED,
+                                    kernel_all=['rbf', 'linear', 'poly'],
+                                    C_all = [0.5],
+                                    gamma_all = [1])
 
+inputs = range( len(parameters))
+tr_val_error = Parallel(n_jobs = njob)(delayed(parallel_SVM)(i) for i in inputs)
 
+train_accuracy = []; valid_accuracy = []
 
-n_params = svm_parameters.shape[0]
-from sklearn import svm
-svm_parameters['validation_error'] = range( n_params )
-svm_parameters['training_error'] = range( n_params )
-svm_parameters['predictors'] = np.repeat( 'ISIS_20', n_params)
+for accuracy in tr_val_error:
+    train_accuracy.append( accuracy[0])
+    valid_accuracy.append(accuracy[1] )
 
-svm_parameters.to_csv( dir  + 'SVM_' + str(SEED) + '_VALIDATION_SCORE.csv')
+parameters['validation_accuracy'] = valid_accuracy
+parameters['training_accuracy'] = train_accuracy
 
+# parameters.to_csv(tree_dir_dest + 'validation.csv', index = False)
+update_validation( MODEL = 'SVM', PARAMETERS = parameters, path = dir_dest )
+
+ix_max = parameters.validation_accuracy.nlargest(1).index
+kernel = parameters.ix[ix_max, 'kernel'].values[0]
+C = parameters.ix[ix_max, 'C'].values[0]
+gamma = parameters.ix[ix_max, 'gamma'].values[0]
+
+SVM = svm.SVC(C = C, gamma = gamma, kernel = kernel, probability = True)
+final_svm = SVM.fit( X_val, Y_val )
+
+probs = final_svm.predict_proba(X_ts)
+
+prediction = []; [prediction.append( p[1]) for p in probs]
+ROC = ROC_analysis( Y_ts, prediction, label = "SVM",
+                    probability_tresholds = np.arange(0.1, 0.91, 0.1))
+
+ROC.to_csv(dir_dest + 'ROC.csv', index = False)
+update_metrics(ROC, SEED, method, eff_nvar )
+
+# importance = create_variable_score (  model = 'SVM', SEED = SEED, VARIABLES = X_tr.columns,
+#                                       SCORE = final_tree.feature_importances_,
+#                                       method_var_sel = method, n_var = eff_nvar )
+# update_var_score( importance, path = dir_dest)
 
 
 ## SERIAL COMPUTATION ##
-for i in range( n_params ):
-    print i
-    kernel = svm_parameters.ix[ i, 'kernel']
-    C = svm_parameters.ix[i, 'C']
-    gamma = svm_parameters.ix[i, 'gamma']
-    SVM = svm.SVC( C = C, gamma = gamma, kernel= kernel)
-    fitted_svm = SVM.fit(X_tr, Y_tr)
-    pred = fitted_svm.predict(X_val)
-    accuracy = skl.metrics.accuracy_score(Y_val, pred)
-    tr_accuracy = skl.metrics.accuracy_score(Y_tr, fitted_svm.predict(X_tr))
-    svm_parameters.ix[i, 'validation_error'] = accuracy
-    svm_parameters.ix[i, 'training_error'] = tr_accuracy
-    print svm_parameters
-    print 'TRAINING ACCURACY =', tr_accuracy
-    svm_parameters.to_csv(dir + 'SVM_' + str(SEED) + '_VALIDATION_SCORE.csv')
-
-#SCRIVERE FUNZIONE PER APPENDERE I RISULTATI
-
-##################### SAMPLE #############################
-n_tr = 20#len(Y_tr)
-n_val = 10#len(Y_val)
-
-indexes_training = np.random.randint(0, len(Y_tr), n_tr )
-indexes_val = np.random.randint(0, len(Y_val), n_val )
-
-X_sample = X_tr.ix[indexes_training, : ]
-Y_sample = Y_tr.ix[ indexes_training ]
-X_sample_val = X_val.ix[indexes_val, : ]
-Y_sample_val = Y_val.ix[indexes_val]
-
-# X_sample_ts = X_ts.ix[50:100, : ]
-# Y_sample_ts = Y_ts.ix[50:100]
-
-## SERIAL COMPUTATION ##
-for i in range( n_params ):
-    print i
-    kernel = svm_parameters.ix[ i, 'kernel']
-    C = svm_parameters.ix[i, 'C']
-    gamma = svm_parameters.ix[i, 'gamma']
-    SVM = svm.SVC( C = C, gamma = gamma, kernel= kernel)
-    fitted_svm = SVM.fit(X_sample, Y_sample)
-    pred = fitted_svm.predict(X_sample_val)
-    accuracy = skl.metrics.accuracy_score(Y_sample_val, pred)
-    tr_accuracy = skl.metrics.accuracy_score(Y_sample, fitted_svm.predict(X_sample))
-    svm_parameters.ix[i, 'validation_error'] = accuracy
-    svm_parameters.ix[i, 'training_error'] = tr_accuracy
-    print svm_parameters
-    print 'TRAINING ACCURACY =', tr_accuracy
-    svm_parameters.to_csv(dir + 'VAL_SVM.csv', index = False)
-
-
-
-''' PARALLEL VERSION '''
-from joblib import Parallel, delayed
-import multiprocessing
-
-# what are your inputs, and what operation do you want to
-# perform on each input. For example...
-inputs = range(n_params)
-
-
-def parallel_SVM(i):
-    kernel = svm_parameters.ix[ i, 'kernel']
-    C = svm_parameters.ix[i, 'C']
-    gamma = svm_parameters.ix[i, 'gamma']
-    SVM = svm.SVC( C = C, gamma = gamma, kernel= kernel, probability = True)
-    fitted_svm = SVM.fit(X_val, Y_val)
-    pred = fitted_svm.predict(X_val)
-    accuracy = skl.metrics.accuracy_score(Y_val, pred)
-    #svm_parameters.ix[i, 'validation_error'] = accuracy
-    return accuracy
-
-results = Parallel(n_jobs=n_params)(delayed(parallel_SVM)(i) for i in inputs)
-svm_parameters.to_csv('SVM.csv', index = False)
-
-# prob = fitted_svm.predict_proba(X_ts)
-#
-# prediction_svm = []
-# for p in prob:
-#     prediction_svm.append(p[1])
-# prediction_svm = np.array(prediction_svm)
-#
-# ROC_SVM = ROC_analysis(Y_ts, prediction_svm, label="SVM")
-#
-
-# ROC = pd.concat([ROC_dt, ROC_rf], ignore_index=True)
-# ROC.to_csv("results/ROC.csv", index=False)
+# for i in range( n_params ):
+#     print i
+#     kernel = svm_parameters.ix[ i, 'kernel']
+#     C = svm_parameters.ix[i, 'C']
+#     gamma = svm_parameters.ix[i, 'gamma']
+#     SVM = svm.SVC( C = C, gamma = gamma, kernel= kernel)
+#     fitted_svm = SVM.fit(X_tr, Y_tr)
+#     pred = fitted_svm.predict(X_val)
+#     accuracy = skl.metrics.accuracy_score(Y_val, pred)
+#     tr_accuracy = skl.metrics.accuracy_score(Y_tr, fitted_svm.predict(X_tr))
+#     svm_parameters.ix[i, 'validation_error'] = accuracy
+#     svm_parameters.ix[i, 'training_error'] = tr_accuracy
+#     print svm_parameters
+#     print 'TRAINING ACCURACY =', tr_accuracy
+#     svm_parameters.to_csv(dir + 'SVM_' + str(SEED) + '_VALIDATION_SCORE.csv')
 

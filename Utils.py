@@ -37,6 +37,10 @@ from sklearn import cross_validation, linear_model
 from random import randint
 import itertools
 import os
+from sklearn.linear_model import LogisticRegression
+from sklearn.metrics import mean_squared_error, r2_score
+from sklearn.naive_bayes import BernoulliNB
+from sklearn.neighbors import KNeighborsClassifier
 
 
 def expand_grid(data_dict):
@@ -267,6 +271,74 @@ def create_parameters_gbm( method, nvar, eff_nvar, SEED,
         {'n_estimators': n_estimators_all,
          'max_depth': max_depth_all,
          'learning_rate': learning_rate_all} )
+
+    n_params = parameters.shape[0]
+    from sklearn import svm
+    parameters['method_var_sel'] = np.repeat( method, n_params)
+    parameters['nvar'] = np.repeat( nvar, n_params)
+    parameters['effective_nvar'] = np.repeat( eff_nvar, n_params)
+    parameters['SEED'] = np.repeat( SEED, n_params)
+    return parameters
+
+
+def create_parameters_svm( method, nvar, eff_nvar, SEED,
+                           kernel_all=['rbf', 'linear', 'poly'],
+                           C_all = [0.5, 1, 3, 5, 10],
+                           gamma_all = [0.1, 0.4, 1, 2, 5]):
+    parameters = expand_grid(
+        {'kernel': kernel_all,
+         'C': C_all,
+         'gamma': gamma_all} )
+
+    n_params = parameters.shape[0]
+    from sklearn import svm
+    parameters['method_var_sel'] = np.repeat( method, n_params)
+    parameters['nvar'] = np.repeat( nvar, n_params)
+    parameters['effective_nvar'] = np.repeat( eff_nvar, n_params)
+    parameters['SEED'] = np.repeat( SEED, n_params)
+    return parameters
+
+
+
+def create_parameters_regularized( method, nvar, eff_nvar, SEED,
+                                   penalty_all = ['l1', 'l2'],
+                                   C_all = np.arange(0.001, 1, 0.001).tolist()):
+    parameters = expand_grid(
+        {'penalty': penalty_all,
+         'C': C_all} )
+
+    n_params = parameters.shape[0]
+    from sklearn import svm
+    parameters['method_var_sel'] = np.repeat( method, n_params)
+    parameters['nvar'] = np.repeat( nvar, n_params)
+    parameters['effective_nvar'] = np.repeat( eff_nvar, n_params)
+    parameters['SEED'] = np.repeat( SEED, n_params)
+    return parameters
+
+
+def create_parameters_BNB( method, nvar, eff_nvar, SEED,
+                           alpha_all = np.arange( 0.01, 1, 0.01).tolist()):
+
+    parameters = expand_grid(
+        {'alpha': alpha_all} )
+
+    n_params = parameters.shape[0]
+    from sklearn import svm
+    parameters['method_var_sel'] = np.repeat( method, n_params)
+    parameters['nvar'] = np.repeat( nvar, n_params)
+    parameters['effective_nvar'] = np.repeat( eff_nvar, n_params)
+    parameters['SEED'] = np.repeat( SEED, n_params)
+    return parameters
+
+
+
+
+def create_parameters_KNN( method, nvar, eff_nvar, SEED,
+                           n_neighbors_all = np.arange(5, 1000, 10).tolist(),
+                           p_all = [ 1,2,3,4] ):
+    parameters = expand_grid(
+        {'n_neighbors': n_neighbors_all,
+         'p': p_all} )
 
     n_params = parameters.shape[0]
     from sklearn import svm
