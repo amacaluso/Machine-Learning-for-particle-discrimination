@@ -52,15 +52,31 @@ def expand_grid(data_dict):
 
 def ROC_analysis(y_true, y_prob, label, probability_tresholds = np.arange(0.1, 0.91, 0.05)):
     roc_matrix = pd.DataFrame()
-    AUC = skl.metrics.roc_auc_score(y_true, y_prob)
-    for tresh in probability_tresholds:
-        current_y_hat = (y_prob > tresh).astype(int)
-        precision, recall, fscore, support = skl.metrics.precision_recall_fscore_support(y_true, current_y_hat)
-        accuracy = skl.metrics.accuracy_score(y_true, current_y_hat)
-        result = pd.Series([label, tresh, accuracy, AUC, precision[1], recall[1], recall[0], fscore[1]])
-        roc_matrix = roc_matrix.append(result, ignore_index=True)
-    roc_matrix.columns = ["Model", "Treshold", "Accuracy", "AUC",
-                          "Precision", "Recall", "Specificity", "F-score"]
+    try:
+        AUC = skl.metrics.roc_auc_score(y_true, y_prob)
+    except:
+        AUC = None
+    try:
+        for tresh in probability_tresholds:
+            #tresh = probability_tresholds[0]
+            current_y_hat = (y_prob > tresh).astype(int)
+            precision, recall, fscore, support = skl.metrics.precision_recall_fscore_support(y_true, current_y_hat)
+            accuracy = skl.metrics.accuracy_score(y_true, current_y_hat)
+            result = pd.Series([label, tresh, accuracy, AUC, precision[1],
+                                recall[1], recall[0], fscore[1]])
+            roc_matrix = roc_matrix.append(result, ignore_index=True)
+        roc_matrix.columns = ["Model", "Treshold", "Accuracy", "AUC",
+                              "Precision", "Recall", "Specificity", "F-score"]
+    except:
+        for tresh in probability_tresholds:
+            current_y_hat = (y_prob > tresh).astype(int)
+            precision, recall, fscore, support = skl.metrics.precision_recall_fscore_support(y_true, current_y_hat)
+            accuracy = skl.metrics.accuracy_score(y_true, current_y_hat)
+            result = pd.Series([label, tresh, accuracy, AUC, precision,
+                                None, recall[0], None])
+            roc_matrix = roc_matrix.append(result, ignore_index=True)
+        roc_matrix.columns = ["Model", "Treshold", "Accuracy", "AUC",
+                              "Precision", "Recall", "Specificity", "F-score"]
     return roc_matrix
 
 
@@ -459,6 +475,98 @@ def update_metrics(ROC_MATRIX, SEED, METHOD, NVAR,
         df.to_csv(path, index=False)
 
 
+def update_subset_metrics(ROC_MATRIX, SEED, METHOD, NVAR,
+                          path='results/MODELING/CLASSIFICATION/subset_metrics.csv'):
+    # ROC_MATRIX = ROC
+    # SEED
+    # METHOD = method
+    # NVAR = eff_nvar
+    data = datetime.datetime.now()
+    # path = 'results/MODELING/CLASSIFICATION/metrics.csv'
+
+    Time = pd.Series(np.repeat(data, len(ROC_MATRIX)))
+    series_seed = pd.Series(np.repeat(SEED, len(ROC_MATRIX)))
+    method = pd.Series(np.repeat(METHOD, len(ROC_MATRIX)))
+    nvar = pd.Series(np.repeat(NVAR, len(ROC_MATRIX)))
+    df = pd.concat([ROC_MATRIX, method, nvar, Time, series_seed], axis=1)
+    df.columns = ROC_MATRIX.columns.tolist() + ['Method'] + ['n_variables'] + ['Time'] + ['SEED']
+
+    df['KEY'] = df['Model'] + '_' + \
+                df['Method'] + '_' + \
+                df['n_variables'].astype(str) + '_' +\
+                df['SEED'].astype(str) + '_' +\
+                df['Energy'].astype(str)
+
+
+    KEY = df.KEY.unique()[0]
+
+    try:
+        ALL_METRICS = pd.read_csv( path )
+        ALL_METRICS['KEY'] = ALL_METRICS['Model'] + '_' + \
+                             ALL_METRICS['Method'] + '_' + \
+                             ALL_METRICS['n_variables'].astype(str) + '_' +\
+                             ALL_METRICS['SEED'].astype(str)+ '_' + \
+                             ALL_METRICS['Energy'].astype(str)
+
+        if KEY in ALL_METRICS.KEY.unique():
+            ALL_METRICS = ALL_METRICS.drop(ALL_METRICS[(ALL_METRICS.KEY == KEY)].index)
+            ALL_METRICS = pd.concat([ALL_METRICS, df])
+            print 'Metrics for energy',df.Energy.unique(),'have been updated'
+        else:
+            ALL_METRICS = pd.concat([ALL_METRICS, df])
+            print 'Metrics for energy',df.Energy.unique(),'have been added'
+
+        ALL_METRICS.to_csv(path, index = False)
+    except:
+        print 'There is no file metrics, it will be created'
+        df.to_csv(path, index=False)
+
+
+
+def update_prediction(prediction, MODEL, SEED, METHOD, NVAR,
+                      path='results/MODELING/CLASSIFICATION/prediction.csv'):
+    # ROC_MATRIX = ROC
+    # SEED
+    # METHOD = method
+    # NVAR = eff_nvar
+    date = datetime.datetime.now()
+    # path = 'results/MODELING/CLASSIFICATION/metrics.csv'
+    Time = pd.Series(np.repeat(date, len(prediction)))
+    series_seed = pd.Series(np.repeat(SEED, len(prediction)))
+    model = pd.Series(np.repeat(MODEL, len(prediction)))
+    method = pd.Series(np.repeat(METHOD, len(prediction)))
+    nvar = pd.Series(np.repeat(NVAR, len(prediction)))
+    df = pd.concat([prediction, model, method, nvar, Time, series_seed], axis=1)
+    df.columns = prediction.columns.tolist() + ['Model'] + ['Method'] + \
+                 ['n_variables'] + ['Time'] + ['SEED']
+
+
+    df['KEY'] = df['Model'] + '_' + \
+                df['Method'] + '_' + \
+                df['n_variables'].astype(str) + '_' +\
+                df['SEED'].astype(str)
+
+    KEY = df.KEY.unique()[0]
+
+    try:
+        ALL_PREDICTIONS = pd.read_csv( path )
+        ALL_PREDICTIONS['KEY'] = ALL_PREDICTIONS['Model'] + '_' + \
+                                 ALL_PREDICTIONS['Method'] + '_' + \
+                                 ALL_PREDICTIONS['n_variables'].astype(str) + '_' + \
+                                 ALL_PREDICTIONS['SEED'].astype(str)
+
+        if KEY in ALL_PREDICTIONS.KEY.unique():
+            ALL_PREDICTIONS = ALL_PREDICTIONS.drop(ALL_PREDICTIONS[(ALL_PREDICTIONS.KEY == KEY)].index)
+            ALL_PREDICTIONS = pd.concat([ALL_PREDICTIONS, df])
+            print 'Predictions have been updated'
+        else:
+            ALL_PREDICTIONS = pd.concat([ALL_PREDICTIONS, df])
+            print 'Predictions have been added'
+
+            ALL_PREDICTIONS.to_csv(path, index = False)
+    except:
+        print 'There is no file metrics, it will be created'
+        df.to_csv(path, index = False)
 
 
 
