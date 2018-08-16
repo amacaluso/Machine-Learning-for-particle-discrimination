@@ -33,7 +33,6 @@ Y_val, Y_ts = load_data_for_modeling( SEED, predictors)
 
 ''' K NEAREST NEIGHBORS '''
 
-
 parameters = create_parameters_KNN( method, nvar, eff_nvar, SEED,
                                     n_neighbors_all = [5, 100],
                                     p_all=[1, 2] )

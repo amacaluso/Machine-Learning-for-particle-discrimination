@@ -16,8 +16,8 @@ method = 'ISIS'
 nvar = 10
 probs_to_check = np.arange(0.1, 0.91, 0.1)
 
-exec(open("041_TREE_BASED_MODELS.py").read(), globals())
+# exec(open("041_TREE_BASED_MODELS.py").read(), globals())
 # exec(open("042_SVM.py").read(), globals())
-exec(open("043_REGULARIZED_METHODS.py").read(), globals())
+# exec(open("043_REGULARIZED_METHODS.py").read(), globals())
 exec(open("045_NAIVE_BAYES.py").read(), globals())
 exec(open("046_KNN.py").read(), globals())

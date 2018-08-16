@@ -72,6 +72,12 @@ for energy in test_set.ENERGY.unique():
 
 ''' BERNOULLI NAIVE BAYES '''
 
+training_set, validation_set, test_set, \
+X_tr, X_val, X_ts, Y_tr, \
+Y_val, Y_ts = load_data_for_modeling( SEED, predictors)
+
+
+
 model = 'BERNOULLI_NAIVE_BAYES'
 parameters = create_parameters_BNB( method, nvar, eff_nvar, SEED)
 

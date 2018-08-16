@@ -409,7 +409,7 @@ def update_validation( MODEL, PARAMETERS,
 
     df['KEY'] = df['Model'] + '_' + \
                 df['method_var_sel'] + '_' + \
-                df['effective_nvar'] + '_' + \
+                df['effective_nvar'].astype(str) + '_' + \
                 df['SEED'].astype(str)
 
     KEY = df.KEY.unique()[0]
@@ -418,7 +418,7 @@ def update_validation( MODEL, PARAMETERS,
         all_parameters = pd.read_csv( path )
         all_parameters['KEY'] = all_parameters['Model'] + '_' + \
                                 all_parameters['method_var_sel'] + '_' + \
-                                all_parameters['effective_nvar'] + '_' + \
+                                all_parameters['effective_nvar'].astype(str) + '_' + \
                                 all_parameters['SEED'].astype(str)
         if KEY in all_parameters.KEY.unique():
             all_parameters = all_parameters.drop(all_parameters[(all_parameters.KEY == KEY)].index)
