@@ -60,7 +60,7 @@ final_regularized = log_regression.fit(X_tr, Y_tr)
 probs = final_regularized.predict_proba(X_ts)
 prediction = []; [prediction.append( p[1]) for p in probs]
 ROC = ROC_analysis( Y_ts, prediction, label = model,
-                    probability_tresholds = np.arange(0.1, 0.91, 0.1))
+                    probability_tresholds = probs_to_check)
 
 ROC.to_csv(dir_dest + 'ROC.csv', index = False)
 update_metrics(ROC, SEED, method, eff_nvar )

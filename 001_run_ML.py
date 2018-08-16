@@ -1,14 +1,19 @@
 exec(open("Utils.py").read(), globals())
 exec(open("Utils_parallel.py").read(), globals())
 
-SEED = 789
+SEED = 231
 # exec(open("015_SPLITTING_DATA.py").read(), globals())
 # exec(open("030_VARIABLES_SELECTION.py").read(), globals())
 
 
 njob = 1
-method = 'LR_ACCURACY'
-nvar = 5
+method = 'ISIS'
+# GET PREDICTOR
+# ['LASSO', 'DECISION_TREE', 'RANDOM_FOREST', 'GBM',
+#  'E_NET', 'INFORMATION_GAIN', 'LR_ACCURACY']
+# ISIS
+
+nvar = 10
 probs_to_check = np.arange(0.1, 0.91, 0.1)
 
 exec(open("041_TREE_BASED_MODELS.py").read(), globals())
