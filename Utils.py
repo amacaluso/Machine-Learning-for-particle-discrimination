@@ -42,6 +42,8 @@ from sklearn.metrics import mean_squared_error, r2_score
 from sklearn.naive_bayes import BernoulliNB
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.naive_bayes import GaussianNB
+from sklearn import svm
+
 
 
 def expand_grid(data_dict):
@@ -261,7 +263,7 @@ def create_parameters_dt( method, nvar, eff_nvar, SEED,
 
 def create_parameters_rf( method, nvar, eff_nvar, SEED,
                           n_estimators_all = [50, 100, 200, 500, 700, 1000, 1500, 2000],
-                          max_features_all = np.arange(2, 30, 5 ).tolist(),
+                          max_features_all = np.arange(2, eff_nvar, 3 ).tolist(),
                           max_depth_all = np.arange(3, 24, 5).tolist(),
                           min_samples_split_all =  [100, 500, 1000]):
 
@@ -281,9 +283,9 @@ def create_parameters_rf( method, nvar, eff_nvar, SEED,
 
 
 def create_parameters_gbm( method, nvar, eff_nvar, SEED,
-                           n_estimators_all=[50, 300],
-                           max_depth_all=np.arange(3, 9, 5).tolist(),
-                           learning_rate_all = [ 0.001, 0.1] ):
+                           n_estimators_all=[50, 100, 200, 300, 400, 500],
+                           max_depth_all = np.arange(3, 9, 5).tolist(),
+                           learning_rate_all = np.arange(0.001, 0.9, 0.01).tolist()):
     parameters = expand_grid(
         {'n_estimators': n_estimators_all,
          'max_depth': max_depth_all,
@@ -319,7 +321,7 @@ def create_parameters_svm( method, nvar, eff_nvar, SEED,
 
 def create_parameters_regularized( method, nvar, eff_nvar, SEED,
                                    penalty_all = ['l1', 'l2'],
-                                   C_all = np.arange(0.001, 1, 0.001).tolist()):
+                                   C_all = np.arange(0.001, 1, 0.01).tolist()):
     parameters = expand_grid(
         {'penalty': penalty_all,
          'C': C_all} )

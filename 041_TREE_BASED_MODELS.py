@@ -116,7 +116,7 @@ Y_val, Y_ts = load_data_for_modeling( SEED, predictors)
 
 parameters = create_parameters_rf( method, nvar, eff_nvar, SEED,
                                    n_estimators_all=[50, 2000],
-                                   max_features_all = np.arange(2, nvar, 3).tolist(),
+                                   max_features_all = np.arange(2, eff_nvar, 3).tolist(),
                                    max_depth_all = np.arange(3, 9, 5).tolist(),
                                    min_samples_split_all=[1000]
                                    )
