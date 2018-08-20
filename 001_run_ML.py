@@ -4,8 +4,6 @@ exec(open("Utils_parallel.py").read(), globals())
 SEED = 231
 # exec(open("015_SPLITTING_DATA.py").read(), globals())
 # exec(open("030_VARIABLES_SELECTION.py").read(), globals())
-
-
 njob = 16
 
 #methods = ['ISIS', 'LASSO', 'DECISION_TREE',
