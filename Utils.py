@@ -489,6 +489,7 @@ def update_subset_metrics(ROC_MATRIX, SEED, METHOD, NVAR,
     # NVAR = eff_nvar
     data = datetime.datetime.now()
     # path = 'results/MODELING/CLASSIFICATION/metrics.csv'
+    # print 'Saving Metrics for energy'
 
     Time = pd.Series(np.repeat(data, len(ROC_MATRIX)))
     series_seed = pd.Series(np.repeat(SEED, len(ROC_MATRIX)))
@@ -517,10 +518,10 @@ def update_subset_metrics(ROC_MATRIX, SEED, METHOD, NVAR,
         if KEY in ALL_METRICS.KEY.unique():
             ALL_METRICS = ALL_METRICS.drop(ALL_METRICS[(ALL_METRICS.KEY == KEY)].index)
             ALL_METRICS = pd.concat([ALL_METRICS, df])
-            print 'Metrics for energy',df.Energy.unique(),'have been updated'
+            # print 'Metrics for energy',df.Energy.unique(),'have been updated'
         else:
             ALL_METRICS = pd.concat([ALL_METRICS, df])
-            print 'Metrics for energy',df.Energy.unique(),'have been added'
+            # print 'Metrics for energy',df.Energy.unique(),'have been added'
 
         ALL_METRICS.to_csv(path, index = False)
     except:

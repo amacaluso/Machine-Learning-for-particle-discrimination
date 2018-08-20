@@ -8,6 +8,11 @@
 # nvar = 10
 # probs_to_check = np.arange(0.1, 0.91, 0.1)
 
+print ' >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> '
+print '   KNN ---', 'VAR SEL:', method, '- SEED:', str(SEED), '- N° VAR:', str(eff_nvar)
+print ' >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> '
+
+
 
 model = 'KNN'
 
@@ -21,8 +26,6 @@ create_dir( dir_dest )
 #  'E_NET', 'INFORMATION_GAIN', 'LR_ACCURACY']
 # ISIS
 
-predictors = extract_predictors( method, nvar, SEED)
-eff_nvar = len(predictors)
 
 training_set, validation_set, test_set, \
 X_tr, X_val, X_ts, Y_tr, \

@@ -8,9 +8,6 @@
 # probs_to_check = np.arange(0.1, 0.91, 0.1)
 
 
-predictors = extract_predictors( method, nvar, SEED)
-eff_nvar = len(predictors)
-
 
 model = 'TREE'
 
@@ -32,6 +29,12 @@ Y_val, Y_ts = load_data_for_modeling( SEED, predictors)
 ############################################################
 ####################### MODELING ###########################
 ############################################################
+
+print ' >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> '
+print '   DECISION TREE ---', 'VAR SEL:', method, '- SEED:', str(SEED), '- N° VAR:', str(eff_nvar)
+print ' >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> '
+
+
 
 '''DECISION TREE'''
 parameters = create_parameters_dt( method, nvar, eff_nvar, SEED)
@@ -105,6 +108,13 @@ for energy in test_set.ENERGY.unique():
 ######################################################################
 ######################################################################
 ####################### RANDOM FOREST ################################
+
+print ' >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> '
+print '   RANDOM FOREST ---', 'VAR SEL:', method, '- SEED:', str(SEED), '- N° VAR:', str(eff_nvar)
+print ' >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> '
+
+
+
 
 model = 'RANDOM_FOREST'
 dir_dest = 'results/MODELING/CLASSIFICATION/' + model + '/'
@@ -187,6 +197,13 @@ for energy in test_set.ENERGY.unique():
 ######################################################################
 ######################################################################
 ####################### Gradient Boosting Machine ####################
+
+
+print ' >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> '
+print '   GBM ---', 'VAR SEL:', method, '- SEED:', str(SEED), '- N° VAR:', str(eff_nvar)
+print ' >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> '
+
+
 model = 'GBM'
 dir_dest = 'results/MODELING/CLASSIFICATION/' + model + '/'
 create_dir( dir_dest )
