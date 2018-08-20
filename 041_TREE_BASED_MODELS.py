@@ -7,6 +7,11 @@
 # nvar = 5
 # probs_to_check = np.arange(0.1, 0.91, 0.1)
 
+
+predictors = extract_predictors( method, nvar, SEED)
+eff_nvar = len(predictors)
+
+
 model = 'TREE'
 
 dir_images = 'Images/'
@@ -19,8 +24,6 @@ create_dir( dir_dest )
 #  'E_NET', 'LR_ACCURACY', 'LR_ACCURACY']
 # ISIS
 
-predictors = extract_predictors( method, nvar, SEED)
-eff_nvar = len(predictors)
 
 training_set, validation_set, test_set, \
 X_tr, X_val, X_ts, Y_tr, \
@@ -115,11 +118,7 @@ Y_val, Y_ts = load_data_for_modeling( SEED, predictors)
 ''' RANDOM FOREST '''
 
 parameters = create_parameters_rf( method, nvar, eff_nvar, SEED,
-                                   n_estimators_all=[50, 2000],
-                                   max_features_all = np.arange(2, eff_nvar, 3).tolist(),
-                                   max_depth_all = np.arange(3, 9, 5).tolist(),
-                                   min_samples_split_all=[1000]
-                                   )
+                                   max_features_all = np.arange(2, eff_nvar, 3).tolist())
 inputs = range( len(parameters))
 tr_val_error = Parallel(n_jobs = njob)(delayed(parallel_rf)(i) for i in inputs)
 
@@ -204,11 +203,8 @@ gbm = GradientBoostingClassifier(n_estimators = 100, max_depth = 25,
                                  learning_rate = 0.1)
 ''' RANDOM FOREST '''
 
-parameters = create_parameters_gbm( method, nvar, eff_nvar, SEED,
-                                   n_estimators_all=[50],
-                                   max_depth_all = np.arange(3, 9, 5).tolist(),
-                                   learning_rate_all = [ 0.001, 0.1]
-                                   )
+parameters = create_parameters_gbm( method, nvar, eff_nvar, SEED)
+
 inputs = range( len(parameters))
 tr_val_error = Parallel(n_jobs = njob)(delayed(parallel_gbm)(i) for i in inputs)
 

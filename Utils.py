@@ -263,9 +263,10 @@ def create_parameters_dt( method, nvar, eff_nvar, SEED,
 
 def create_parameters_rf( method, nvar, eff_nvar, SEED,
                           n_estimators_all = [50, 100, 200, 500, 700, 1000, 1500, 2000],
-                          max_features_all = np.arange(2, eff_nvar, 3 ).tolist(),
+                          max_features_all = np.arange(2, 20, 3 ).tolist(),
                           max_depth_all = np.arange(3, 24, 5).tolist(),
                           min_samples_split_all =  [100, 500, 1000]):
+
 
     parameters = expand_grid(
         {'n_estimators': n_estimators_all,

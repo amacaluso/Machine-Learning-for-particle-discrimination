@@ -60,7 +60,7 @@ def parallel_gbm(i):
                                      max_depth = max_depth,
                                      learning_rate = learning_rate)
 
-    fitted_gbm = random_forest.fit(X_tr, Y_tr)
+    fitted_gbm = gbm.fit(X_tr, Y_tr)
     prediction = fitted_gbm.predict(X_val)
     accuracy = skl.metrics.accuracy_score(Y_val, prediction)
     prediction_tr = fitted_gbm.predict(X_tr)
