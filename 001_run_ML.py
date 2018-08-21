@@ -1,14 +1,15 @@
 exec(open("Utils.py").read(), globals())
 exec(open("Utils_parallel.py").read(), globals())
 
-SEED = 123
-# exec(open("015_SPLITTING_DATA.py").read(), globals())
-# exec(open("030_VARIABLES_SELECTION.py").read(), globals())
+SEED = 741
 njob = 16
+
+exec(open("015_SPLITTING_DATA.py").read(), globals())
+exec(open("030_VARIABLES_SELECTION.py").read(), globals())
+exec(open("035_UNIVARIATE_VARIABLES_SELECTION.py").read(), globals())
 
 #methods = ['ISIS', 'LASSO', 'DECISION_TREE',
 methods = ['RANDOM_FOREST', 'GBM', 'E_NET', 'INFORMATION_GAIN', 'LR_ACCURACY', 'ISIS', 'LASSO']
-nvars = [1, 3, 5, 15, 30, 50, 100, 150]
 #method = 'ISIS'
 # GET PREDICTOR
 # ['LASSO', 'DECISION_TREE', 'RANDOM_FOREST', 'GBM',
