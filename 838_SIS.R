@@ -1,7 +1,7 @@
 source( '801_Utils.R')
 ensureLibrary( 'SIS' )
 
-SEED = 123
+SEED = 741
 
 dir_source = paste0( "DATA/CLASSIFICATION/", SEED, "/")
 dir_dest = paste0("results/VARIABLE_SELECTION/", SEED, "/")

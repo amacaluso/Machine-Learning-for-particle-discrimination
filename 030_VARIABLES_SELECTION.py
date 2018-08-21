@@ -1,6 +1,6 @@
 exec(open("Utils.py").read(), globals())
 
-SEED = 123
+SEED = 741
 #exec(open("8015_SPLITTING_DATA.py").read(), globals())
 
 
@@ -11,7 +11,7 @@ create_dir(dir_var_sel)
 dir_data = 'DATA/CLASSIFICATION/' + str(SEED) +'/'
 variable_sub_dataset = pd.read_csv( dir_data + "pre_training_set.csv" )
 
-njobs = 1
+njobs = 16
 print 'The dimension of dataset for variable selection is', variable_sub_dataset.shape
 
 target_variable = 'Y'

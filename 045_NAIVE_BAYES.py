@@ -5,10 +5,10 @@
 # SEED = 123
 # njob = 1
 # method = 'LR_ACCURACY'
-# nvar = 10
+# nvar = 5
 # probs_to_check = np.arange(0.1, 0.91, 0.1)
-# predictors = extract_predictors(method, nvar, SEED)
-# eff_nvar = len(predictors)
+predictors = extract_predictors(method, nvar, SEED)
+eff_nvar = len(predictors)
 
 model = 'NAIVE_BAYES'
 
@@ -134,10 +134,11 @@ update_prediction(prediction = test_set_prediction, SEED = SEED, MODEL = model, 
 
 for energy in test_set.ENERGY.unique():
     if energy > 0:
-        # energy = test_set.ENERGY.unique()[4]
+        #energy = test_set.ENERGY.unique()[4]
         df = test_set[test_set.ENERGY == energy]
         probabilities = df.ix[:, -1].tolist()
-        ROC_subset = ROC_analysis(y_true = df.Y.tolist(), y_prob = probabilities , label = model, probability_tresholds = probs_to_check)
+        ROC_subset = ROC_analysis(y_true = df.Y.tolist(), y_prob = probabilities , label = model,
+                                  probability_tresholds = probs_to_check)
         cols_roc = ROC_subset.columns.tolist() +[ 'Energy']
         ROC_subset = pd.concat( [ROC_subset,
                                 pd.Series( np.repeat(energy, len(probs_to_check)))],
