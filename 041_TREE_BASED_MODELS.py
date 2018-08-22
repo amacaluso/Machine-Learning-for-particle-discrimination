@@ -21,6 +21,9 @@ create_dir( dir_dest )
 #  'E_NET', 'LR_ACCURACY', 'LR_ACCURACY']
 # ISIS
 
+# predictors = extract_predictors( method, nvar, SEED)
+# eff_nvar = len(predictors)
+
 
 training_set, validation_set, test_set, \
 X_tr, X_val, X_ts, Y_tr, \
@@ -128,7 +131,7 @@ Y_val, Y_ts = load_data_for_modeling( SEED, predictors)
 ''' RANDOM FOREST '''
 
 parameters = create_parameters_rf( method, nvar, eff_nvar, SEED,
-                                   max_features_all = np.arange(2, eff_nvar, 3).tolist())
+                                   max_features_all = list(set(np.random.randint(2, eff_nvar, 6))))
 inputs = range( len(parameters))
 tr_val_error = Parallel(n_jobs = njob)(delayed(parallel_rf)(i) for i in inputs)
 
