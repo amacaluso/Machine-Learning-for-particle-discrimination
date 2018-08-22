@@ -4,9 +4,9 @@ exec(open("Utils_parallel.py").read(), globals())
 SEED = 741
 njob = 16
 
-exec(open("015_SPLITTING_DATA.py").read(), globals())
-exec(open("030_VARIABLES_SELECTION.py").read(), globals())
-exec(open("035_UNIVARIATE_VARIABLES_SELECTION.py").read(), globals())
+# exec(open("015_SPLITTING_DATA.py").read(), globals())
+# exec(open("030_VARIABLES_SELECTION.py").read(), globals())
+# exec(open("035_UNIVARIATE_VARIABLES_SELECTION.py").read(), globals())
 
 #methods = ['ISIS', 'LASSO', 'DECISION_TREE',
 methods = ['RANDOM_FOREST', 'GBM', 'E_NET', 'INFORMATION_GAIN', 'LR_ACCURACY', 'ISIS', 'LASSO']
@@ -27,7 +27,7 @@ DF = pd.DataFrame()
 for method in methods:
     predictors = extract_predictors(method, 1, SEED)
     eff_nvar = len(predictors)
-    nvars = [eff_nvar, 1, 3, 5, 10, 15, 30, 50, 70, 100, 130]
+    nvars = [eff_nvar, 1, 3, 5, 10, 15, 30, 50, 70, 100] #, 130]
     nvars = list(set( [el for el in nvars if el>=eff_nvar] ))
     for nvar in nvars:
         #nvar = nvars[0]
