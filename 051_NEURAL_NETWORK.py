@@ -1,10 +1,19 @@
+# srun -N 1 -n16 -A cin_staff -t300  -p gll_usr_gpuprod --gres=gpu:kepler:2 --pty /bin/bash
+# module use /gpfs/scratch/userinternal/epascol1/spack/share/spack/modules/linux-centos7-x86_64
+# module load  gcc-6.3.0-gcc-7.3.0-us4i5fv
+# module load  cuda-9.0.176-gcc-6.3.0-xjorzpo
+# module load  cudnn-7.0.5-gcc-6.3.0-ceoy3cj
+# module load python/2.7.12
+# source py2/bin/activate
+
+
 exec(open("Utils.py").read(), globals())
 #exec(open("Utils_parallel.py").read(), globals())
 
 SEED = 123
 njob = 1
-method = 'LR_ACCURACY'
-nvar = 10
+method = 'ISIS'
+nvar = 3
 probs_to_check = np.arange(0.1, 0.91, 0.1)
 
 
@@ -26,6 +35,7 @@ training_set, validation_set, test_set, \
 X_tr, X_val, X_ts, Y_tr, \
 Y_val, Y_ts = load_data_for_modeling( SEED, predictors)
 
+X_tr = X_tr.astype(float)
 ############################################################
 ## MODELING
 
@@ -46,25 +56,35 @@ from sklearn.preprocessing import MinMaxScaler
 from keras import optimizers
 from keras import initializers
 
-all_results = []
 
 #sgd = optimizers.SGD(lr=0.01, decay=1e-6, momentum=0.9, nesterov=True)
+
+encoder = LabelEncoder()
+encoder.fit(Y_tr)
+encoded_Y_tr = encoder.transform(Y_tr)
+
+encoder = LabelEncoder()
+encoder.fit(Y_val)
+encoded_Y_val = encoder.transform(Y_val)
+
+encoder = LabelEncoder()
+encoder.fit(Y_ts)
+encoded_Y_ts = encoder.transform(Y_ts)
+
+
 
 # seeds  = [randint(0, 10000) for p in range(0, 4)]
 # seeds = [2, 5, 12, 36, 200, 1234]
 seeds = [15, 22, 3896 ,181]
 
 ## MODELING
-hidden_size = [10 , 20, 50]
+hidden_size = [10 , 20]
 first_hidden_layer = [10]
-n_layers = [ 1, 4, 6, 10]
+n_layers = [ 1, 4, 10]
 activations = ['relu', 'tanh']
 batch_sizes = [ 3000, 5000]
-nb_epochs = [ 40, 60, 100 ]
+nb_epochs = [ 20, 40 ,200]
 optimizers = [ 'adam']
-
-
-
 
 
 ## MODELING
@@ -90,36 +110,45 @@ parameters = expand_grid(
 
 n_param = parameters.shape[ 0 ]
 
-for i in range(0, n_param):
-    #i = 0
-    print (parameters.ix[ i, :])
-    hidden_size = parameters.ix[ i ,'hidden_size']
-    first_hidden_layer = parameters.ix[ i, 'first_hidden_layer']
-    n_layer = parameters.ix[ i, 'n_layers']
-    activation = parameters.ix[ i, 'activations']
-    batch_size = parameters.ix[ i, 'batch_sizes']
-    nb_epoch = parameters.ix[ i, 'nb_epochs']
-    optimizer = parameters.ix[ i, 'optimizers']
-    #################################
-    for seed in seeds:
-        model = Sequential()
-        init = initializers.RandomNormal( seed = seed )
-        model.add(Dense(first_hidden_layer, input_dim = n_var,
-                        kernel_initializer = init,
-                        activation = activation, ))
-        for i in range( n_layer-1 ):
-            model.add(Dense(hidden_size, activation = activation))
-        model.add( Dense( 1, activation = 'linear'))
-        model.compile( loss = 'mse', optimizer = optimizer )
+# for i in range(0, n_param):
+i = 0
+print (parameters.ix[ i, :])
+hidden_size = parameters.ix[ i ,'hidden_size']
+first_hidden_layer = parameters.ix[ i, 'first_hidden_layer']
+n_layer = parameters.ix[ i, 'n_layers']
+activation = parameters.ix[ i, 'activations']
+batch_size = parameters.ix[ i, 'batch_sizes']
+nb_epoch = parameters.ix[ i, 'nb_epochs']
+optimizer = parameters.ix[ i, 'optimizers']
+#################################
+#for seed in seeds:
+seed = seeds[0]
+model = Sequential()
+init = initializers.RandomNormal( seed = seed )
+model.add(Dense(first_hidden_layer, input_dim = eff_nvar, kernel_initializer = init, activation = activation))
+for i in range( n_layer-1 ):
+    model.add(Dense(hidden_size, activation = activation))
+
+model.add(Dense(1, kernel_initializer='normal', activation='sigmoid'))
+model.compile(loss='binary_crossentropy', optimizer='adam', metrics=['accuracy'])
+filepath = "weights-improvement-{epoch:02d}-{val_acc:.2f}.hdf5"
+checkpoint = ModelCheckpoint(filepath, verbose=1, save_best_only=True, mode='auto', monitor='val_acc')
+callbacks_list = [checkpoint]
+
+model.fit(X_tr, encoded_Y_tr, epochs = nb_epoch,
+          batch_size = batch_size, callbacks = callbacks_list,
+          verbose=1, validation_split=0.01)
+        # model.add( Dense( 1, activation = 'linear'))
+        # model.compile( loss = 'mse', optimizer = optimizer )
         #breaks here
-        model.fit(X, Y, nb_epoch = nb_epoch, batch_size = batch_size )
+        # model.fit(X, Y, nb_epoch = nb_epoch, batch_size = batch_size )
         # n_test = X_test.shape[0]
         # scalarX, scalarY = MinMaxScaler(), MinMaxScaler()
         # scalarX.fit(X_test)
         # scalarY.fit(Y_test.reshape( n_test, 1))
         # X_test = scalarX.transform(X_test)
         # Y_test = scalarY.transform(Y_test.reshape(n_test,1))
-        score = model.evaluate( X_test, Y_test )
+        score = model.evaluate( X_val, encoded_Y_val )
         print score
         Y_hat = model.predict( X_test )
         Y_hat = [ y[0] for y in Y_hat]
