@@ -276,7 +276,7 @@ def create_parameters_dt( method, nvar, eff_nvar, SEED,
 
 
 def create_parameters_rf( method, nvar, eff_nvar, SEED,
-                          n_estimators_all = [50, 200, 500, 1000, 1500, 2000],
+                          n_estimators_all = [50, 200, 500, 1000], #, 1500, 2000],
                           max_features_all = np.arange(2, 20, 3 ).tolist(),
                           max_depth_all = np.arange(3, 15, 5).tolist(),
                           min_samples_split_all =  [100, 1000]):
@@ -298,7 +298,7 @@ def create_parameters_rf( method, nvar, eff_nvar, SEED,
 
 
 def create_parameters_gbm( method, nvar, eff_nvar, SEED,
-                           n_estimators_all=[50, 100, 200, 300, 400, 500],
+                           n_estimators_all=[50, 200, 300, 500],
                            max_depth_all = np.arange(3, 9, 5).tolist(),
                            learning_rate_all = np.arange(0.001, 0.9, 0.01).tolist()):
     parameters = expand_grid(
