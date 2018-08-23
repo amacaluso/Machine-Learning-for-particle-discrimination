@@ -134,6 +134,7 @@ model.compile(loss='binary_crossentropy', optimizer='adam', metrics=['accuracy']
 filepath = "weights-improvement-{epoch:02d}-{val_acc:.2f}.hdf5"
 checkpoint = ModelCheckpoint(filepath, verbose=1, save_best_only=True, mode='auto', monitor='val_acc')
 callbacks_list = [checkpoint]
+
 model.fit(X_tr, encoded_Y_tr, epochs = nb_epoch,
           batch_size = batch_size, callbacks = callbacks_list,
           verbose=1, validation_split=0.01)

@@ -223,7 +223,8 @@ gbm = GradientBoostingClassifier(n_estimators = 100, max_depth = 25,
                                  learning_rate = 0.1)
 ''' RANDOM FOREST '''
 
-parameters = create_parameters_gbm( method, nvar, eff_nvar, SEED)
+parameters = create_parameters_gbm( method, nvar, eff_nvar, SEED,
+                                    n_estimators_all=[50, 200, 300])
 
 inputs = range( len(parameters))
 tr_val_error = Parallel(n_jobs = njob)(delayed(parallel_gbm)(i) for i in inputs)

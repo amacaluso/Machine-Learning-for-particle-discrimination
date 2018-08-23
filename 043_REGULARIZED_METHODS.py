@@ -36,7 +36,8 @@ Y_val, Y_ts = load_data_for_modeling( SEED, predictors)
 '''REGULARIZED REGRESSION'''
 
 
-parameters = create_parameters_regularized( method, nvar, eff_nvar, SEED)
+parameters = create_parameters_regularized( method, nvar, eff_nvar, SEED,
+                                            C_all=np.arange(0.001, 1, 0.1).tolist())
 
 inputs = range( len(parameters))
 tr_val_error = Parallel(n_jobs = njob)(delayed(parallel_regularized)(i) for i in inputs)
