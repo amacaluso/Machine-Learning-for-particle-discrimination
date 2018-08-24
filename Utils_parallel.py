@@ -67,6 +67,8 @@ def parallel_gbm(i):
     accuracy_tr = skl.metrics.accuracy_score(Y_tr, prediction_tr)
     return [accuracy, accuracy_tr]
 
+
+
 def parallel_SVM(i):
     kernel = parameters.ix[ i, 'kernel']
     C = parameters.ix[i, 'C']

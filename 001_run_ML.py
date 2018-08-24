@@ -56,9 +56,18 @@ for method in methods:
         DF.to_csv(  scheduled_model + '999_' + method + '_' + str(nvar) + '.csv' )
 
 
+#########################################################################################
+######## ****** RANDOM FOREST ****** ####################################################
+################################### ****** E ****** #####################################
+#################################################### ****** GBM  ****** #################
+#########################################################################################
 
+# srun -N 1 -n16 -A cin_staff -t300  -p gll_usr_gpuprod --gres=gpu:kepler:2 --pty /bin/bash
+# module load python/2.7.12
+# source py2/bin/activate
+# cd INAF/
+# python
 
-############ RANDOM FOREST E GBM ################
 
 exec(open("Utils.py").read(), globals())
 exec(open("000_Utils_parallel.py").read(), globals())
