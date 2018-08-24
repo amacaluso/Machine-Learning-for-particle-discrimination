@@ -619,3 +619,58 @@ def update_var_score( importance, path = 'results/MODELING/CLASSIFICATION/'):
         print 'There is no file metrics, it will be created'
         importance.to_csv(path, index=False)
 
+
+
+
+### *********** FUNCTIONS FOR NEURAL NETWORK ************* ###
+
+
+
+def create_parameters_nn( method, nvar, eff_nvar, SEED,
+                          hidden_size_all = [ 2, 5, 10, 20, 50],
+                          first_layer_all = [2, 3, 10, 20],
+                          n_layers_all = [1, 2, 3, 4, 10],
+                          activation_all = ['relu'],
+                          batch_size_all = [100, 500, 1000, 3000, 5000],
+                          nb_epochs_all = [40, 200],
+                          optimizer_all = ['adam']):
+
+    parameters = expand_grid(
+        {'hidden_size': hidden_size_all,
+         'first_hidden_layer': first_layer_all,
+         'n_layers': n_layers_all,
+         'activations': activation_all,
+         'batch_sizes': batch_size_all,
+         'nb_epochs': nb_epochs_all,
+         'optimizers': optimizer_all
+         }
+    )
+
+    n_params = parameters.shape[0]
+    from sklearn import svm
+    parameters['method_var_sel'] = np.repeat( method, n_params)
+    parameters['nvar'] = np.repeat( nvar, n_params)
+    parameters['effective_nvar'] = np.repeat( eff_nvar, n_params)
+    parameters['SEED'] = np.repeat( SEED, n_params)
+    return parameters
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
