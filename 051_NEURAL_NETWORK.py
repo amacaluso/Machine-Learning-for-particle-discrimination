@@ -7,15 +7,15 @@
 # source py2/bin/activate
 # cd INAF/
 # python
-
+#
 
 exec(open("Utils.py").read(), globals())
 #exec(open("Utils_NN.py").read(), globals())
 
-SEED = 123
+SEED = 741
 njob = 1
-method = 'ISIS'
-nvar = 3
+method = 'LR_ACCURACY'
+nvar = 10
 probs_to_check = np.arange(0.1, 0.91, 0.1)
 
 
@@ -86,21 +86,20 @@ models = []
 train_accuracy = []
 valid_accuracy = []
 parameters = create_parameters_nn( method, nvar, eff_nvar, SEED,
-                                   hidden_size_all = [ 2, 5],
-                                   first_layer_all = [2, 3],
-                                   n_layers_all = [1, 4],
-                                   activation_all = ['relu'],
-                                   batch_size_all = [5000],
-                                   nb_epochs_all = [40],
+                                   hidden_size_all = [ 2, 5, 10, 20],
+                                   first_layer_all = [1, 5 ,10 ],
+                                   n_layers_all = [1, 2, 5, 20],
+                                   activation_all = ['relu', 'tanh'],
+                                   batch_size_all = [500, 1000, 3000, 5000],
+                                   nb_epochs_all = [40, 200],
                                    optimizer_all = ['adam'])
 
 
-seeds = [15, 22, 1337, 3896 ,181, 168]
+np.random.seed( SEED )
+seeds = np.random.randint(0, 100, 10).tolist()
 best_score = 0
 
 ## MODELING
-
-
 
 n_param = parameters.shape[ 0 ]
 
@@ -126,7 +125,9 @@ for i in range(0, n_param):
         model.add(Dense(1, kernel_initializer='normal', activation='sigmoid'))
         model.compile(loss='binary_crossentropy', optimizer='adam', metrics=['accuracy'])
         filepath = dir_log + "weights-improvement-{epoch:02d}-{val_acc:.2f}.hdf5"
-        checkpoint = ModelCheckpoint(filepath, verbose = 1, save_best_only = True, mode = 'auto', monitor = 'val_acc')
+        checkpoint = ModelCheckpoint(filepath, verbose = 0,
+                                     save_best_only = True,
+                                     mode = 'auto', monitor = 'val_acc')
         callbacks_list = [checkpoint]
         model.fit(X_tr, encoded_Y_tr, epochs = nb_epoch, batch_size = batch_size, callbacks = callbacks_list, validation_split = 0.1)
         score = model.evaluate( X_tr, encoded_Y_tr )
@@ -139,6 +140,8 @@ for i in range(0, n_param):
     val_accuracy = best_model.evaluate( X_val, encoded_Y_val )[1]
     train_accuracy.append( tr_accuracy )
     valid_accuracy.append( val_accuracy )
+    print 'Training accuracy =', tr_accuracy
+    print 'Validation accuracy =', val_accuracy
 
 
 
@@ -148,32 +151,29 @@ parameters['training_accuracy'] = train_accuracy
 # parameters.to_csv(tree_dir_dest + 'validation.csv', index = False)
 update_validation( MODEL = label_model, PARAMETERS = parameters, path = dir_dest)
 
-ix_max = parameters.validation_accuracy.nlargest(1).index
-min_samples_split = parameters.ix[ix_max, 'min_samples_split'].values[0]
-criterion = parameters.ix[ix_max, 'criterion'].values[0]
-max_depth = parameters.ix[ix_max, 'max_depth'].values[0]
-min_samples_leaf = parameters.ix[ix_max, 'min_samples_leaf'].values[0]
-
-hidden_size = parameters.ix[ix_max, 'hidden_size']
-first_hidden_layer = parameters.ix[ix_max, 'first_hidden_layer']
-n_layer = parameters.ix[ix_max, 'n_layers']
-activation = parameters.ix[ix_max, 'activations']
-batch_size = parameters.ix[ix_max, 'batch_sizes']
-nb_epoch = parameters.ix[ix_max, 'nb_epochs']
-optimizer = parameters.ix[ix_max, 'optimizers']
+# ix_max = parameters.validation_accuracy.nlargest(1).index
+# hidden_size = parameters.ix[ix_max, 'hidden_size']
+# first_hidden_layer = parameters.ix[ix_max, 'first_hidden_layer']
+# n_layer = parameters.ix[ix_max, 'n_layers']
+# activation = parameters.ix[ix_max, 'activations']
+# batch_size = parameters.ix[ix_max, 'batch_sizes']
+# nb_epoch = parameters.ix[ix_max, 'nb_epochs']
+# optimizer = parameters.ix[ix_max, 'optimizers']
 
 ix_best = valid_accuracy.index( max(valid_accuracy))
-best_model = models[ix_max]
-
+best_model = models[ix_best]
 
 probs = best_model.predict(X_ts)
 
-prediction = []; [prediction.append( p[0]) for p in probs]
+prediction = []
+for p in probs:
+    prediction.append(p[0])
+
 ROC = ROC_analysis( Y_ts, prediction, label = label_model,
                     probability_tresholds = probs_to_check)
 
 ROC.to_csv(dir_dest + 'ROC.csv', index = False)
-update_metrics(ROC, SEED, method, eff_nvar )
+update_metrics(ROC, SEED, method, eff_nvar, path = dir_dest + 'metrics.csv' )
 
 
 ''' POST PROCESSING '''
@@ -182,7 +182,9 @@ test_set_prediction = pd.concat([pd.Series( test_set.index.tolist()),
                                 test_set[test_set.columns[-3:]]],
                                 axis = 1)
 test_set_prediction.columns = ['ID', 'Y', 'ENERGY', 'Probability']
-update_prediction(prediction = test_set_prediction, SEED = SEED, MODEL = label_model, METHOD = method, NVAR = eff_nvar)
+update_prediction(prediction = test_set_prediction, SEED = SEED,
+                  MODEL = label_model, METHOD = method, NVAR = eff_nvar,
+                  path = dir_dest + 'prediction.csv')
 # test_set_prediction.to_csv( dir_dest + 'prediction_' + str(SEED) + '.csv')
 
 for energy in test_set.ENERGY.unique():
@@ -197,7 +199,8 @@ for energy in test_set.ENERGY.unique():
                                 pd.Series( np.repeat(energy, len(probs_to_check)))],
                                 axis = 1 )
         ROC_subset.columns = cols_roc
-        update_subset_metrics(ROC_subset, SEED, method, eff_nvar)
+        update_subset_metrics(ROC_subset, SEED, method, eff_nvar,
+                              path = dir_dest + 'subset_metrics.csv')
 
 
 

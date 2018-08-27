@@ -9,11 +9,11 @@ njob = 16
 # exec(open("035_UNIVARIATE_VARIABLES_SELECTION.py").read(), globals())
 
 #method = 'ISIS'
-# GET PREDICTOR ['ISIS', 'LR_ACCURACY', 'E_NET', 'INFORMATION_GAIN', 'LASSO', 'RIDGE', 'DECISION_TREE', 'RANDOM_FOREST', 'GBM']
+# GET PREDICTOR ['ISIS', 'LR_ACCURACY', 'E_NET', 'INFORMATION_GAIN', 'LASSO', 'RIDGE', 'RANDOM_FOREST', 'GBM']
 # all_nvars = np.concatenate( ([1], np.arange(10, 51, 10))), np.arange(70, 130, 30)))
 
-methods = [ 'DECISION_TREE', 'RANDOM_FOREST', 'GBM']
-all_nvars = np.concatenate( ([1], np.arange(10, 51, 10)))
+methods = ['E_NET', 'INFORMATION_GAIN', 'LASSO', 'RIDGE', 'RANDOM_FOREST', 'GBM']
+all_nvars = np.arange(70, 140, 20).tolist()
 
 
 # predictors = extract_predictors( method, nvar, SEED)
@@ -53,7 +53,7 @@ for method in methods:
             exec(open("046_KNN.py").read(), globals())
         except:
             DF.to_csv( scheduled_model + '000_KNN_' + method + '_' + str(nvar) + '.csv')
-        DF.to_csv(  scheduled_model + '999_' + method + '_' + str(nvar) + '.csv' )
+        DF.to_csv(  scheduled_model + '9999_' + method + '_' + str(nvar) + '.csv' )
 
 
 #########################################################################################
@@ -84,11 +84,16 @@ njob = 4
 # all_nvars = np.concatenate( ([1], np.arange(10, 51, 10))), np.arange(70, 130, 30)))
 
 methods = ['ISIS', 'LR_ACCURACY', 'E_NET', 'INFORMATION_GAIN', 'LASSO', 'RIDGE', 'DECISION_TREE', 'RANDOM_FOREST', 'GBM']
-all_nvars = np.concatenate( ([1], np.arange(10, 51, 10)))
+all_nvars = np.arange(70, 140, 20).tolist()
 
+# ****************************************************#
+all_nvars = [100]
+methods = ['ISIS']
+# ****************************************************#
 
 # predictors = extract_predictors( method, nvar, SEED)
 # eff_nvar = len(predictors)
+
 probs_to_check = np.arange(0.1, 0.91, 0.1)
 DF = pd.DataFrame()
 
@@ -104,6 +109,7 @@ for method in methods:
             nvars.append( eff_nvar)
         # nvars = list(set( [el for el in nvars if el>=eff_nvar] ))
     for nvar in nvars:
+        # nvar = 100
         predictors = extract_predictors(method, nvar, SEED)
         eff_nvar = len(predictors)
         print method, nvar
