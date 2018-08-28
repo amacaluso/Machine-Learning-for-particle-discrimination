@@ -12,7 +12,7 @@ njob = 16
 # GET PREDICTOR ['ISIS', 'LR_ACCURACY', 'E_NET', 'INFORMATION_GAIN', 'LASSO', 'RIDGE', 'RANDOM_FOREST', 'GBM']
 # all_nvars = np.concatenate( ([1], np.arange(10, 51, 10))), np.arange(70, 130, 30)))
 
-methods = ['E_NET', 'INFORMATION_GAIN', 'LASSO', 'RIDGE', 'RANDOM_FOREST', 'GBM']
+methods = ['INFORMATION_GAIN', 'LASSO', 'RIDGE', 'RANDOM_FOREST', 'GBM']
 all_nvars = np.arange(70, 140, 20).tolist()
 
 
@@ -53,7 +53,7 @@ for method in methods:
             exec(open("046_KNN.py").read(), globals())
         except:
             DF.to_csv( scheduled_model + '000_KNN_' + method + '_' + str(nvar) + '.csv')
-        DF.to_csv(  scheduled_model + '9999_' + method + '_' + str(nvar) + '.csv' )
+        DF.to_csv(  scheduled_model + '999_' + method + '_' + str(nvar) + '.csv' )
 
 
 #########################################################################################
@@ -83,12 +83,12 @@ njob = 4
 # GET PREDICTOR ['ISIS', 'LR_ACCURACY', 'E_NET', 'INFORMATION_GAIN', 'LASSO', 'RIDGE', 'DECISION_TREE', 'RANDOM_FOREST', 'GBM']
 # all_nvars = np.concatenate( ([1], np.arange(10, 51, 10))), np.arange(70, 130, 30)))
 
-methods = ['ISIS', 'LR_ACCURACY', 'E_NET', 'INFORMATION_GAIN', 'LASSO', 'RIDGE', 'DECISION_TREE', 'RANDOM_FOREST', 'GBM']
+methods = ['LR_ACCURACY', 'E_NET', 'INFORMATION_GAIN', 'LASSO', 'RIDGE', 'RANDOM_FOREST', 'GBM']
 all_nvars = np.arange(70, 140, 20).tolist()
 
 # ****************************************************#
-all_nvars = [100]
-methods = ['ISIS']
+#all_nvars = [100]
+#methods = ['ISIS']
 # ****************************************************#
 
 # predictors = extract_predictors( method, nvar, SEED)
