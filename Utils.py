@@ -625,14 +625,13 @@ def update_var_score( importance, path = 'results/MODELING/CLASSIFICATION/'):
 ### *********** FUNCTIONS FOR NEURAL NETWORK ************* ###
 
 
-
 def create_parameters_nn( method, nvar, eff_nvar, SEED,
-                          hidden_size_all = [ 2, 5, 10, 20],
-                          first_layer_all = [2, 3, 10],
-                          n_layers_all = [1, 2, 10],
+                          hidden_size_all = [ 2, 5, 10, 20, 50],
+                          first_layer_all = [2, 3, 20],
+                          n_layers_all = [1, 4, 10],
                           activation_all = ['relu'],
-                          batch_size_all = [100, 500, 3000, 5000],
-                          nb_epochs_all = [40, 200],
+                          batch_size_all = [100, 500, 5000],
+                          nb_epochs_all = [200],
                           optimizer_all = ['adam']):
 
     parameters = expand_grid(
@@ -653,13 +652,6 @@ def create_parameters_nn( method, nvar, eff_nvar, SEED,
     parameters['effective_nvar'] = np.repeat( eff_nvar, n_params)
     parameters['SEED'] = np.repeat( SEED, n_params)
     return parameters
-
-
-
-
-
-
-
 
 
 
