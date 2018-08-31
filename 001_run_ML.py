@@ -12,8 +12,8 @@ njob = 16
 # GET PREDICTOR ['ISIS', 'LR_ACCURACY', 'E_NET', 'INFORMATION_GAIN', 'LASSO', 'RIDGE', 'RANDOM_FOREST', 'GBM']
 # all_nvars = np.concatenate( ([1], np.arange(10, 51, 10))), np.arange(70, 130, 30)))
 
-methods = ['INFORMATION_GAIN', 'LASSO', 'RIDGE', 'RANDOM_FOREST', 'GBM']
-all_nvars = np.arange(70, 140, 20).tolist()
+methods = ['DECISION_TREE', 'ISIS', 'LR_ACCURACY', 'E_NET', 'INFORMATION_GAIN', 'LASSO', 'RIDGE', 'RANDOM_FOREST', 'GBM']
+all_nvars = np.concatenate( ([1], np.arange(10, 51, 10)))
 
 
 # predictors = extract_predictors( method, nvar, SEED)

@@ -7,16 +7,23 @@
 # source py2/bin/activate
 # cd INAF/
 # python
-#
+
 
 exec(open("Utils.py").read(), globals())
 #exec(open("Utils_NN.py").read(), globals())
 
 SEED = 741
 njob = 1
-method = 'LR_ACCURACY'
-nvar = 10
 probs_to_check = np.arange(0.1, 0.91, 0.1)
+
+
+
+#method = 'ISIS'
+# GET PREDICTOR ['ISIS', 'LR_ACCURACY', 'E_NET', 'INFORMATION_GAIN', 'LASSO', 'RIDGE', 'RANDOM_FOREST', 'GBM']
+# all_nvars = np.concatenate( ([1], np.arange(10, 51, 10))), np.arange(70, 130, 30)))
+
+method = 'ISIS'
+nvar = 1
 
 
 
@@ -85,23 +92,24 @@ encoded_Y_ts = encoder.transform(Y_ts)
 models = []
 train_accuracy = []
 valid_accuracy = []
-parameters = create_parameters_nn( method, nvar, eff_nvar, SEED,
-                                   hidden_size_all = [ 2, 5, 10, 20],
-                                   first_layer_all = [1, 5 ,10 ],
-                                   n_layers_all = [1, 2, 5, 20],
-                                   activation_all = ['relu', 'tanh'],
-                                   batch_size_all = [500, 1000, 3000, 5000],
-                                   nb_epochs_all = [40, 200],
-                                   optimizer_all = ['adam'])
+parameters = create_parameters_nn( method, nvar, eff_nvar, SEED)
+                                   # batch_size_all = [ 10000 ],
+                                   # n_layers_all = [1, 5],
+                                   # hidden_size_all = [ 5,  20])
+#                                first_layer_all = [1, 5 ,10 ],
+#                                activation_all = ['relu', 'tanh'],
+#                                batch_size_all = [250], # [100, 500, 5000],
+#                                nb_epochs_all = [200], #[40, 200],
+#                                optimizer_all = ['adam'])
 
 
 np.random.seed( SEED )
-seeds = np.random.randint(0, 100, 10).tolist()
+seeds = np.random.randint(0, 100, 5).tolist()
 best_score = 0
 
 ## MODELING
-
 n_param = parameters.shape[ 0 ]
+
 
 for i in range(0, n_param):
     # i = 0
@@ -129,7 +137,9 @@ for i in range(0, n_param):
                                      save_best_only = True,
                                      mode = 'auto', monitor = 'val_acc')
         callbacks_list = [checkpoint]
-        model.fit(X_tr, encoded_Y_tr, epochs = nb_epoch, batch_size = batch_size, callbacks = callbacks_list, validation_split = 0.1)
+        model.fit(X_tr, encoded_Y_tr, epochs = nb_epoch,
+                  batch_size = batch_size, callbacks = callbacks_list,
+                  validation_split = 0.01, verbose = 0)
         score = model.evaluate( X_tr, encoded_Y_tr )
         if score[1] > best_score:
             best_score = score[1]
@@ -138,11 +148,12 @@ for i in range(0, n_param):
     models.append( best_model )
     tr_accuracy = best_model.evaluate( X_tr, encoded_Y_tr )[1]
     val_accuracy = best_model.evaluate( X_val, encoded_Y_val )[1]
+    # parameters.ix[i, 'training_accuracy'] = tr_accuracy
+    # parameters.ix[i, 'validation_accuracy'] = val_accuracy
     train_accuracy.append( tr_accuracy )
     valid_accuracy.append( val_accuracy )
     print 'Training accuracy =', tr_accuracy
     print 'Validation accuracy =', val_accuracy
-
 
 
 parameters['validation_accuracy'] = valid_accuracy
@@ -150,6 +161,8 @@ parameters['training_accuracy'] = train_accuracy
 
 # parameters.to_csv(tree_dir_dest + 'validation.csv', index = False)
 update_validation( MODEL = label_model, PARAMETERS = parameters, path = dir_dest)
+
+
 
 # ix_max = parameters.validation_accuracy.nlargest(1).index
 # hidden_size = parameters.ix[ix_max, 'hidden_size']
