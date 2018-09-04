@@ -2,7 +2,16 @@ exec(open("Utils.py").read(), globals())
 import random
 
 data = pd.read_csv( 'results/MODELING/CLASSIFICATION/metrics.csv')
-# data = pd.read_csv( 'results/MODELING/CLASSIFICATION/NEURAL_NETWORK/metrics.csv')
+data_NN = pd.read_csv( 'results/MODELING/CLASSIFICATION/NEURAL_NETWORK/metrics.csv')
+
+data = pd.concat( [ data, data_NN])
+#data = data_NN.copy()
+
+############## DELETING ################
+data.shape
+data = data[(data.Method != 'DECISION_TREE')]
+data.shape
+
 
 dir_images = 'Images/'
 create_dir(dir_images)
@@ -16,7 +25,6 @@ data.Model.unique()
 
 print data.columns
 
-
 data = data[data.Treshold == 0.5]
 
 for method in data.Method.unique().tolist():
@@ -28,14 +36,16 @@ for method in data.Method.unique().tolist():
         # nvars = current_data.n_variables[ current_data.Method == method].unique().tolist()
         # model = data.Model.unique().tolist()[2]
         current_data_model = current_data[current_data.Model == model]
-        print model, method, nvars
+        #print model, method, nvars
         color = random.choice( colors )
         colors.remove( color )
         plt.plot(current_data_model.n_variables, current_data_model.Accuracy, 'bs-', color = color, label = model)
+        plt.style.use('seaborn-darkgrid')
+        # fig.patch.set_facecolor('white')
         plt.title(method)
         plt.ylabel('Accuratezza')
-        plt.legend()
-    plt.savefig(dir_dest + method + '.png')
+        plt.legend(loc='center left', bbox_to_anchor=(1.0, 0.5))
+    plt.savefig(dir_dest + method + '.png', bbox_inches="tight")
     plt.close()
 
 

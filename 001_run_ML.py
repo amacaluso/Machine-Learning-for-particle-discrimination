@@ -129,15 +129,15 @@ for method in methods:
 
 
 
-srun -N 1 -n16 -A cin_staff -t300  -p gll_usr_gpuprod --gres=gpu:kepler:2 --pty /bin/bash
-module use /gpfs/scratch/userinternal/epascol1/spack/share/spack/modules/linux-centos7-x86_64
-module load  gcc-6.3.0-gcc-7.3.0-us4i5fv
-module load  cuda-9.0.176-gcc-6.3.0-xjorzpo
-module load  cudnn-7.0.5-gcc-6.3.0-ceoy3cj
-module load python/2.7.12
-source py2/bin/activate
-cd INAF/
-python
+# srun -N 1 -n16 -A cin_staff -t300  -p gll_usr_gpuprod --gres=gpu:kepler:2 --pty /bin/bash
+# module use /gpfs/scratch/userinternal/epascol1/spack/share/spack/modules/linux-centos7-x86_64
+# module load  gcc-6.3.0-gcc-7.3.0-us4i5fv
+# module load  cuda-9.0.176-gcc-6.3.0-xjorzpo
+# module load  cudnn-7.0.5-gcc-6.3.0-ceoy3cj
+# module load python/2.7.12
+# source py2/bin/activate
+# cd INAF/
+# python
 
 
 
