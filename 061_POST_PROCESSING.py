@@ -11,7 +11,7 @@ data = pd.concat( [ data, data_NN])
 data.shape
 data = data[(data.Method != 'DECISION_TREE')]
 data.shape
-
+########################################
 
 dir_images = 'Images/'
 create_dir(dir_images)
@@ -26,27 +26,60 @@ data.Model.unique()
 print data.columns
 
 data = data[data.Treshold == 0.5]
+data = data.sort_values( by = [ 'Method', 'Model', 'n_variables'])
+
+
+
+
 
 for method in data.Method.unique().tolist():
     # method = data.Method.unique().tolist()[2]
     current_data = data[ data.Method == method ]
     models = current_data.Model.unique().tolist()
-    colors = ['b', 'y', 'r', 'g', 'k', 'w', 'm', 'c']
+    colors = ['b', 'y', 'w', 'r', 'g', 'k', 'm', 'c']
+    i = 0
     for model in data.Model.unique().tolist():
         # nvars = current_data.n_variables[ current_data.Method == method].unique().tolist()
         # model = data.Model.unique().tolist()[2]
         current_data_model = current_data[current_data.Model == model]
         #print model, method, nvars
-        color = random.choice( colors )
-        colors.remove( color )
-        plt.plot(current_data_model.n_variables, current_data_model.Accuracy, 'bs-', color = color, label = model)
-        plt.style.use('seaborn-darkgrid')
-        # fig.patch.set_facecolor('white')
-        plt.title(method)
-        plt.ylabel('Accuratezza')
-        plt.legend(loc='center left', bbox_to_anchor=(1.0, 0.5))
+        #color = random.choice( colors )
+        #colors.remove( color )
+        plt.plot(current_data_model.n_variables, current_data_model.Accuracy, 'bs-', color = colors[i], label = model)
+        print i
+        i = i + 1
+    plt.style.use('seaborn-darkgrid')
+    plt.title(method)
+    plt.ylabel('Accuratezza')
+    plt.legend(loc='center left', bbox_to_anchor=(1.0, 0.5))
     plt.savefig(dir_dest + method + '.png', bbox_inches="tight")
     plt.close()
+
+
+
+
+for method in data.Method.unique().tolist():
+    # method = data.Method.unique().tolist()[2]
+    current_data = data[ data.Method == method ]
+    models = current_data.Model.unique().tolist()
+    colors = ['b', 'y', 'w', 'r', 'g', 'k', 'm', 'c']
+    i = 0
+    for model in data.Model.unique().tolist():
+        current_data_model = current_data[current_data.Model == model]
+        try:
+            sns.kdeplot(current_data_model.Accuracy,
+                        label=model, color=colors[i], shade=True)
+        except:
+            print method, model
+        i = i+1
+    # Plot formatting
+    plt.style.use('seaborn-darkgrid')
+    plt.title(method)
+    plt.ylabel('Accuratezza')
+    plt.legend(loc='center left', bbox_to_anchor=(1.0, 0.5))
+    plt.savefig(dir_dest + 'density_' + method + '.png', bbox_inches="tight")
+    plt.close()
+
 
 
 ##################################################
@@ -135,58 +168,6 @@ for energy in data.Energy.unique().tolist():
             plt.legend()
         plt.savefig(dir_dest + method + '.png')
         plt.close()
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-# for model in data.Model.unique().tolist():
-#     current_data = data[ data.Model == model ]
-#     maximum = np.round( max(current_data.Accuracy), 2)
-#     ix_max = current_data.Accuracy.nlargest(1).index
-#     best_model = current_data.ix[ix_max, 'Model'].values[0]
-#     best_method = current_data.ix[ix_max, 'Method'].values[0]
-#     best_nvar = current_data.ix[ix_max, 'n_variables'].values[0]
-#     best_threshold = current_data.ix[ix_max, 'Treshold'].values[0]
-#     ACC = current_data.ix[ix_max, 'Accuracy'].values[0]
-#     #print best_model, best_method, current_data.shape
-#     print best_model, best_method, best_nvar, best_threshold, np.round(ACC,2)
-
-#
-#
-#
-#
-#
-# for model in data.Model.unique().tolist():
-#     current_data = data[ data.Model == model ]
-#     maximum = np.round( max(current_data.Accuracy), 2)
-#     ix_max = current_data.Accuracy.nlargest(1).index
-#     best_model = current_data.ix[ix_max, 'Model'].values[0]
-#     best_method = current_data.ix[ix_max, 'Method'].values[0]
-#     best_nvar = current_data.ix[ix_max, 'n_variables'].values[0]
-#     ACC = current_data.ix[ix_max, 'Accuracy'].values[0]
-#     #print best_model, best_method, current_data.shape
-#     print best_model, best_method, best_nvar, np.round(ACC,2)
-#
-
-
 
 
 

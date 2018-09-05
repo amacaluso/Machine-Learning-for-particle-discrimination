@@ -317,8 +317,8 @@ def create_parameters_gbm( method, nvar, eff_nvar, SEED,
 
 def create_parameters_svm( method, nvar, eff_nvar, SEED,
                            kernel_all=['rbf', 'linear', 'poly'],
-                           C_all = [0.5, 1, 3, 5, 10],
-                           gamma_all = [0.1, 0.4, 1, 2, 5]):
+                           C_all = [0.5, 1,  5, 10],
+                           gamma_all = [0.1, 0.4, 1]):
     parameters = expand_grid(
         {'kernel': kernel_all,
          'C': C_all,
@@ -626,12 +626,12 @@ def update_var_score( importance, path = 'results/MODELING/CLASSIFICATION/'):
 
 
 def create_parameters_nn( method, nvar, eff_nvar, SEED,
-                          hidden_size_all = [ 2, 5, 10, 20, 50],
-                          first_layer_all = [2, 3, 20],
+                          hidden_size_all = [ 2, 5, 20],
+                          first_layer_all = [ 4, 10],
                           n_layers_all = [1, 4, 10],
                           activation_all = ['relu'],
-                          batch_size_all = [100, 500, 5000],
-                          nb_epochs_all = [200],
+                          batch_size_all = [250],
+                          nb_epochs_all = [100],
                           optimizer_all = ['adam']):
 
     parameters = expand_grid(
@@ -655,9 +655,112 @@ def create_parameters_nn( method, nvar, eff_nvar, SEED,
 
 
 
-
-
-
+# def update_validation_nn( PARAMETERS,
+#                           MODEL = 'NEURAL_NETWORK',
+#                           path = 'results/MODELING/CLASSIFICATION/NEURAL_NETWORK/'):
+#     # MODEL = 'NEURAL_NETWORK'
+#     # PARAMETERS = parameters
+#     path = path + 'parameters.csv'
+#     data = datetime.datetime.now()
+#     Model = pd.Series(np.repeat( MODEL, len(PARAMETERS)))
+#     Time = pd.Series(np.repeat(data, len(PARAMETERS)))
+#     df = pd.concat( [Model, Time, PARAMETERS ], axis = 1 )
+#     df.columns = ['Model'] + ['Time'] + PARAMETERS.columns.tolist()
+#     df['KEY'] = df['Model'] + '_' + \
+#                 df['method_var_sel'] + '_' + \
+#                 df['effective_nvar'].astype(str) + '_' + \
+#                 df['SEED'].astype(str) + '_' + \
+#                 df['first_hidden_layer'].astype(str) + '_' + \
+#                 df['n_layers'].astype(str) + '_' + \
+#                 df['batch_sizes'].astype(str) + '_' + \
+#                 df['activations'] + '_' + \
+#                 df['hidden_size'].astype(str) + '_' + \
+#                 df['nb_epochs'].astype(str) + '_' + \
+#                 df['optimizers']
+#
+#
+#     KEYS = [ value for key, value in dict( df.KEY).iteritems()]
+#
+#     for key in KEYS:
+#         try:
+#             all_parameters = pd.read_csv( path )
+#             all_parameters['KEY'] = all_parameters['Model'] + '_' + \
+#                                     all_parameters['method_var_sel'] + '_' + \
+#                                     all_parameters['effective_nvar'].astype(str) + '_' + \
+#                                     all_parameters['SEED'].astype(str) + '_' + \
+#                                     all_parameters['first_hidden_layer'].astype(str) + '_' + \
+#                                     all_parameters['n_layers'].astype(str) + '_' + \
+#                                     all_parameters['batch_sizes'].astype(str) + '_' + \
+#                                     all_parameters['activations'] + '_' + \
+#                                     all_parameters['hidden_size'].astype(str) + '_' + \
+#                                     all_parameters['nb_epochs'].astype(str) + '_' + \
+#                                     all_parameters['optimizers']
+#             if key in all_parameters.KEY.unique():
+#                 all_parameters = all_parameters.drop(all_parameters[(all_parameters.KEY == key)].index)
+#                 all_parameters = pd.concat([all_parameters, df])
+#                 # print 'The parameters have been updated'
+#             else:
+#                 all_parameters = pd.concat([all_parameters, df])
+#                 # print 'The parameters have been added'
+#             all_parameters.to_csv(path, index=False)
+#         except:
+#             print 'There is no file parameters, it will be created'
+#             df.to_csv(path, index=False)
+#
+#
+#
+# def update_validation_nn( PARAMETERS,
+#                           MODEL = 'NEURAL_NETWORK',
+#                           path = 'results/MODELING/CLASSIFICATION/NEURAL_NETWORK/'):
+# MODEL = 'NEURAL_NETWORK'
+# PARAMETERS = parameters
+# path = path + 'parameters.csv'
+# data = datetime.datetime.now()
+# Model = pd.Series(np.repeat( MODEL, len(PARAMETERS)))
+# Time = pd.Series(np.repeat(data, len(PARAMETERS)))
+# df = pd.concat( [Model, Time, PARAMETERS ], axis = 1 )
+# df.columns = ['Model'] + ['Time'] + PARAMETERS.columns.tolist()
+# df['KEY'] = df['Model'] + '_' + \
+#             df['method_var_sel'] + '_' + \
+#             df['effective_nvar'].astype(str) + '_' + \
+#             df['SEED'].astype(str) + '_' + \
+#             df['first_hidden_layer'].astype(str) + '_' + \
+#             df['n_layers'].astype(str) + '_' + \
+#             df['batch_sizes'].astype(str) + '_' + \
+#             df['activations'] + '_' + \
+#             df['hidden_size'].astype(str) + '_' + \
+#             df['nb_epochs'].astype(str) + '_' + \
+#             df['optimizers']
+#
+#
+# KEYS = [ value for key, value in dict( df.KEY).iteritems()]
+#
+# for key in KEYS:
+#     print key
+#     try:
+#         all_parameters = pd.read_csv( path )
+#         all_parameters['KEY'] = all_parameters['Model'] + '_' + \
+#                                 all_parameters['method_var_sel'] + '_' + \
+#                                 all_parameters['effective_nvar'].astype(str) + '_' + \
+#                                 all_parameters['SEED'].astype(str) + '_' + \
+#                                 all_parameters['first_hidden_layer'].astype(str) + '_' + \
+#                                 all_parameters['n_layers'].astype(str) + '_' + \
+#                                 all_parameters['batch_sizes'].astype(str) + '_' + \
+#                                 all_parameters['activations'] + '_' + \
+#                                 all_parameters['hidden_size'].astype(str) + '_' + \
+#                                 all_parameters['nb_epochs'].astype(str) + '_' + \
+#                                 all_parameters['optimizers']
+#         if key in all_parameters.KEY.unique():
+#             all_parameters = all_parameters.drop(all_parameters[(all_parameters.KEY == key)].index)
+#             all_parameters = pd.concat([all_parameters, df])
+#             print 'The parameters have been updated'
+#         else:
+#             all_parameters = pd.concat([all_parameters, df])
+#             print 'The parameters have been added'
+#         all_parameters.to_csv(path, index=False)
+#     except:
+#             print 'There is no file parameters, it will be created'
+#             df.to_csv(path, index=False)
 
 
 

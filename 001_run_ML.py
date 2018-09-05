@@ -158,7 +158,7 @@ njob = 4
 # all_nvars = np.concatenate( ([1], np.arange(10, 51, 10))), np.arange(70, 130, 30)))
 
 methods = ['LR_ACCURACY', 'E_NET', 'INFORMATION_GAIN', 'LASSO', 'RIDGE', 'RANDOM_FOREST', 'GBM']
-nvars = [30, 50] #np.arange(70, 140, 20).tolist()
+nvars = [26, 31, 37, ]#np.arange(1, 50, 3).tolist()
 
 # ****************************************************#
 #all_nvars = [100]
@@ -174,7 +174,7 @@ DF = pd.DataFrame()
 scheduled_model = 'running_model/'
 create_dir( scheduled_model)
 
-method = 'LR_ACCURACY'
+method = 'LASSO'
 
 for nvar in nvars:
     # nvar = 100
@@ -184,8 +184,8 @@ for nvar in nvars:
     try:
         exec(open("051_NEURAL_NETWORK.py").read(), globals())
     except:
-        DF.to_csv( scheduled_model + '000_NN_' + method + '_' + str(nvar) + '.csv')
-    DF.to_csv(  scheduled_model + '999_NN_' + method + '_' + str(nvar) + '.csv' )
+        DF.to_csv( scheduled_model + 'OK_NN_' + method + '_' + str(nvar) + '.csv')
+    DF.to_csv(  scheduled_model + 'ERROR_NN_' + method + '_' + str(nvar) + '.csv' )
 
 
 
