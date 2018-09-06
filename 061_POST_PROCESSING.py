@@ -19,11 +19,59 @@ create_dir(dir_images)
 dir_dest = dir_images + 'MODELING/'
 create_dir( dir_dest )
 
-data.shape
-data.Method.unique()
-data.Model.unique()
+##################################################
+################# BEST MODEL #####################
+##################################################
+best_results = pd.DataFrame( )
 
-print data.columns
+
+for model in data.Model.unique().tolist():
+    current_data = data[ data.Model == model ]
+    maximum = max(current_data.Accuracy)
+    ix_max = current_data.Accuracy.nlargest(1).index
+    row = data.ix[ix_max]
+    best_results = best_results.append( row, ignore_index = True )
+#    print best_model, best_method, best_nvar, best_threshold, np.round(AUC, 4)
+
+best_results = best_results.round(decimals = 4)
+best_results.to_csv( dir_dest + 'best_results.csv', index = False)
+
+# create plot
+fig, ax = plt.subplots(); index = np.arange(8); bar_width = 0.35; opacity = 0.8
+rects1 = plt.bar(index, best_results.AUC[0:8], bar_width,
+                 alpha=opacity, color='b', label='AUC')
+rects2 = plt.bar(index + bar_width, best_results.Accuracy[0:8], bar_width,
+                 alpha=opacity, color='g', label='ACCURACY')
+
+plt.xlabel('Models')
+#plt.ylabel('Scores')
+plt.title('Best model: AUC')
+plt.xticks(index + bar_width,  best_results.Model[0:8], rotation = 90)
+plt.legend()
+plt.tight_layout()
+plt.savefig(dir_dest + 'AUC' + '.png', bbox_inches="tight")
+plt.show()
+
+
+
+# create plot
+fig, ax = plt.subplots(); index = np.arange(8); bar_width = 0.35; opacity = 0.8
+rects1 = plt.bar(index, best_results.AUC[8:16], bar_width,
+                 alpha=opacity, color='b', label='AUC')
+rects2 = plt.bar(index + bar_width, best_results.Accuracy[8:16], bar_width,
+                 alpha=opacity, color='g', label='ACCURACY')
+
+plt.xlabel('Models')
+#plt.ylabel('Scores')
+plt.title('Best model: Accuracy')
+plt.xticks(index + bar_width,  best_results.Model[0:8], rotation = 90)
+plt.legend()
+plt.tight_layout()
+plt.savefig(dir_dest + 'Accuracy' + '.png', bbox_inches="tight")
+plt.show()
+
+
+
 
 data = data[data.Treshold == 0.5]
 data = data.sort_values( by = [ 'Method', 'Model', 'n_variables'])
@@ -81,30 +129,6 @@ for method in data.Method.unique().tolist():
 
 
 
-##################################################
-################# BEST MODEL #####################
-##################################################
-
-
-best_results = pd.DataFrame( )
-
-
-for model in data.Model.unique().tolist():
-    current_data = data[ data.Model == model ]
-    maximum = np.round( max(current_data.Accuracy), 2)
-    ix_max = current_data.Accuracy.nlargest(1).index
-    best_model = current_data.ix[ix_max, 'Model'].values[0]
-    best_method = current_data.ix[ix_max, 'Method'].values[0]
-    best_nvar = current_data.ix[ix_max, 'n_variables'].values[0]
-    best_threshold = current_data.ix[ix_max, 'Treshold'].values[0]
-    ACC = current_data.ix[ix_max, 'Accuracy'].values[0]
-    #print best_model, best_method, current_data.shape
-    row = pd.Series( [best_model, best_method, best_nvar, best_threshold, np.round(ACC, 4)])
-    best_results = best_results.append( row, ignore_index = True )
-    print best_model, best_method, best_nvar, best_threshold, np.round(ACC, 4)
-
-best_results.columns = [ 'MODEL', 'VARIABLE_SELECTION', 'N_VARIABLES', 'TRESHOLD', 'ACCURACY']
-best_results.to_csv( dir_dest + 'best_results.csv', index = False)
 
 
 
@@ -129,10 +153,10 @@ colors = ['b', 'y', 'r', 'g', 'k', 'w', 'm', 'c']
 
 for i in range( len(best_results)):
     color = colors[ i ]
-    model = best_results.ix[i, :].MODEL
-    method = best_results.ix[i, :].VARIABLE_SELECTION
-    n_var = best_results.ix[i, :].N_VARIABLES
-    accuracy = best_results.ix[i, :].ACCURACY
+    model = best_results.ix[i, :].Model
+    method = best_results.ix[i, :].Method
+    n_var = best_results.ix[i, :].n_variables
+    #accuracy = best_results.ix[i, :].ACCURACY
     current_data = data[ (data.Model == model) & (data.Method == method) & (data.n_variables == n_var)]
     #current_data = current_data[ current_data.Energy < 10000]
     current_data = current_data.sort_values( by = 'Energy')
