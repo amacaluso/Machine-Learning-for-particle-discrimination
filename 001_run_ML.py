@@ -73,7 +73,7 @@ exec(open("Utils.py").read(), globals())
 exec(open("000_Utils_parallel.py").read(), globals())
 
 SEED = 741
-njob = 4
+njob = 2
 
 # exec(open("015_SPLITTING_DATA.py").read(), globals())
 # exec(open("030_VARIABLES_SELECTION.py").read(), globals())
@@ -115,9 +115,10 @@ for method in methods:
         print method, nvar
         try:
             exec(open("000_GALILEO_TREE_BASED.py").read(), globals())
+            DF.to_csv(scheduled_model + 'OK_RF_GBM_' + method + '_' + str(nvar) + '.csv')
         except:
-            DF.to_csv( scheduled_model + '000_RF_GBM_' + method + '_' + str(nvar) + '.csv')
-        DF.to_csv(  scheduled_model + '999_RF_GBM_' + method + '_' + str(nvar) + '.csv' )
+            DF.to_csv( scheduled_model + 'ERROR_RF_GBM_' + method + '_' + str(nvar) + '.csv')
+
 
 
 

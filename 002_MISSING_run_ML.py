@@ -191,3 +191,55 @@ for nvar in nvars:
 
 
 
+
+exec(open("Utils.py").read(), globals())
+exec(open("000_Utils_parallel.py").read(), globals())
+
+SEED = 741
+njob = 2
+
+# exec(open("015_SPLITTING_DATA.py").read(), globals())
+# exec(open("030_VARIABLES_SELECTION.py").read(), globals())
+# exec(open("035_UNIVARIATE_VARIABLES_SELECTION.py").read(), globals())
+
+#method = 'ISIS'
+# GET PREDICTOR ['ISIS', 'LR_ACCURACY', 'E_NET', 'INFORMATION_GAIN', 'LASSO', 'RIDGE', 'DECISION_TREE', 'RANDOM_FOREST', 'GBM']
+# all_nvars = np.concatenate( ([1], np.arange(10, 51, 10))), np.arange(70, 130, 30)))
+
+methods = ['LR_ACCURACY', 'E_NET', 'INFORMATION_GAIN', 'LASSO', 'RIDGE', 'RANDOM_FOREST', 'GBM']
+all_nvars = [70, 100, 130] #np.arange(70, 140, 20).tolist()
+
+# ****************************************************#
+#all_nvars = [100]
+#methods = ['ISIS']
+# ****************************************************#
+
+# predictors = extract_predictors( method, nvar, SEED)
+# eff_nvar = len(predictors)
+
+probs_to_check = np.arange(0.1, 0.91, 0.1)
+DF = pd.DataFrame()
+
+scheduled_model = 'running_model/'
+create_dir( scheduled_model)
+
+for method in methods:
+    nvars = []
+    for i in all_nvars:
+        predictors = extract_predictors(method, i, SEED)
+        eff_nvar = len(predictors)
+        if eff_nvar not in nvars:
+            nvars.append( eff_nvar)
+        # nvars = list(set( [el for el in nvars if el>=eff_nvar] ))
+    for nvar in nvars:
+        # nvar = 100
+        predictors = extract_predictors(method, nvar, SEED)
+        eff_nvar = len(predictors)
+        print method, nvar
+        try:
+            exec(open("000_GALILEO_TREE_BASED.py").read(), globals())
+            DF.to_csv(scheduled_model + 'OK_RF_GBM_' + method + '_' + str(nvar) + '.csv')
+        except:
+            DF.to_csv( scheduled_model + 'ERROR_RF_GBM_' + method + '_' + str(nvar) + '.csv')
+
+
