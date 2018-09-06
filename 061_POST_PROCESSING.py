@@ -31,7 +31,6 @@ data = data.sort_values( by = [ 'Method', 'Model', 'n_variables'])
 
 
 
-
 for method in data.Method.unique().tolist():
     # method = data.Method.unique().tolist()[2]
     current_data = data[ data.Method == method ]
@@ -175,3 +174,7 @@ for energy in data.Energy.unique().tolist():
 
 
 
+methods = data.Method.unique()
+models = data.Method.unique()
+
+data[ [ 'Method', 'n_variables'] ].drop_duplicates().to_csv( 'TABELLA_SCHEDULING.csv', index = False)
