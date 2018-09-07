@@ -22,16 +22,28 @@ create_dir( dir_dest )
 ##################################################
 ################# BEST MODEL #####################
 ##################################################
-best_results = pd.DataFrame( )
+best_results = pd.DataFrame( columns = data.columns )
+
+
+for model in data.Model.unique().tolist():
+    #model = data.Model.unique().tolist()[3]
+    current_data = data[ data.Model == model ]
+    maximum = max(current_data.Accuracy)
+    ix_max = current_data.Accuracy.nlargest(1).index
+    row = current_data.ix[ix_max]
+    if model not in best_results.Model.tolist():
+        best_results = best_results.append( row, ignore_index = True )
+        print model, len(row)
+#    print best_model, best_method, best_nvar, best_threshold, np.round(AUC, 4)
 
 
 for model in data.Model.unique().tolist():
     current_data = data[ data.Model == model ]
-    maximum = max(current_data.Accuracy)
-    ix_max = current_data.Accuracy.nlargest(1).index
-    row = data.ix[ix_max]
+    maximum = max(current_data.AUC)
+    ix_max = current_data.AUC.nlargest(1).index
+    row = current_data.ix[ix_max]
     best_results = best_results.append( row, ignore_index = True )
-#    print best_model, best_method, best_nvar, best_threshold, np.round(AUC, 4)
+
 
 best_results = best_results.round(decimals = 4)
 best_results.to_csv( dir_dest + 'best_results.csv', index = False)
@@ -51,6 +63,7 @@ plt.legend()
 plt.tight_layout()
 plt.savefig(dir_dest + 'AUC' + '.png', bbox_inches="tight")
 plt.show()
+plt.close()
 
 
 
@@ -69,6 +82,7 @@ plt.legend()
 plt.tight_layout()
 plt.savefig(dir_dest + 'Accuracy' + '.png', bbox_inches="tight")
 plt.show()
+plt.close()
 
 
 
@@ -93,7 +107,7 @@ for method in data.Method.unique().tolist():
         #color = random.choice( colors )
         #colors.remove( color )
         plt.plot(current_data_model.n_variables, current_data_model.Accuracy, 'bs-', color = colors[i], label = model)
-        print i
+        #print i
         i = i + 1
     plt.style.use('seaborn-darkgrid')
     plt.title(method)
@@ -138,7 +152,7 @@ for method in data.Method.unique().tolist():
 #########################################################
 
 data = pd.read_csv( 'results/MODELING/CLASSIFICATION/subset_metrics.csv')
-# data = pd.read_csv( 'results/MODELING/CLASSIFICATION/NEURAL_NETWORK/metrics.csv')
+data_NN = pd.read_csv( 'results/MODELING/CLASSIFICATION/NEURAL_NETWORK/subset_metrics.csv')
 
 
 data.shape

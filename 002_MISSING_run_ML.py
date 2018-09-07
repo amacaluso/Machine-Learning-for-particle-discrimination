@@ -152,7 +152,7 @@ njob = 4
 # all_nvars = np.concatenate( ([1], np.arange(10, 51, 10))), np.arange(70, 130, 30)))
 
 methods = ['LR_ACCURACY', 'E_NET', 'INFORMATION_GAIN', 'LASSO', 'RIDGE', 'RANDOM_FOREST', 'GBM']
-nvars = [30, 50] #np.arange(70, 140, 20).tolist()
+nvars = [10, 20, 30, 50, 70, 90, 110] #np.arange(70, 140, 20).tolist()
 
 # ****************************************************#
 #all_nvars = [100]
@@ -168,7 +168,7 @@ DF = pd.DataFrame()
 scheduled_model = 'running_model/'
 create_dir( scheduled_model)
 
-method = 'LR_ACCURACY'
+method = 'RANDOM_FOREST'
 
 for nvar in nvars:
     # nvar = 100

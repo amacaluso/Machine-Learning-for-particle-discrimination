@@ -38,8 +38,8 @@ print ' >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> '
 
 parameters = create_parameters_svm( method, nvar, eff_nvar, SEED,
                                     kernel_all=['rbf', 'linear', 'poly'],
-                                    C_all = [0.5],
-                                    gamma_all = [1])
+                                    C_all=[0.5, 1],
+                                    gamma_all=['auto'])
 
 inputs = range( len(parameters))
 tr_val_error = Parallel(n_jobs = njob)(delayed(parallel_SVM)(i) for i in inputs)
