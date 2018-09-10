@@ -151,10 +151,10 @@ def regression_performance_estimate( Y_test, Y_hat,  model = 'LM'):
 
 def create_dir (path):
     if not os.path.exists(path):
-        print 'The directory does not exist and will be created'
+        print 'The directory', path, 'does not exist and will be created'
         os.makedirs(path)
     else:
-        print 'The directory already exists'
+        print 'The directory', path, ' already exists'
 
 
 def correlation_matrix(df, path):

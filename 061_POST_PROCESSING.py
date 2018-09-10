@@ -181,7 +181,7 @@ print data.columns
 
 data = data[ data.Treshold == 0.5 ]
 
-colors = ['blue', 'hotpink', 'navy', 'red', 'k', 'gold', 'green', 'aqua']
+colors = ['blue', 'hotpink', 'navy', 'orange', 'k', 'gold', 'green', 'aqua']
 
 for i in range( len(best_results_ACC)):
     color = colors[ i ]
@@ -192,7 +192,8 @@ for i in range( len(best_results_ACC)):
     current_data = data[ (data.Model == model) & (data.Method == method) & (data.n_variables == n_var)]
     #current_data = current_data[ current_data.Energy < 10000]
     current_data = current_data.sort_values( by = 'Energy')
-    plt.plot( np.log2(current_data.Energy), current_data.Accuracy, 'ro-', color = color, label = model)
+    plt.plot( np.log2(current_data.Energy), current_data.Accuracy, 'bs-', color = color, label = model)
+    #plt.xticks( np.log2(current_data.Energy), 'log' + current_data.Energy)
     plt.title('ENERGY')
     plt.ylabel('Accuratezza')
     plt.legend()
@@ -200,30 +201,50 @@ plt.savefig(dir_dest + '051_Energy_performance.png')
 plt.close()
 
 
-
-
-# for energy in data.Energy.unique().tolist():
-energy = data.Energy.unique().tolist()[1]
-energy_data = data[ data.Energy == energy ]
-# for method in data.Method.unique().tolist():
-# method = data.Method.unique().tolist()[0]
-current_data = energy_data[energy_data.Method == method]
-models = current_data.Model.unique().tolist()
-colors = ['b', 'y', 'w', 'r', 'g', 'k', 'm', 'c']
-i = 0
-#for model in current_data.Model.unique().tolist():
-model = data.Model.unique().tolist()[2]
-current_data_model = current_data[current_data.Model == model]
-plt.plot(current_data_model.n_variables, current_data_model.Accuracy,
-         'bs-', color=colors[i], label=model)
-plt.title('Energy: ' + str(energy) + ' MEV ' + method)
-i = i + 1
-plt.style.use('seaborn-darkgrid')
-plt.ylabel('Accuratezza')
-plt.legend(loc = 'center left', bbox_to_anchor=(1.0, 0.5))
-current_dir = dir_dest + str(energy) + '/'
-plt.savefig(dir_dest + '053_' + str(energy) + '_' + method + '.png', bbox_inches="tight")
+for i in range( len(best_results_ACC)):
+    color = colors[ i ]
+    model = best_results_ACC.ix[i, :].Model
+    method = best_results_ACC.ix[i, :].Method
+    n_var = best_results_ACC.ix[i, :].n_variables
+    #accuracy = best_results.ix[i, :].ACCURACY
+    current_data = data[ (data.Model == model) & (data.Method == method) & (data.n_variables == n_var)]
+    #current_data = current_data[ current_data.Energy < 10000]
+    current_data = current_data.sort_values( by = 'Energy')
+    plt.plot( current_data.Energy, current_data.Accuracy, 'bs-', color = color, label = model)
+    #plt.xticks( np.log2(current_data.Energy), 'log' + current_data.Energy)
+    plt.title('ENERGY')
+    plt.ylabel('Accuratezza')
+    plt.legend()
+plt.savefig(dir_dest + '052_Log_Energy_performance.png')
 plt.close()
+
+
+
+
+
+
+# # for energy in data.Energy.unique().tolist():
+# energy = data.Energy.unique().tolist()[1]
+# energy_data = data[ data.Energy == energy ]
+# # for method in data.Method.unique().tolist():
+# # method = data.Method.unique().tolist()[0]
+# current_data = energy_data[energy_data.Method == method]
+# models = current_data.Model.unique().tolist()
+# colors = ['b', 'y', 'w', 'r', 'g', 'k', 'm', 'c']
+# i = 0
+# #for model in current_data.Model.unique().tolist():
+# model = data.Model.unique().tolist()[2]
+# current_data_model = current_data[current_data.Model == model]
+# plt.plot(current_data_model.n_variables, current_data_model.Accuracy,
+#          'bs-', color=colors[i], label=model)
+# plt.title('Energy: ' + str(energy) + ' MEV ' + method)
+# i = i + 1
+# plt.style.use('seaborn-darkgrid')
+# plt.ylabel('Accuratezza')
+# plt.legend(loc = 'center left', bbox_to_anchor=(1.0, 0.5))
+# current_dir = dir_dest + str(energy) + '/'
+# plt.savefig(dir_dest + '053_' + str(energy) + '_' + method + '.png', bbox_inches="tight")
+# plt.close()
 
 
 
@@ -238,7 +259,7 @@ for energy in data.Energy.unique().tolist():
         # method = data.Method.unique().tolist()[0]
         current_data = energy_data[energy_data.Method == method]
         models = current_data.Model.unique().tolist()
-        colors = ['b', 'y', 'w', 'r', 'g', 'k', 'm', 'c']
+        colors = ['blue', 'hotpink', 'navy', 'orange', 'k', 'gold', 'green', 'aqua']
         i = 0
         for model in current_data.Model.unique().tolist():
             # model = data.Model.unique().tolist()[2]
