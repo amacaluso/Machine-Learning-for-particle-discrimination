@@ -25,6 +25,8 @@ create_dir( dir_dest )
 
 
 
+
+
 ''' SELEZIONE DEL MIGLIOR MODELLO '''
 ##################################################
 ################# BEST MODEL #####################
@@ -47,6 +49,49 @@ best_results_ACC = best_results_ACC.round(decimals = 4)
 best_results_ACC.to_csv( dir_dest + 'best_results_ACC.csv', index = False)
 
 
+''' Barplot + table (Accuracy)'''
+##################################################
+
+table = best_results_ACC.transpose()
+table.columns = ['TREE', 'REGULARIZED', 'GAUSSIAN NB', 'BERNOULLI NB', 'KNN',
+                 'NEURAL NETWORK', 'RANDOM FOREST', 'GBM']
+#table[ table.index == 'Model'].values.tolist()[0]
+table = table.ix[[2,3,4,8,9], : ]
+columns = table.columns
+rows = table.index.tolist()
+n_rows = len(table.values)
+
+# Add a table at the bottom of the axes
+cell_text = table.values
+#cell_text.reverse()
+
+# create plot
+fig, ax = plt.subplots(); index = np.arange(8); bar_width = 0.35; opacity = 0.8
+ACC_plot = plt.bar(index, best_results_ACC.AUC, bar_width,
+                   alpha=opacity, color='b', label='AUC')
+
+ACC_plot = plt.bar(index + bar_width, best_results_ACC.Accuracy, bar_width,
+                 alpha=opacity, color='g', label='ACCURACY')
+
+
+#plt.xlabel('Models')
+plt.title('Best model: Accuracy')
+plt.xticks([]) #index + bar_width,  best_results_AUC.Model, rotation = 90)
+plt.legend(loc='upper right')
+plt.tight_layout()
+the_table = plt.table(cellText=cell_text,
+                      rowLabels=rows,
+                      colLabels=columns,
+                      loc='bottom',
+                      cellLoc='center')
+the_table.auto_set_font_size(False)
+the_table.set_fontsize(10)
+plt.subplots_adjust(left=0.2, bottom=0.2)
+#plt.figure(figsize=( 1080, 1920))
+plt.savefig(dir_dest + '023_ACC' + '.png', bbox_inches="tight")
+plt.show()
+plt.close()
+
 
 best_results_AUC = pd.DataFrame( columns = data.columns )
 
@@ -61,51 +106,71 @@ for model in data.Model.unique().tolist():
 best_results_AUC = best_results_AUC.round(decimals = 4)
 best_results_AUC.to_csv( dir_dest + 'best_results_AUC.csv', index = False)
 
+''' Barplot + table (AUC)'''
+##################################################
+table = best_results_AUC.transpose()
+table.columns = ['TREE', 'REGULARIZED', 'GAUSSIAN NB', 'BERNOULLI NB', 'KNN',
+                 'NEURAL NETWORK', 'RANDOM FOREST', 'GBM']
+#table[ table.index == 'Model'].values.tolist()[0]
+table = table.ix[[2,3,4,8,9], : ]
+columns = table.columns
+rows = table.index.tolist()
+n_rows = len(table.values)
+
+# Add a table at the bottom of the axes
+cell_text = table.values
+#cell_text.reverse()
+
 # create plot
 fig, ax = plt.subplots(); index = np.arange(8); bar_width = 0.35; opacity = 0.8
 AUC_plot = plt.bar(index, best_results_AUC.AUC, bar_width,
-                   alpha=opacity, color='b', label='AUC')
+                   alpha=opacity, color='red', label='AUC')
 
 ACC_plot = plt.bar(index + bar_width, best_results_AUC.Accuracy, bar_width,
-                 alpha=opacity, color='g', label='ACCURACY')
+                 alpha=opacity, color='green', label='ACCURACY')
 
 
-plt.xlabel('Models')
+#plt.xlabel('Models')
 plt.title('Best model: AUC')
-plt.xticks(index + bar_width,  best_results_AUC.Model, rotation = 90)
+plt.xticks([]) #index + bar_width,  best_results_AUC.Model, rotation = 90)
 plt.legend(loc='upper right')
 plt.tight_layout()
+the_table = plt.table(cellText=cell_text,
+                      rowLabels=rows,
+                      colLabels=columns,
+                      loc='bottom',
+                      cellLoc='center')
+the_table.auto_set_font_size(False)
+the_table.set_fontsize(10)
+plt.subplots_adjust(left=0.2, bottom=0.2)
+#plt.figure(figsize=( 1080, 1920))
 plt.savefig(dir_dest + '021_AUC' + '.png', bbox_inches="tight")
 plt.show()
 plt.close()
 
 
 
-# create plot
-AUC_plot = plt.bar(index, best_results_ACC.AUC, bar_width,
-                   alpha=opacity, color='R', label='AUC')
 
-ACC_plot = plt.bar(index + bar_width, best_results_ACC.Accuracy, bar_width,
-                 alpha=opacity, color='y', label='ACCURACY')
 
-plt.xlabel('Models')
-#plt.ylabel('Scores')
-plt.title('Best model: Accuracy')
-plt.xticks(index + bar_width,  best_results_ACC.Model, rotation = 90)
-plt.legend(loc='upper right')
-plt.tight_layout()
-plt.savefig(dir_dest + '023_Accuracy' + '.png', bbox_inches="tight")
-plt.show()
-plt.close()
 
-''' Inserire la tabella sotto il grafico dei due criteri '''
+
 ''' Inserire l'AUC media e l'Accuratezza media '''
 ''' Inserire la scelta del modello con la soglia ottimale '''
 
+''' Barplot + table (Accuracy)'''
+##################################################
 
-data = data[data.Treshold == 0.5]
-data = data.sort_values( by = [ 'Method', 'Model', 'n_variables'])
+models = best_results_ACC.Model.unique().tolist()
+df_best_results = pd.DataFrame( columns = data.columns)
 
+for model in models:
+    best_treshold = best_results_ACC[ best_results_ACC.Model == model].Treshold.values[0]
+    print model, best_treshold
+    current_df = data[ (data.Treshold == best_treshold) & (data.Model == model) ]
+    df_best_results = pd.concat( [df_best_results, current_df ])
+
+df_best_results = df_best_results.sort_values( by = [ 'Method', 'Model', 'n_variables'])
+data = df_best_results.copy()
 
 
 for method in data.Method.unique().tolist():
@@ -294,3 +359,46 @@ methods = data.Method.unique()
 models = data.Method.unique()
 
 data[ [ 'Method', 'n_variables'] ].drop_duplicates().to_csv( 'TABELLA_SCHEDULING.csv', index = False)
+
+
+
+
+
+
+
+
+
+table = best_results_ACC.transpose()
+table.columns = table[ table.index == 'Model'].values.tolist()[0]
+table = table.ix[[2,3,4,8,9], : ]
+columns = table.columns
+rows = table.index.tolist()
+n_rows = len(table.values)
+
+# Add a table at the bottom of the axes
+cell_text = table.values
+#cell_text.reverse()
+
+# create plot
+fig, ax = plt.subplots(); index = np.arange(8); bar_width = 0.35; opacity = 0.8
+AUC_plot = plt.bar(index, best_results_AUC.AUC, bar_width,
+                   alpha=opacity, color='b', label='AUC')
+
+ACC_plot = plt.bar(index + bar_width, best_results_AUC.Accuracy, bar_width,
+                 alpha=opacity, color='g', label='ACCURACY')
+
+
+#plt.xlabel('Models')
+plt.title('Best model: AUC')
+plt.xticks([]) #index + bar_width,  best_results_AUC.Model, rotation = 90)
+plt.legend(loc='upper right')
+plt.tight_layout()
+the_table = plt.table(cellText=cell_text,
+                      rowLabels=rows,
+                      colLabels=columns,
+                      loc='bottom',
+                      cellLoc='center')
+the_table.auto_set_font_size(False)
+the_table.set_fontsize(10)
+plt.subplots_adjust(left=0.2, bottom=0.2)
+plt.show()
