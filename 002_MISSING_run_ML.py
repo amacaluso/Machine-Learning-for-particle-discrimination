@@ -74,24 +74,24 @@ nvars = [100, 70]
 methods = ['RIDGE', 'GBM']
 
 for method in methods:
-    for nvar in all_nvars:
+    for nvar in nvars:
         predictors = extract_predictors(method, nvar, SEED)
         eff_nvar = len(predictors)
         print method, nvar
         try:
             exec(open("041_TREE_BASED_MODELS.py").read(), globals())
-            DF.to_csv(scheduled_model + 'OK_TREE_BASED_MODELS' + method + '_' + str(nvar) + '.csv')
+            DF.to_csv(scheduled_model + 'OK_TREE_BASED_MODELS_' + method + '_' + str(nvar) + '.csv')
         except:
             DF.to_csv( scheduled_model + 'ERROR_TREE_BASED_' + method + '_' + str(nvar) + '.csv')
         # >>>>>>>>> exec(open("042_SVM.py").read(), globals()) >>>>>>>>>>>>
         try:
             exec(open("043_REGULARIZED_METHODS.py").read(), globals())
-            DF.to_csv(scheduled_model + 'OK_REGULARIZED_METHODS' + method + '_' + str(nvar) + '.csv')
+            DF.to_csv(scheduled_model + 'OK_REGULARIZED_METHODS_' + method + '_' + str(nvar) + '.csv')
         except:
             DF.to_csv( scheduled_model + 'ERROR_LASSO_' + method + '_' + str(nvar) + '.csv')
         try:
             exec(open("045_NAIVE_BAYES.py").read(), globals())
-            DF.to_csv(scheduled_model + 'OK_NAIVE_BAYES' + method + '_' + str(nvar) + '.csv')
+            DF.to_csv(scheduled_model + 'OK_NAIVE_BAYES_' + method + '_' + str(nvar) + '.csv')
         except:
             DF.to_csv( scheduled_model + 'ERROR_NAIVE_BAYES_' + method + '_' + str(nvar) + '.csv')
         try:
@@ -99,11 +99,11 @@ for method in methods:
             DF.to_csv( scheduled_model + 'OK_KNN_' + method + '_' + str(nvar) + '.csv')
         except:
             DF.to_csv(  scheduled_model + 'ERROR_KNN_' + method + '_' + str(nvar) + '.csv' )
-        try:
-            exec (open("000_GALILEO_TREE_BASED.py").read(), globals())
-            DF.to_csv(scheduled_model + 'OK_RF_GBM_' + method + '_' + str(nvar) + '.csv')
-        except:
-            DF.to_csv(scheduled_model + 'ERROR_RF_GBM_' + method + '_' + str(nvar) + '.csv')
+        # try:
+        #     exec (open("000_GALILEO_TREE_BASED.py").read(), globals())
+        #     DF.to_csv(scheduled_model + 'OK_RF_GBM_' + method + '_' + str(nvar) + '.csv')
+        # except:
+        #     DF.to_csv(scheduled_model + 'ERROR_RF_GBM_' + method + '_' + str(nvar) + '.csv')
 
 
 
@@ -120,7 +120,7 @@ for method in methods:
         print method, nvar
         try:
             exec(open("043_REGULARIZED_METHODS.py").read(), globals())
-            DF.to_csv(scheduled_model + 'OK_REGULARIZED_METHODS' + method + '_' + str(nvar) + '.csv')
+            DF.to_csv(scheduled_model + 'OK_REGULARIZED_METHODS_' + method + '_' + str(nvar) + '.csv')
         except:
             DF.to_csv( scheduled_model + 'ERROR_LASSO_' + method + '_' + str(nvar) + '.csv')
 
@@ -139,7 +139,7 @@ for method in methods:
         print method, nvar
         try:
             exec(open("043_REGULARIZED_METHODS.py").read(), globals())
-            DF.to_csv(scheduled_model + 'OK_REGULARIZED_METHODS' + method + '_' + str(nvar) + '.csv')
+            DF.to_csv(scheduled_model + 'OK_REGULARIZED_METHODS_' + method + '_' + str(nvar) + '.csv')
         except:
             DF.to_csv( scheduled_model + 'ERROR_LASSO_' + method + '_' + str(nvar) + '.csv')
 
@@ -156,7 +156,7 @@ for method in methods:
         print method, nvar
         try:
             exec(open("041_TREE_BASED_MODELS.py").read(), globals())
-            DF.to_csv(scheduled_model + 'OK_TREE_BASED_MODELS' + method + '_' + str(nvar) + '.csv')
+            DF.to_csv(scheduled_model + 'OK_TREE_BASED_MODELS_' + method + '_' + str(nvar) + '.csv')
         except:
             DF.to_csv( scheduled_model + 'ERROR_TREE_BASED_' + method + '_' + str(nvar) + '.csv')
         # >>>>>>>>> exec(open("042_SVM.py").read(), globals()) >>>>>>>>>>>>

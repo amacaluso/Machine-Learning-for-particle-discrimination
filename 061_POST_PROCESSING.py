@@ -112,7 +112,7 @@ for method in data.Method.unique().tolist():
     #method = data.Method.unique().tolist()[0]
     current_data = data[ data.Method == method ]
     models = current_data.Model.unique().tolist()
-    colors = ['b', 'y', 'w', 'r', 'g', 'k', 'm', 'c']
+    colors = ['blue', 'hotpink', 'navy', 'red', 'k', 'gold', 'green', 'aqua']
     i = 0
     for model in data.Model.unique().tolist():
         # model = data.Model.unique().tolist()[2]
@@ -137,7 +137,7 @@ for method in data.Method.unique().tolist():
     # method = data.Method.unique().tolist()[2]
     current_data = data[ data.Method == method ]
     models = current_data.Model.unique().tolist()
-    colors = ['b', 'y', 'w', 'r', 'g', 'k', 'm', 'c']
+    colors = ['blue', 'hotpink', 'navy', 'red', 'k', 'gold', 'green', 'aqua']
     i = 0
     for model in data.Model.unique().tolist():
         current_data_model = current_data[current_data.Model == model]
@@ -150,7 +150,7 @@ for method in data.Method.unique().tolist():
     # Plot formatting
     plt.style.use('seaborn-darkgrid')
     plt.title(method)
-    plt.ylabel('Accuratezza')
+    plt.xlabel('Accuratezza')
     plt.legend(loc='center left', bbox_to_anchor=(1.0, 0.5))
     plt.savefig(dir_dest + '043_density_' + method + '.png', bbox_inches="tight")
     plt.close()
@@ -181,7 +181,7 @@ print data.columns
 
 data = data[ data.Treshold == 0.5 ]
 
-colors = ['b', 'y', 'r', 'g', 'k', 'w', 'm', 'c']
+colors = ['blue', 'hotpink', 'navy', 'red', 'k', 'gold', 'green', 'aqua']
 
 for i in range( len(best_results_ACC)):
     color = colors[ i ]
@@ -192,7 +192,7 @@ for i in range( len(best_results_ACC)):
     current_data = data[ (data.Model == model) & (data.Method == method) & (data.n_variables == n_var)]
     #current_data = current_data[ current_data.Energy < 10000]
     current_data = current_data.sort_values( by = 'Energy')
-    plt.plot(current_data.Energy, current_data.Accuracy, 'ro-', color = color, label = model)
+    plt.plot( np.log2(current_data.Energy), current_data.Accuracy, 'ro-', color = color, label = model)
     plt.title('ENERGY')
     plt.ylabel('Accuratezza')
     plt.legend()

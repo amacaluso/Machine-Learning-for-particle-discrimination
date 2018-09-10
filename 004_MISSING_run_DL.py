@@ -11,7 +11,9 @@
 # source py2/bin/activate
 # cd INAF/
 # python
-#
+
+
+
 exec(open("Utils.py").read(), globals())
 exec(open("Utils_parallel.py").read(), globals())
 
@@ -34,8 +36,8 @@ create_dir( scheduled_model)
 
 
 # 'ISIS', 'LR_ACCURACY', 'E_NET', 'INFORMATION_GAIN', 'LASSO', 'RIDGE', 'RANDOM_FOREST', 'GBM']
-nvars = [ 90, 110, 130 ]
-methods = ['E_NET', 'INFORMATION_GAIN']
+nvars = [ 110, 130 ]
+methods = ['INFORMATION_GAIN']
 
 for method in methods:
     for nvar in nvars:
@@ -49,41 +51,6 @@ for method in methods:
         except:
             DF.to_csv(scheduled_model + 'ERROR_NN_' + method + '_' + str(nvar) + '.csv')
 
-
-
-# 'ISIS', 'LR_ACCURACY', 'E_NET', 'INFORMATION_GAIN', 'LASSO', 'RIDGE', 'RANDOM_FOREST', 'GBM']
-nvars = [ 70, 100 ]
-methods = ['GBM']
-
-for method in methods:
-    for nvar in nvars:
-        # nvar = 100
-        predictors = extract_predictors(method, nvar, SEED)
-        eff_nvar = len(predictors)
-        print method, nvar
-        try:
-            exec (open("051_NEURAL_NETWORK.py").read(), globals())
-            DF.to_csv(scheduled_model + 'OK_NN_' + method + '_' + str(nvar) + '.csv')
-        except:
-            DF.to_csv(scheduled_model + 'ERROR_NN_' + method + '_' + str(nvar) + '.csv')
-
-
-
-# 'ISIS', 'LR_ACCURACY', 'E_NET', 'INFORMATION_GAIN', 'LASSO', 'RIDGE', 'RANDOM_FOREST', 'GBM']
-nvars = [ 60 ]
-methods = ['ISIS']
-
-for method in methods:
-    for nvar in nvars:
-        # nvar = 100
-        predictors = extract_predictors(method, nvar, SEED)
-        eff_nvar = len(predictors)
-        print method, nvar
-        try:
-            exec (open("051_NEURAL_NETWORK.py").read(), globals())
-            DF.to_csv(scheduled_model + 'OK_NN_' + method + '_' + str(nvar) + '.csv')
-        except:
-            DF.to_csv(scheduled_model + 'ERROR_NN_' + method + '_' + str(nvar) + '.csv')
 
 
 
@@ -104,20 +71,3 @@ for method in methods:
             DF.to_csv(scheduled_model + 'ERROR_NN_' + method + '_' + str(nvar) + '.csv')
 
 
-
-
-# 'ISIS', 'LR_ACCURACY', 'E_NET', 'INFORMATION_GAIN', 'LASSO', 'RIDGE', 'RANDOM_FOREST', 'GBM']
-nvars = [ 110, 130 ]
-methods = ['LR_ACCURACY']
-
-for method in methods:
-    for nvar in nvars:
-        # nvar = 100
-        predictors = extract_predictors(method, nvar, SEED)
-        eff_nvar = len(predictors)
-        print method, nvar
-        try:
-            exec (open("051_NEURAL_NETWORK.py").read(), globals())
-            DF.to_csv(scheduled_model + 'OK_NN_' + method + '_' + str(nvar) + '.csv')
-        except:
-            DF.to_csv(scheduled_model + 'ERROR_NN_' + method + '_' + str(nvar) + '.csv')
