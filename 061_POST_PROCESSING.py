@@ -259,10 +259,11 @@ for i in range( len(best_results_ACC)):
     current_data = current_data.sort_values( by = 'Energy')
     plt.plot( np.log2(current_data.Energy), current_data.Accuracy, 'bs-', color = color, label = model)
     #plt.xticks( np.log2(current_data.Energy), 'log' + current_data.Energy)
-    plt.title('ENERGY')
+    plt.title('Accuracy vs ENERGY')
     plt.ylabel('Accuratezza')
+    plt.xlabel('log2(energy)')
     plt.legend()
-plt.savefig(dir_dest + '051_Energy_performance.png')
+plt.savefig(dir_dest + '051_LOG_Energy_performance.png')
 plt.close()
 
 
@@ -277,10 +278,11 @@ for i in range( len(best_results_ACC)):
     current_data = current_data.sort_values( by = 'Energy')
     plt.plot( current_data.Energy, current_data.Accuracy, 'bs-', color = color, label = model)
     #plt.xticks( np.log2(current_data.Energy), 'log' + current_data.Energy)
-    plt.title('ENERGY')
-    plt.ylabel('Accuratezza')
+    plt.title('ENERGY ')
+    plt.ylabel('Accuratezza vs Energy')
+    plt.ylabel('Energy')
     plt.legend()
-plt.savefig(dir_dest + '052_Log_Energy_performance.png')
+plt.savefig(dir_dest + '052_Energy_performance.png')
 plt.close()
 
 
