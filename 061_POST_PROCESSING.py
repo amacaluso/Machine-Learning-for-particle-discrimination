@@ -67,7 +67,7 @@ cell_text = table.values
 
 # create plot
 fig, ax = plt.subplots(); index = np.arange(8); bar_width = 0.35; opacity = 0.8
-ACC_plot = plt.bar(index, best_results_ACC.AUC, bar_width,
+AUC_plot = plt.bar(index, best_results_ACC.AUC, bar_width,
                    alpha=opacity, color='b', label='AUC')
 
 ACC_plot = plt.bar(index + bar_width, best_results_ACC.Accuracy, bar_width,
@@ -88,8 +88,9 @@ the_table.auto_set_font_size(False)
 the_table.set_fontsize(10)
 plt.subplots_adjust(left=0.2, bottom=0.2)
 #plt.figure(figsize=( 1080, 1920))
-plt.savefig(dir_dest + '023_ACC' + '.png', bbox_inches="tight")
+plt.interactive()
 plt.show()
+plt.savefig(dir_dest + '023_ACC' + '.png', bbox_inches="tight")
 plt.close()
 
 
