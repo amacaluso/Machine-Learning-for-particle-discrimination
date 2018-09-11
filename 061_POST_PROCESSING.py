@@ -56,7 +56,7 @@ table = best_results_ACC.transpose()
 table.columns = ['TREE', 'REGULARIZED', 'GAUSSIAN NB', 'BERNOULLI NB', 'KNN',
                  'NEURAL NETWORK', 'RANDOM FOREST', 'GBM']
 #table[ table.index == 'Model'].values.tolist()[0]
-table = table.ix[[1, 2,3,4,8,9], : ]
+table = table.ix[[1, 2, 3,4,8,9], : ]
 columns = table.columns
 rows = table.index.tolist()
 n_rows = len(table.values)
@@ -112,7 +112,7 @@ table = best_results_AUC.transpose()
 table.columns = ['TREE', 'REGULARIZED', 'GAUSSIAN NB', 'BERNOULLI NB', 'KNN',
                  'NEURAL NETWORK', 'RANDOM FOREST', 'GBM']
 #table[ table.index == 'Model'].values.tolist()[0]
-table = table.ix[[2,3,4,8,9], : ]
+table = table.ix[[1, 2,3,4,8,9], : ]
 columns = table.columns
 rows = table.index.tolist()
 n_rows = len(table.values)
@@ -143,7 +143,7 @@ the_table = plt.table(cellText=cell_text,
 the_table.auto_set_font_size(False)
 the_table.set_fontsize(10)
 plt.subplots_adjust(left=0.2, bottom=0.2)
-#plt.figure(figsize=( 1080, 1920))
+#plt.figure(figsize=( 20, 10))
 plt.savefig(dir_dest + '021_AUC' + '.png', bbox_inches = "tight")
 plt.show()
 plt.close()
@@ -153,13 +153,15 @@ plt.close()
 
 
 ''' Inserire l'AUC media e l'Accuratezza media '''
-''' Inserire la scelta del modello con la soglia ottimale '''
 
 ''' Barplot + table (Accuracy)'''
 ##################################################
 
 models = best_results_ACC.Model.unique().tolist()
 df_best_results = pd.DataFrame( columns = data.columns)
+
+
+''' Scelta del modello con la soglia ottimale '''
 
 for model in models:
     best_treshold = best_results_ACC[ best_results_ACC.Model == model].Treshold.values[0]
@@ -189,7 +191,7 @@ for method in data.Method.unique().tolist():
     plt.style.use('seaborn-darkgrid')
     plt.title(method)
     plt.ylabel('Accuratezza')
-    plt.legend(loc='center left', bbox_to_anchor=(1.0, 0.5))
+    plt.legend(loc = 'center left', bbox_to_anchor=(1.0, 0.5))
     plt.savefig(dir_dest + '041_' + method + '.png', bbox_inches="tight")
     plt.close()
 
@@ -243,6 +245,7 @@ data.Model.unique()
 print data.columns
 
 data = data[ data.Treshold == 0.5 ]
+#data['Model_(treshold)'] = data.Model + ' (' + data['Treshold'].astype(str) + ')'
 
 colors = ['blue', 'hotpink', 'navy', 'orange', 'k', 'gold', 'green', 'aqua']
 
