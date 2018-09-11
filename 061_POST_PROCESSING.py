@@ -56,7 +56,7 @@ table = best_results_ACC.transpose()
 table.columns = ['TREE', 'REGULARIZED', 'GAUSSIAN NB', 'BERNOULLI NB', 'KNN',
                  'NEURAL NETWORK', 'RANDOM FOREST', 'GBM']
 #table[ table.index == 'Model'].values.tolist()[0]
-table = table.ix[[2,3,4,8,9], : ]
+table = table.ix[[1, 2,3,4,8,9], : ]
 columns = table.columns
 rows = table.index.tolist()
 n_rows = len(table.values)
@@ -144,11 +144,9 @@ the_table.auto_set_font_size(False)
 the_table.set_fontsize(10)
 plt.subplots_adjust(left=0.2, bottom=0.2)
 #plt.figure(figsize=( 1080, 1920))
-plt.savefig(dir_dest + '021_AUC' + '.png', bbox_inches="tight")
+plt.savefig(dir_dest + '021_AUC' + '.png', bbox_inches = "tight")
 plt.show()
 plt.close()
-
-
 
 
 
@@ -259,9 +257,9 @@ for i in range( len(best_results_ACC)):
     current_data = current_data.sort_values( by = 'Energy')
     plt.plot( np.log2(current_data.Energy), current_data.Accuracy, 'bs-', color = color, label = model)
     #plt.xticks( np.log2(current_data.Energy), 'log' + current_data.Energy)
-    plt.title('Accuracy vs ENERGY')
+    plt.title('Performance modelli per diversi livelli di energia')
     plt.ylabel('Accuratezza')
-    plt.xlabel('log2(energy)')
+    plt.xlabel('Log - Energy (MEV)')
     plt.legend()
 plt.savefig(dir_dest + '051_LOG_Energy_performance.png')
 plt.close()
@@ -278,9 +276,9 @@ for i in range( len(best_results_ACC)):
     current_data = current_data.sort_values( by = 'Energy')
     plt.plot( current_data.Energy, current_data.Accuracy, 'bs-', color = color, label = model)
     #plt.xticks( np.log2(current_data.Energy), 'log' + current_data.Energy)
-    plt.title('ENERGY ')
-    plt.ylabel('Accuratezza vs Energy')
-    plt.ylabel('Energy')
+    plt.title('Performance modelli per diversi livelli di energia')
+    plt.ylabel('Accuratezza')
+    plt.xlabel('Energy (MEV)')
     plt.legend()
 plt.savefig(dir_dest + '052_Energy_performance.png')
 plt.close()
@@ -290,117 +288,33 @@ plt.close()
 
 
 
-# # for energy in data.Energy.unique().tolist():
-# energy = data.Energy.unique().tolist()[1]
-# energy_data = data[ data.Energy == energy ]
-# # for method in data.Method.unique().tolist():
-# # method = data.Method.unique().tolist()[0]
-# current_data = energy_data[energy_data.Method == method]
-# models = current_data.Model.unique().tolist()
-# colors = ['b', 'y', 'w', 'r', 'g', 'k', 'm', 'c']
-# i = 0
-# #for model in current_data.Model.unique().tolist():
-# model = data.Model.unique().tolist()[2]
-# current_data_model = current_data[current_data.Model == model]
-# plt.plot(current_data_model.n_variables, current_data_model.Accuracy,
-#          'bs-', color=colors[i], label=model)
-# plt.title('Energy: ' + str(energy) + ' MEV ' + method)
-# i = i + 1
-# plt.style.use('seaborn-darkgrid')
-# plt.ylabel('Accuratezza')
-# plt.legend(loc = 'center left', bbox_to_anchor=(1.0, 0.5))
-# current_dir = dir_dest + str(energy) + '/'
-# plt.savefig(dir_dest + '053_' + str(energy) + '_' + method + '.png', bbox_inches="tight")
-# plt.close()
+# for energy in data.Energy.unique().tolist():
+#     # energy = data.Energy.unique().tolist()
+#     current_dir = dir_dest + str(energy) + '/'
+#     create_dir(current_dir)
+#     energy_data = data[ data.Energy == energy ]
+#     for method in data.Method.unique().tolist():
+#         # method = data.Method.unique().tolist()[0]
+#         current_data = energy_data[energy_data.Method == method]
+#         models = current_data.Model.unique().tolist()
+#         colors = ['blue', 'hotpink', 'navy', 'orange', 'k', 'gold', 'green', 'aqua']
+#         i = 0
+#         for model in current_data.Model.unique().tolist():
+#             # model = data.Model.unique().tolist()[2]
+#             current_data_model = current_data[current_data.Model == model]
+#             # print model, method, nvars
+#             # color = random.choice( colors )
+#             # colors.remove( color )
+#             plt.plot(current_data_model.n_variables, current_data_model.Accuracy, 'bs-', color=colors[i], label=model)
+#             plt.title('Energy: ' + str(energy) + ' MEV ' + method)
+#             # print i
+#             i = i + 1
+#         plt.style.use('seaborn-darkgrid')
+#         plt.ylabel('Accuratezza')
+#         plt.legend(loc='center left', bbox_to_anchor=(1.0, 0.5))
+#         plt.savefig(current_dir + '053_' + str(energy) + '_' + method + '.png', bbox_inches="tight")
+#         plt.close()
 
 
 
 
-
-for energy in data.Energy.unique().tolist():
-    # energy = data.Energy.unique().tolist()
-    current_dir = dir_dest + str(energy) + '/'
-    create_dir(current_dir)
-    energy_data = data[ data.Energy == energy ]
-    for method in data.Method.unique().tolist():
-        # method = data.Method.unique().tolist()[0]
-        current_data = energy_data[energy_data.Method == method]
-        models = current_data.Model.unique().tolist()
-        colors = ['blue', 'hotpink', 'navy', 'orange', 'k', 'gold', 'green', 'aqua']
-        i = 0
-        for model in current_data.Model.unique().tolist():
-            # model = data.Model.unique().tolist()[2]
-            current_data_model = current_data[current_data.Model == model]
-            # print model, method, nvars
-            # color = random.choice( colors )
-            # colors.remove( color )
-            plt.plot(current_data_model.n_variables, current_data_model.Accuracy, 'bs-', color=colors[i], label=model)
-            plt.title('Energy: ' + str(energy) + ' MEV ' + method)
-            # print i
-            i = i + 1
-        plt.style.use('seaborn-darkgrid')
-        plt.ylabel('Accuratezza')
-        plt.legend(loc='center left', bbox_to_anchor=(1.0, 0.5))
-        plt.savefig(current_dir + '053_' + str(energy) + '_' + method + '.png', bbox_inches="tight")
-        plt.close()
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-methods = data.Method.unique()
-models = data.Method.unique()
-
-data[ [ 'Method', 'n_variables'] ].drop_duplicates().to_csv( 'TABELLA_SCHEDULING.csv', index = False)
-
-
-
-
-
-
-
-
-
-table = best_results_ACC.transpose()
-table.columns = table[ table.index == 'Model'].values.tolist()[0]
-table = table.ix[[2,3,4,8,9], : ]
-columns = table.columns
-rows = table.index.tolist()
-n_rows = len(table.values)
-
-# Add a table at the bottom of the axes
-cell_text = table.values
-#cell_text.reverse()
-
-# create plot
-fig, ax = plt.subplots(); index = np.arange(8); bar_width = 0.35; opacity = 0.8
-AUC_plot = plt.bar(index, best_results_AUC.AUC, bar_width,
-                   alpha=opacity, color='b', label='AUC')
-
-ACC_plot = plt.bar(index + bar_width, best_results_AUC.Accuracy, bar_width,
-                 alpha=opacity, color='g', label='ACCURACY')
-
-
-#plt.xlabel('Models')
-plt.title('Best model: AUC')
-plt.xticks([]) #index + bar_width,  best_results_AUC.Model, rotation = 90)
-plt.legend(loc='upper right')
-plt.tight_layout()
-the_table = plt.table(cellText=cell_text,
-                      rowLabels=rows,
-                      colLabels=columns,
-                      loc='bottom',
-                      cellLoc='center')
-the_table.auto_set_font_size(False)
-the_table.set_fontsize(10)
-plt.subplots_adjust(left=0.2, bottom=0.2)
-plt.show()
