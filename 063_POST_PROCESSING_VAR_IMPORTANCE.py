@@ -37,10 +37,10 @@ cell_text = table.values
 #cell_text.reverse()
 
 # create plot
-fig, ax = plt.subplots(); index = np.arange(n_var-1); bar_width = 0.35; opacity = 0.8
+fig, ax = plt.subplots(); index = np.arange(n_var-1); bar_width = 0.20; opacity = 0.8
 plt.bar(index, data_top20.VI_ALL, bar_width, alpha=opacity, color='b', label='ALL')
 plt.bar(index + bar_width, data_top20.VI_multi, bar_width, alpha=opacity, color='y', label='MULTI')
-# plt.bar(index + bar_width + bar_width, data_top20.VI_uni, bar_width, alpha=opacity, color='y', label='UNI')
+plt.bar(index + bar_width + bar_width, data_top20.VI_uni, bar_width, alpha=opacity, color='r', label='UNI')
 
 
 #plt.xlabel('Models')
@@ -60,7 +60,7 @@ x = index + bar_width /2
 for i in range( len(x) ):
     plt.text( x[i], 20, data_top20.Variable.values[i], rotation=90 )
 # plt.text( index + bar_width /2, np.repeat(20, 19), data_top20.Variable.astype('str') )
-plt.interactive()
+# plt.interactive()
 plt.show()
 plt.savefig(dir_dest + 'Variable_ranking' + '.png', bbox_inches="tight")
 plt.close()

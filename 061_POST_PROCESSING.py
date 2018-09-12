@@ -87,8 +87,8 @@ the_table = plt.table(cellText=cell_text,
 the_table.auto_set_font_size(False)
 the_table.set_fontsize(10)
 plt.subplots_adjust(left=0.2, bottom=0.2)
-#plt.figure(figsize=( 1080, 1920))
-plt.interactive()
+# plt.figure(figsize=( 1080, 1920))
+# plt.interactive()
 plt.show()
 plt.savefig(dir_dest + '023_ACC' + '.png', bbox_inches="tight")
 plt.close()
@@ -193,6 +193,7 @@ for method in data.Method.unique().tolist():
     plt.title(method)
     plt.ylabel('Accuratezza')
     plt.legend(loc = 'center left', bbox_to_anchor=(1.0, 0.5))
+    plt.ylim(ymin = 0.45, ymax=0.95)
     plt.savefig(dir_dest + '041_' + method + '.png', bbox_inches="tight")
     plt.close()
 
@@ -224,6 +225,30 @@ for method in data.Method.unique().tolist():
 
 
 
+#for method in data.Method.unique().tolist():
+for model in data.Model.unique().tolist():
+    #method = data.Method.unique().tolist()[0]
+    current_data = data[data.Model == model]
+    # models = current_data.Model.unique().tolist()
+    colors = ['blue', 'hotpink', 'navy', 'red', 'k', 'gold', 'green', 'aqua']
+    i = 0
+    for method in data.Method.unique().tolist():
+        # model = data.Model.unique().tolist()[2]
+        current_data_method = current_data[ current_data.Method == method ]
+        #print model, method, nvars
+        #color = random.choice( colors )
+        #colors.remove( color )
+        plt.plot(current_data_method.n_variables, current_data_method.Accuracy, 'bs-', color = colors[i], label = method)
+        #print i
+        i = i + 1
+    plt.style.use('seaborn-darkgrid')
+    plt.title(model)
+    plt.ylabel('Accuratezza')
+    plt.legend(loc = 'center left', bbox_to_anchor=(1.0, 0.5))
+    plt.ylim(ymin = 0.45, ymax=0.95)
+    plt.savefig(dir_dest + '047_' + model + '.png', bbox_inches="tight")
+    plt.close()
+
 
 
 
@@ -231,61 +256,61 @@ for method in data.Method.unique().tolist():
 ################# ENERGY - ACCURACY #####################
 #########################################################
 
-data = pd.read_csv( 'results/MODELING/CLASSIFICATION/subset_metrics.csv')
-data_NN = pd.read_csv( 'results/MODELING/CLASSIFICATION/NEURAL_NETWORK/subset_metrics.csv')
-
-
-dir_dest = dir_images + 'MODELING/'
-dir_dest = dir_dest + 'ENERGY/'
-create_dir( dir_dest )
-
-data.shape
-data.Method.unique()
-data.Model.unique()
-
-print data.columns
-
-data = data[ data.Treshold == 0.5 ]
-#data['Model_(treshold)'] = data.Model + ' (' + data['Treshold'].astype(str) + ')'
-
-colors = ['blue', 'hotpink', 'navy', 'orange', 'k', 'gold', 'green', 'aqua']
-
-for i in range( len(best_results_ACC)):
-    color = colors[ i ]
-    model = best_results_ACC.ix[i, :].Model
-    method = best_results_ACC.ix[i, :].Method
-    n_var = best_results_ACC.ix[i, :].n_variables
-    #accuracy = best_results.ix[i, :].ACCURACY
-    current_data = data[ (data.Model == model) & (data.Method == method) & (data.n_variables == n_var)]
-    #current_data = current_data[ current_data.Energy < 10000]
-    current_data = current_data.sort_values( by = 'Energy')
-    plt.plot( np.log2(current_data.Energy), current_data.Accuracy, 'bs-', color = color, label = model)
-    #plt.xticks( np.log2(current_data.Energy), 'log' + current_data.Energy)
-    plt.title('Performance modelli per diversi livelli di energia')
-    plt.ylabel('Accuratezza')
-    plt.xlabel('Log - Energy (MEV)')
-    plt.legend()
-plt.savefig(dir_dest + '051_LOG_Energy_performance.png')
-plt.close()
-
-
-for i in range( len(best_results_ACC)):
-    color = colors[ i ]
-    model = best_results_ACC.ix[i, :].Model
-    method = best_results_ACC.ix[i, :].Method
-    n_var = best_results_ACC.ix[i, :].n_variables
-    #accuracy = best_results.ix[i, :].ACCURACY
-    current_data = data[ (data.Model == model) & (data.Method == method) & (data.n_variables == n_var)]
-    #current_data = current_data[ current_data.Energy < 10000]
-    current_data = current_data.sort_values( by = 'Energy')
-    plt.plot( current_data.Energy, current_data.Accuracy, 'bs-', color = color, label = model)
-    #plt.xticks( np.log2(current_data.Energy), 'log' + current_data.Energy)
-    plt.title('Performance modelli per diversi livelli di energia')
-    plt.ylabel('Accuratezza')
-    plt.xlabel('Energy (MEV)')
-    plt.legend()
-plt.savefig(dir_dest + '052_Energy_performance.png')
-plt.close()
+# data = pd.read_csv( 'results/MODELING/CLASSIFICATION/subset_metrics.csv')
+# data_NN = pd.read_csv( 'results/MODELING/CLASSIFICATION/NEURAL_NETWORK/subset_metrics.csv')
+#
+#
+# dir_dest = dir_images + 'MODELING/'
+# dir_dest = dir_dest + 'ENERGY/'
+# create_dir( dir_dest )
+#
+# data.shape
+# data.Method.unique()
+# data.Model.unique()
+#
+# print data.columns
+#
+# data = data[ data.Treshold == 0.5 ]
+# #data['Model_(treshold)'] = data.Model + ' (' + data['Treshold'].astype(str) + ')'
+#
+# colors = ['blue', 'hotpink', 'navy', 'orange', 'k', 'gold', 'green', 'aqua']
+#
+# for i in range( len(best_results_ACC)):
+#     color = colors[ i ]
+#     model = best_results_ACC.ix[i, :].Model
+#     method = best_results_ACC.ix[i, :].Method
+#     n_var = best_results_ACC.ix[i, :].n_variables
+#     #accuracy = best_results.ix[i, :].ACCURACY
+#     current_data = data[ (data.Model == model) & (data.Method == method) & (data.n_variables == n_var)]
+#     #current_data = current_data[ current_data.Energy < 10000]
+#     current_data = current_data.sort_values( by = 'Energy')
+#     plt.plot( np.log2(current_data.Energy), current_data.Accuracy, 'bs-', color = color, label = model)
+#     #plt.xticks( np.log2(current_data.Energy), 'log' + current_data.Energy)
+#     plt.title('Performance modelli per diversi livelli di energia')
+#     plt.ylabel('Accuratezza')
+#     plt.xlabel('Log - Energy (MEV)')
+#     plt.legend()
+# plt.savefig(dir_dest + '051_LOG_Energy_performance.png')
+# plt.close()
+#
+#
+# for i in range( len(best_results_ACC)):
+#     color = colors[ i ]
+#     model = best_results_ACC.ix[i, :].Model
+#     method = best_results_ACC.ix[i, :].Method
+#     n_var = best_results_ACC.ix[i, :].n_variables
+#     #accuracy = best_results.ix[i, :].ACCURACY
+#     current_data = data[ (data.Model == model) & (data.Method == method) & (data.n_variables == n_var)]
+#     #current_data = current_data[ current_data.Energy < 10000]
+#     current_data = current_data.sort_values( by = 'Energy')
+#     plt.plot( current_data.Energy, current_data.Accuracy, 'bs-', color = color, label = model)
+#     #plt.xticks( np.log2(current_data.Energy), 'log' + current_data.Energy)
+#     plt.title('Performance modelli per diversi livelli di energia')
+#     plt.ylabel('Accuratezza')
+#     plt.xlabel('Energy (MEV)')
+#     plt.legend()
+# plt.savefig(dir_dest + '052_Energy_performance.png')
+# plt.close()
 
 
 
