@@ -65,6 +65,7 @@ best_results_AUC = best_results_AUC.round(decimals = 4)
 
 data = pd.read_csv( 'results/MODELING/CLASSIFICATION/subset_metrics.csv')
 data_NN = pd.read_csv( 'results/MODELING/CLASSIFICATION/NEURAL_NETWORK/subset_metrics.csv')
+data = pd.concat( [ data, data_NN])
 
 
 dir_dest = dir_images + 'MODELING/'
