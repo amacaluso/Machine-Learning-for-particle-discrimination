@@ -81,22 +81,31 @@ print data.columns
 data = data[ data.Treshold == 0.5 ]
 #data['Model_(treshold)'] = data.Model + ' (' + data['Treshold'].astype(str) + ')'
 
-colors = ['blue', 'hotpink', 'navy', 'orange', 'k', 'gold', 'green', 'aqua']
+colors = ['blue', 'hotpink', 'navy', 'beige',  'lavender' ,'k', 'gold', 'green', 'aqua']
 
 for i in range( len(best_results_ACC)):
     color = colors[ i ]
     model = best_results_ACC.ix[i, :].Model
-    method = best_results_ACC.ix[i, :].Method
-    n_var = best_results_ACC.ix[i, :].n_variables
-    #accuracy = best_results.ix[i, :].ACCURACY
+
+    if model == 'KNN':
+        method = 'GBM'
+        n_var = 36
+    else:
+        method = best_results_ACC.ix[i, :].Method
+        n_var = best_results_ACC.ix[i, :].n_variables
+        #accuracy = best_results.ix[i, :].ACCURACY
     current_data = data[ (data.Model == model) & (data.Method == method) & (data.n_variables == n_var)]
     #current_data = current_data[ current_data.Energy < 10000]
     current_data = current_data.sort_values( by = 'Energy')
-    plt.plot( np.log2(current_data.Energy), current_data.Accuracy, 'bs-', color = color, label = model)
     #plt.xticks( np.log2(current_data.Energy), 'log' + current_data.Energy)
-    plt.title('Performance modelli per diversi livelli di energia')
-    plt.ylabel('Accuratezza')
-    plt.xlabel('Log - Energy (MEV)')
+    #corr = np.around( np.corrcoef( np.log2(current_data.Energy), current_data.Accuracy )[0,1], 2)
+    print current_data.Model.unique(), np.around( scipy.stats.pearsonr( np.log2(current_data.Energy),
+                                                                        current_data.Accuracy ), 4)
+    ############
+    plt.plot( np.log2(current_data.Energy), current_data.Accuracy, 'bs-', color = color, label = model)
+    plt.title('Accuracy and energy classes')
+    plt.ylabel('Accuracy')
+    plt.xlabel('Log2(energy)')
     plt.legend()
 plt.savefig(dir_dest + '051_LOG_Energy_performance.png')
 plt.close()

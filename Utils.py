@@ -43,7 +43,7 @@ from sklearn.naive_bayes import BernoulliNB
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.naive_bayes import GaussianNB
 from sklearn import svm
-
+import scipy
 
 
 def expand_grid(data_dict):

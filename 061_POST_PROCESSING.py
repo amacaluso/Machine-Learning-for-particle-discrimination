@@ -174,6 +174,68 @@ df_best_results = df_best_results.sort_values( by = [ 'Method', 'Model', 'n_vari
 data = df_best_results.copy()
 
 
+
+# Initialize the figure
+plt.style.use('seaborn-darkgrid')
+
+# create a color palette
+palette = plt.get_cmap('Set1')
+
+# multiple line plot
+num = 0
+for method in data.Method.unique().tolist():
+    #method = data.Method.unique().tolist()[0]
+    current_data = data[ data.Method == method ]
+#    models = current_data.Model.unique().tolist()
+    colors = ['blue', 'hotpink', 'navy', 'red', 'k', 'gold', 'green', 'aqua']
+    i = 0
+#    for model in data.Model.unique().tolist():
+    num += 1
+    # Find the right spot on the plot
+    plt.subplot(3, 3, num)
+
+    colors = ['blue', 'hotpink', 'navy', 'red', 'k', 'gold', 'green', 'aqua']
+    i = 0
+    for model in data.Model.unique().tolist():
+        # model = data.Model.unique().tolist()[2]
+        current_data_model = current_data[current_data.Model == model]
+        #print model, method, nvars
+        #color = random.choice( colors )
+        #colors.remove( color )
+        plt.plot(current_data_model.n_variables, current_data_model.Accuracy, 'bs-', color = colors[i], label = model)
+        #print i
+        i = i + 1
+        plt.xlim(0, 130)
+        plt.ylim(0.5, 1)
+        # Not ticks everywhere
+        if num in range(9):
+            plt.tick_params(labelbottom='off')
+        if num not in [1, 4, 7]:
+            plt.tick_params(labelleft='off')
+
+        # Add title
+        plt.title(method, loc='left', fontsize=12, fontweight=0, color=palette(num))
+
+
+    # Plot the lineplot
+#    plt.plot(current_data_model.n_variables, current_data_model.Accuracy, 'bs-', color=colors[i],
+#             marker='', alpha=0.9, label=method)
+
+    # Same limits for everybody!
+
+# general title
+plt.suptitle("prove", fontsize=13, fontweight=0, color='black',
+             style='italic', y=1.02)
+
+# Axis title
+plt.text(0.5, 0.02, 'Time', ha='center', va='center')
+plt.text(0.06, 0.5, 'Note', ha='center', va='center', rotation='vertical')
+plt.legend(loc='center left', bbox_to_anchor=(1.0, 0.5))
+
+
+
+
+
 for method in data.Method.unique().tolist():
     #method = data.Method.unique().tolist()[0]
     current_data = data[ data.Method == method ]

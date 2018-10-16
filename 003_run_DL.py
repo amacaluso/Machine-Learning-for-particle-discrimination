@@ -13,14 +13,17 @@ exec(open("Utils.py").read(), globals())
 exec(open("Utils_parallel.py").read(), globals())
 
 SEED = 741
-njob = 16
+njob = 15
 
 # exec(open("015_SPLITTING_DATA.py").read(), globals())
 # exec(open("030_VARIABLES_SELECTION.py").read(), globals())
 # exec(open("035_UNIVARIATE_VARIABLES_SELECTION.py").read(), globals())
 
 nvars = np.concatenate( ([1], np.arange(10, 51, 10), np.arange(70, 140, 30)) )
+nvars = [1]
+
 methods = ['ISIS', 'LR_ACCURACY', 'E_NET', 'INFORMATION_GAIN', 'LASSO', 'RIDGE', 'RANDOM_FOREST', 'GBM']
+methods = ['LR_ACCURACY']
 
 
 # predictors = extract_predictors( method, nvar, SEED)
