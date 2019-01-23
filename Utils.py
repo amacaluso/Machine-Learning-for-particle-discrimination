@@ -33,7 +33,8 @@ from scipy.stats import gaussian_kde
 import seaborn as sns
 import scipy
 import sklearn as skl
-from sklearn import cross_validation, linear_model
+from sklearn import linear_model
+from sklearn.model_selection import cross_validate
 from random import randint
 import itertools
 import os

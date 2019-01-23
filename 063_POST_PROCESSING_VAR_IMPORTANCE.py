@@ -1,16 +1,37 @@
 exec(open("Utils.py").read(), globals())
-
+from pandas import ExcelWriter
+from pandas import ExcelFile
 SEED = 741
-
 
 '''CARICAMENTO DATI '''
 
 data_multi = pd.read_csv( 'results/VARIABLE_SELECTION/' + str(SEED) + '/importance_ranked.csv')
 data_uni = pd.read_csv( 'results/VARIABLE_SELECTION/' + str(SEED) + '/univariate_var_sel.csv')
+data_isis = pd.read_csv( 'results/VARIABLE_SELECTION/' + str(SEED) + '/ISIS.csv')
+
 
 data = data_multi.merge( data_uni, on = 'VARIABLE')
 # data = data_NN.copy()
 data = data.drop( 'ANOVA_pvalue', axis = 1 )
+importance = []
+
+writer = ExcelWriter('Variable_ranking.xlsx')
+for col in data.columns:
+    # print col, len(data[ col ].unique()), 'n_eff:', data.ix[ (data[col] <20) ,['VARIABLE', col]
+    df = data.ix[:,['VARIABLE', col]]
+    print( col, len(df))
+    df.to_excel(writer, col , index=False)
+
+writer.save()
+
+
+
+    # importance.append( data.ix[ (data[col] <20) , ['VARIABLE', col]])
+
+prova = pd.DataFrame( importance )
+
+
+
 
 VI_multi = data.ix[:, 1:7].apply(np.mean, axis = 1)
 VI_uni = data.ix[:, 7:9].apply(np.mean, axis = 1)
