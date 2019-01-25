@@ -46,16 +46,18 @@ for model in data.Model.unique().tolist():
 #    print best_model, best_method, best_nvar, best_threshold, np.round(AUC, 4)
 
 best_results_ACC = best_results_ACC.round(decimals = 4)
-best_results_ACC.to_csv( dir_dest + 'best_results_ACC.csv', index = False)
+# best_results_ACC.to_csv( dir_dest + 'best_results_ACC.csv', index = False)
 
 
 ''' Barplot + table (Accuracy)'''
 ##################################################
 
 table = best_results_ACC.transpose()
-table.columns = ['TREE', 'REGULARIZED', 'GAUSSIAN NB', 'BERNOULLI NB', 'KNN',
-                 'NEURAL NETWORK', 'RANDOM FOREST', 'GBM']
-#table[ table.index == 'Model'].values.tolist()[0]
+table.columns = ['Decision Tree', 'Regularized Methods', 'Gaussian Naive Bayes',
+                 'Bernoulli Naive Bayes', 'K-Nearest Neighbour',
+                 'Deep Neural Network', 'Random Forest', 'Gradient Boosting Machine']
+
+# table[ table.index == 'Model'].values.tolist()[0]
 table = table.ix[[1, 2, 3,4,8,9], : ]
 columns = table.columns
 rows = table.index.tolist()
@@ -110,8 +112,9 @@ best_results_AUC.to_csv( dir_dest + 'best_results_AUC.csv', index = False)
 ''' Barplot + table (AUC)'''
 ##################################################
 table = best_results_AUC.transpose()
-table.columns = ['TREE', 'REGULARIZED', 'GAUSSIAN NB', 'BERNOULLI NB', 'KNN',
-                 'NEURAL NETWORK', 'RANDOM FOREST', 'GBM']
+table.columns = ['Decision Tree', 'Regularized Methods', 'Gaussian Naive Bayes',
+                 'Bernoulli Naive Bayes', 'K-Nearest Neighbour',
+                 'Deep Neural Network', 'Random Forest', 'Gradient Boosting Machine']
 #table[ table.index == 'Model'].values.tolist()[0]
 table = table.ix[[1, 2,3,4,8,9], : ]
 columns = table.columns
@@ -228,9 +231,9 @@ plt.suptitle("prove", fontsize=13, fontweight=0, color='black',
              style='italic', y=1.02)
 
 # Axis title
-plt.text(0.5, 0.02, 'Time', ha='center', va='center')
-plt.text(0.06, 0.5, 'Note', ha='center', va='center', rotation='vertical')
-plt.legend(loc='center left', bbox_to_anchor=(1.0, 0.5))
+plt.text( 0.5, 0.02, 'Time', ha = 'center', va = 'center')
+plt.text( 0.06, 0.5, 'Note', ha = 'center', va = 'center', rotation = 'vertical')
+plt.legend(loc = 'center left', bbox_to_anchor = (1.0, 0.5))
 
 
 
@@ -354,8 +357,8 @@ for model in data.Model.unique().tolist():
 #     plt.legend()
 # plt.savefig(dir_dest + '051_LOG_Energy_performance.png')
 # plt.close()
-#
-#
+
+
 # for i in range( len(best_results_ACC)):
 #     color = colors[ i ]
 #     model = best_results_ACC.ix[i, :].Model

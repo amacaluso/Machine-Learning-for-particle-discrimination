@@ -2,15 +2,14 @@ exec(open("Utils.py").read(), globals())
 exec(open("Utils_parallel.py").read(), globals())
 
 SEED = 741
-njob = 160
+njob = 50
 
 # exec(open("015_SPLITTING_DATA.py").read(), globals())
 # exec(open("030_VARIABLES_SELECTION.py").read(), globals())
 # exec(open("035_UNIVARIATE_VARIABLES_SELECTION.py").read(), globals())
 
-nvars = [251] #np.concatenate( ([1], np.arange(10, 51, 10), np.arange(70, 140, 30)) )
-methods = ['ISIS', 'LR_ACCURACY', 'E_NET', 'INFORMATION_GAIN', 'LASSO', 'RIDGE', 'RANDOM_FOREST', 'GBM']
-methods = ['GBM']
+nvars = np.arange(140, 252, 20) #np.concatenate( ([1], np.arange(10, 51, 10), np.arange(70, 140, 30)) )
+methods = ['LR_ACCURACY', 'E_NET', 'INFORMATION_GAIN', 'LASSO', 'RIDGE', 'RANDOM_FOREST', 'GBM']
 
 
 # predictors = extract_predictors( method, nvar, SEED)
@@ -51,6 +50,19 @@ for method in methods:
             DF.to_csv(scheduled_model + 'OK_SVM' + method + '_' + str(nvar) + '.csv')
         except:
             DF.to_csv( scheduled_model + 'ERROR_SVM_' + method + '_' + str(nvar) + '.csv')
+
+
+for method in methods:
+    for nvar in nvars:
+        predictors = extract_predictors(method, nvar, SEED)
+        eff_nvar = len(predictors)
+        print method, nvar
+    try:
+        exec(open("051_NEURAL_NETWORK.py").read(), globals())
+        DF.to_csv(scheduled_model + 'OK_NN_' + method + '_' + str(nvar) + '.csv')
+    except:
+        DF.to_csv( scheduled_model + 'ERROR_NN_' + method + '_' + str(nvar) + '.csv')
+
 
 
 
