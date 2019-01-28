@@ -11,7 +11,6 @@ data_NN = read.csv( "NEURAL_NETWORK/metrics.csv")
 data = rbind(data, data_NN)
 
 data = data[ data$Treshold == 0.5, ]
-data = data[ data$n_variables < 135 , ]
 data = data[ data$Method != 'DECISION_TREE', ]
 
 
