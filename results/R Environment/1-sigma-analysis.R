@@ -28,5 +28,8 @@ data$lower = data$avg - data$sd
 
 data$FLG = ifelse( test = ( data$Accuracy > data$lower & data$Accuracy < data$upper), yes = T, no = F)
 dim( data[ data$FLG == T, ])
-tapply(data$n_variables, INDEX = data$model_method, FUN = min)
+
+tapply(data$n_variables[ data$FLG == T], INDEX = data$model_method[ data$FLG == T], FUN = max)-
+tapply(data$n_variables[ data$FLG == T], INDEX = data$model_method[ data$FLG == T], FUN = min) 
+
 
