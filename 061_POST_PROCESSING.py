@@ -410,5 +410,3 @@ for model in data.Model.unique().tolist():
 #         plt.close()
 
 
-
-

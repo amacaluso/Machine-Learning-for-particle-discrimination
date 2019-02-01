@@ -256,9 +256,9 @@ def extract_predictors( method = 'RANDOM_FOREST' , n_var = 40, SEED = 231):
 
 
 def create_parameters_dt( method, nvar, eff_nvar, SEED,
-                          max_depth_all = [5, 20, 50, 100],
-                          min_samples_leaf_all = [ 50, 100, 200, 500, 1000],
-                          min_samples_split_all = [ 50, 100, 200, 500, 1000],
+                          max_depth_all = [5, 20 ],
+                          min_samples_leaf_all = [ 100, 1000],
+                          min_samples_split_all = [ 50, 1000],
                           criterion_all =  ['gini', 'entropy']):
 
     parameters = expand_grid(
@@ -277,10 +277,10 @@ def create_parameters_dt( method, nvar, eff_nvar, SEED,
 
 
 def create_parameters_rf( method, nvar, eff_nvar, SEED,
-                          n_estimators_all = [50, 500, 1000], #, 1500, 2000],
-                          max_features_all = np.arange(2, 20, 3 ).tolist(),
+                          n_estimators_all = [50, 500], #, 1500, 2000],
+                          max_features_all = np.arange(2, 20, 5 ).tolist(),
                           max_depth_all = np.arange(3, 15, 5).tolist(),
-                          min_samples_split_all =  [100, 1000]):
+                          min_samples_split_all =  [ 500 ]):
 
 
     parameters = expand_grid(
@@ -299,9 +299,9 @@ def create_parameters_rf( method, nvar, eff_nvar, SEED,
 
 
 def create_parameters_gbm( method, nvar, eff_nvar, SEED,
-                           n_estimators_all=[50, 200, 300, 500],
+                           n_estimators_all=[50, 200],
                            max_depth_all = np.arange(3, 9, 5).tolist(),
-                           learning_rate_all = np.arange(0.001, 0.9, 0.01).tolist()):
+                           learning_rate_all = np.arange(0.001, 0.9, 0.11).tolist()):
     parameters = expand_grid(
         {'n_estimators': n_estimators_all,
          'max_depth': max_depth_all,
@@ -337,7 +337,7 @@ def create_parameters_svm( method, nvar, eff_nvar, SEED,
 
 def create_parameters_regularized( method, nvar, eff_nvar, SEED,
                                    penalty_all = ['l1', 'l2'],
-                                   C_all = np.arange(0.001, 1, 0.01).tolist()):
+                                   C_all = np.arange(0.001, 1, 0.1).tolist()):
     parameters = expand_grid(
         {'penalty': penalty_all,
          'C': C_all} )
@@ -352,7 +352,7 @@ def create_parameters_regularized( method, nvar, eff_nvar, SEED,
 
 
 def create_parameters_BNB( method, nvar, eff_nvar, SEED,
-                           alpha_all = np.arange( 0.01, 1, 0.01).tolist()):
+                           alpha_all = np.arange( 0.01, 1, 0.1).tolist()):
 
     parameters = expand_grid(
         {'alpha': alpha_all} )
@@ -369,7 +369,7 @@ def create_parameters_BNB( method, nvar, eff_nvar, SEED,
 
 
 def create_parameters_KNN( method, nvar, eff_nvar, SEED,
-                           n_neighbors_all = np.arange(5, 1000, 10).tolist(),
+                           n_neighbors_all = np.arange(5, 500, 50).tolist(),
                            p_all = [ 1,2,3,4] ):
     parameters = expand_grid(
         {'n_neighbors': n_neighbors_all,
@@ -627,12 +627,12 @@ def update_var_score( importance, path = 'results/MODELING/CLASSIFICATION/'):
 
 
 def create_parameters_nn( method, nvar, eff_nvar, SEED,
-                          hidden_size_all = [ 2, 5, 20],
+                          hidden_size_all = [ 2, 10],
                           first_layer_all = [ 4, 10],
-                          n_layers_all = [1, 4, 10],
+                          n_layers_all = [1, 4],
                           activation_all = ['relu'],
-                          batch_size_all = [250],
-                          nb_epochs_all = [100],
+                          batch_size_all = [500],
+                          nb_epochs_all = [40],
                           optimizer_all = ['adam']):
 
     parameters = expand_grid(

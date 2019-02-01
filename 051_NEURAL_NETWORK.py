@@ -189,31 +189,33 @@ ROC.to_csv(dir_dest + 'ROC.csv', index = False)
 update_metrics(ROC, SEED, method, eff_nvar, path = dir_dest + 'metrics.csv' )
 
 
-''' POST PROCESSING '''
-test_set = pd.concat( [ test_set, pd.Series(prediction)], axis = 1 )
-test_set_prediction = pd.concat([pd.Series( test_set.index.tolist()),
-                                test_set[test_set.columns[-3:]]],
-                                axis = 1)
-test_set_prediction.columns = ['ID', 'Y', 'ENERGY', 'Probability']
-update_prediction(prediction = test_set_prediction, SEED = SEED,
-                  MODEL = label_model, METHOD = method, NVAR = eff_nvar,
-                  path = dir_dest + 'prediction.csv')
-# test_set_prediction.to_csv( dir_dest + 'prediction_' + str(SEED) + '.csv')
 
-for energy in test_set.ENERGY.unique():
-    if energy > 0:
-        #energy = test_set.ENERGY.unique()[4]
-        df = test_set[test_set.ENERGY == energy]
-        probabilities = df.ix[:, -1].tolist()
-        ROC_subset = ROC_analysis(y_true = df.Y.tolist(), y_prob = probabilities , label = label_model,
-                                  probability_tresholds = probs_to_check)
-        cols_roc = ROC_subset.columns.tolist() +[ 'Energy']
-        ROC_subset = pd.concat( [ROC_subset,
-                                pd.Series( np.repeat(energy, len(probs_to_check)))],
-                                axis = 1 )
-        ROC_subset.columns = cols_roc
-        update_subset_metrics(ROC_subset, SEED, method, eff_nvar,
-                              path = dir_dest + 'subset_metrics.csv')
+#
+# ''' POST PROCESSING '''
+# test_set = pd.concat( [ test_set, pd.Series(prediction)], axis = 1 )
+# test_set_prediction = pd.concat([pd.Series( test_set.index.tolist()),
+#                                 test_set[test_set.columns[-3:]]],
+#                                 axis = 1)
+# test_set_prediction.columns = ['ID', 'Y', 'ENERGY', 'Probability']
+# update_prediction(prediction = test_set_prediction, SEED = SEED,
+#                   MODEL = label_model, METHOD = method, NVAR = eff_nvar,
+#                   path = dir_dest + 'prediction.csv')
+# # test_set_prediction.to_csv( dir_dest + 'prediction_' + str(SEED) + '.csv')
+#
+# for energy in test_set.ENERGY.unique():
+#     if energy > 0:
+#         #energy = test_set.ENERGY.unique()[4]
+#         df = test_set[test_set.ENERGY == energy]
+#         probabilities = df.ix[:, -1].tolist()
+#         ROC_subset = ROC_analysis(y_true = df.Y.tolist(), y_prob = probabilities , label = label_model,
+#                                   probability_tresholds = probs_to_check)
+#         cols_roc = ROC_subset.columns.tolist() +[ 'Energy']
+#         ROC_subset = pd.concat( [ROC_subset,
+#                                 pd.Series( np.repeat(energy, len(probs_to_check)))],
+#                                 axis = 1 )
+#         ROC_subset.columns = cols_roc
+#         update_subset_metrics(ROC_subset, SEED, method, eff_nvar,
+#                               path = dir_dest + 'subset_metrics.csv')
 
 
 
