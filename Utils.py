@@ -104,7 +104,7 @@ def create_dataset(data,
                    ):
     #
     data = data.dropna(subset=[target_variable])
-    dataset = pd.concat([data[target_variable], data[explanatory_variable]], axis=1)
+    dataset = pd.concat([data[target_variable], data[explanatory_variable]], axis=1, sort=True)
 
     return dataset
 
@@ -405,7 +405,7 @@ def create_variable_score( model, SEED, VARIABLES, SCORE, method_var_sel, n_var)
     SEED_array = pd.Series (np.repeat( SEED, n ).tolist() )
 
     importance = pd.concat( [model_array, SEED_array, method_array,
-                                nvar_array, VARIABLES, SCORE ], axis=1)
+                                nvar_array, VARIABLES, SCORE ], axis=1, sort=True)
     importance.columns = ['MODEL', 'SEED', 'VAR_SELECTION',
                           'N_VAR', 'VARIABLE', 'SCORE']
     return importance
@@ -422,7 +422,7 @@ def update_validation( MODEL, PARAMETERS,
     data = datetime.datetime.now()
     Model = pd.Series(np.repeat( MODEL, len(PARAMETERS)))
     Time = pd.Series(np.repeat(data, len(PARAMETERS)))
-    df = pd.concat( [Model, Time, PARAMETERS ], axis = 1 )
+    df = pd.concat( [Model, Time, PARAMETERS ], axis = 1 , sort=True)
     df.columns = ['Model'] + ['Time'] + PARAMETERS.columns.tolist()
 
     df['KEY'] = df['Model'] + '_' + \
@@ -440,10 +440,10 @@ def update_validation( MODEL, PARAMETERS,
                                 all_parameters['SEED'].astype(str)
         if KEY in all_parameters.KEY.unique():
             all_parameters = all_parameters.drop(all_parameters[(all_parameters.KEY == KEY)].index)
-            all_parameters = pd.concat([all_parameters, df])
+            all_parameters = pd.concat([all_parameters, df], sort=True)
             print 'The parameters have been updated'
         else:
-            all_parameters = pd.concat([all_parameters, df])
+            all_parameters = pd.concat([all_parameters, df], sort=True)
             print 'The parameters have been added'
         all_parameters.to_csv(path, index=False)
     except:
@@ -465,7 +465,7 @@ def update_metrics(ROC_MATRIX, SEED, METHOD, NVAR,
     series_seed = pd.Series(np.repeat(SEED, len(ROC_MATRIX)))
     method = pd.Series(np.repeat(METHOD, len(ROC_MATRIX)))
     nvar = pd.Series(np.repeat(NVAR, len(ROC_MATRIX)))
-    df = pd.concat([ROC_MATRIX, method, nvar, Time, series_seed], axis=1)
+    df = pd.concat([ROC_MATRIX, method, nvar, Time, series_seed], axis=1, sort=True)
     df.columns = ROC_MATRIX.columns.tolist() + ['Method'] + ['n_variables'] + ['Time'] + ['SEED']
 
     df['KEY'] = df['Model'] + '_' + \
@@ -484,10 +484,10 @@ def update_metrics(ROC_MATRIX, SEED, METHOD, NVAR,
 
         if KEY in ALL_METRICS.KEY.unique():
             ALL_METRICS = ALL_METRICS.drop(ALL_METRICS[(ALL_METRICS.KEY == KEY)].index)
-            ALL_METRICS = pd.concat([ALL_METRICS, df])
+            ALL_METRICS = pd.concat([ALL_METRICS, df], sort=True)
             print 'Metrics have been updated'
         else:
-            ALL_METRICS = pd.concat([ALL_METRICS, df])
+            ALL_METRICS = pd.concat([ALL_METRICS, df], sort=True)
             print 'Metrics have been added'
 
         ALL_METRICS.to_csv(path, index = False)
@@ -510,7 +510,7 @@ def update_subset_metrics(ROC_MATRIX, SEED, METHOD, NVAR,
     series_seed = pd.Series(np.repeat(SEED, len(ROC_MATRIX)))
     method = pd.Series(np.repeat(METHOD, len(ROC_MATRIX)))
     nvar = pd.Series(np.repeat(NVAR, len(ROC_MATRIX)))
-    df = pd.concat([ROC_MATRIX, method, nvar, Time, series_seed], axis=1)
+    df = pd.concat([ROC_MATRIX, method, nvar, Time, series_seed], axis=1, sort=True)
     df.columns = ROC_MATRIX.columns.tolist() + ['Method'] + ['n_variables'] + ['Time'] + ['SEED']
 
     df['KEY'] = df['Model'] + '_' + \
@@ -532,10 +532,10 @@ def update_subset_metrics(ROC_MATRIX, SEED, METHOD, NVAR,
 
         if KEY in ALL_METRICS.KEY.unique():
             ALL_METRICS = ALL_METRICS.drop(ALL_METRICS[(ALL_METRICS.KEY == KEY)].index)
-            ALL_METRICS = pd.concat([ALL_METRICS, df])
+            ALL_METRICS = pd.concat([ALL_METRICS, df], sort=True)
             # print 'Metrics for energy',df.Energy.unique(),'have been updated'
         else:
-            ALL_METRICS = pd.concat([ALL_METRICS, df])
+            ALL_METRICS = pd.concat([ALL_METRICS, df], sort=True)
             # print 'Metrics for energy',df.Energy.unique(),'have been added'
 
         ALL_METRICS.to_csv(path, index = False)
@@ -558,7 +558,7 @@ def update_prediction(prediction, MODEL, SEED, METHOD, NVAR,
     model = pd.Series(np.repeat(MODEL, len(prediction)))
     method = pd.Series(np.repeat(METHOD, len(prediction)))
     nvar = pd.Series(np.repeat(NVAR, len(prediction)))
-    df = pd.concat([prediction, model, method, nvar, Time, series_seed], axis=1)
+    df = pd.concat([prediction, model, method, nvar, Time, series_seed], axis=1, sort=True)
     df.columns = prediction.columns.tolist() + ['Model'] + ['Method'] + \
                  ['n_variables'] + ['Time'] + ['SEED']
 
@@ -579,10 +579,10 @@ def update_prediction(prediction, MODEL, SEED, METHOD, NVAR,
 
         if KEY in ALL_PREDICTIONS.KEY.unique():
             ALL_PREDICTIONS = ALL_PREDICTIONS.drop(ALL_PREDICTIONS[(ALL_PREDICTIONS.KEY == KEY)].index)
-            ALL_PREDICTIONS = pd.concat([ALL_PREDICTIONS, df])
+            ALL_PREDICTIONS = pd.concat([ALL_PREDICTIONS, df], sort=True)
             print 'Predictions have been updated'
         else:
-            ALL_PREDICTIONS = pd.concat([ALL_PREDICTIONS, df])
+            ALL_PREDICTIONS = pd.concat([ALL_PREDICTIONS, df], sort=True)
             print 'Predictions have been added'
 
             ALL_PREDICTIONS.to_csv(path, index = False)
@@ -609,10 +609,10 @@ def update_var_score( importance, path = 'results/MODELING/CLASSIFICATION/'):
         ALL_IMPORTANCE = pd.read_csv(path)
         if KEY in ALL_IMPORTANCE.KEY.unique():
             ALL_IMPORTANCE = ALL_IMPORTANCE.drop(ALL_IMPORTANCE[(ALL_IMPORTANCE.KEY == KEY)].index)
-            ALL_IMPORTANCE = pd.concat([ALL_IMPORTANCE, importance])
+            ALL_IMPORTANCE = pd.concat([ALL_IMPORTANCE, importance], sort=True)
             print 'Importance have been updated'
         else:
-            ALL_IMPORTANCE = pd.concat([ALL_IMPORTANCE, importance])
+            ALL_IMPORTANCE = pd.concat([ALL_IMPORTANCE, importance], sort=True)
             print 'Importance have been added'
 
         ALL_IMPORTANCE.to_csv(path, index = False)

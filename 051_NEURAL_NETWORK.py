@@ -13,7 +13,6 @@ exec(open("Utils.py").read(), globals())
 #exec(open("Utils_NN.py").read(), globals())
 
 SEED = 741
-njob = 1
 probs_to_check = np.arange(0.1, 0.91, 0.1)
 
 
@@ -21,9 +20,6 @@ probs_to_check = np.arange(0.1, 0.91, 0.1)
 #method = 'ISIS'
 # GET PREDICTOR ['ISIS', 'LR_ACCURACY', 'E_NET', 'INFORMATION_GAIN', 'LASSO', 'RIDGE', 'RANDOM_FOREST', 'GBM']
 # all_nvars = np.concatenate( ([1], np.arange(10, 51, 10))), np.arange(70, 130, 30)))
-
-method = 'ISIS'
-nvar = 1
 
 
 
