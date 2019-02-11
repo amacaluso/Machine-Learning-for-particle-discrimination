@@ -12,14 +12,14 @@ X_tr, X_val, X_ts, Y_tr, \
 Y_val, Y_ts = load_data_for_modeling( SEED, predictors)
 
 
-''' RANDOM FOREST '''
-
 parameters = create_parameters_rf( method, nvar,
-                                   eff_nvar, SEED, max_features_all = list(set(np.random.randint(2, eff_nvar, 6))))
+                                   eff_nvar, SEED,
+                                   max_features_all = list(set(np.random.randint(2, eff_nvar, 6))))
 inputs = range( len(parameters))
 tr_val_error = Parallel(n_jobs = njob)(delayed(parallel_rf)(i) for i in inputs)
 
-train_accuracy = []; valid_accuracy = []
+train_accuracy = []
+valid_accuracy = []
 
 for accuracy in tr_val_error:
     train_accuracy.append( accuracy[0])
