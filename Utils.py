@@ -256,9 +256,9 @@ def extract_predictors( method = 'RANDOM_FOREST' , n_var = 40, SEED = 231):
 
 
 def create_parameters_dt( method, nvar, eff_nvar, SEED,
-                          max_depth_all = [5, 20 ],
-                          min_samples_leaf_all = [ 100, 1000],
-                          min_samples_split_all = [ 50, 1000],
+                          max_depth_all = [5, 10 ],
+                          min_samples_leaf_all = [ 1000],
+                          min_samples_split_all = [1000],
                           criterion_all =  ['gini', 'entropy']):
 
     parameters = expand_grid(
@@ -299,9 +299,9 @@ def create_parameters_rf( method, nvar, eff_nvar, SEED,
 
 
 def create_parameters_gbm( method, nvar, eff_nvar, SEED,
-                           n_estimators_all=[50, 200],
+                           n_estimators_all=[ 50, 100 ],
                            max_depth_all = np.arange(3, 9, 5).tolist(),
-                           learning_rate_all = np.arange(0.001, 0.9, 0.11).tolist()):
+                           learning_rate_all = np.arange(0.1, 0.9, 0.3).tolist()):
     parameters = expand_grid(
         {'n_estimators': n_estimators_all,
          'max_depth': max_depth_all,
@@ -318,7 +318,7 @@ def create_parameters_gbm( method, nvar, eff_nvar, SEED,
 
 def create_parameters_svm( method, nvar, eff_nvar, SEED,
                            kernel_all=['rbf', 'linear', 'poly'],
-                           C_all = [0.5, 1,  5, 10],
+                           C_all = [0.5, 1,  5],
                            gamma_all = [0.1, 0.4, 1]):
     parameters = expand_grid(
         {'kernel': kernel_all,
@@ -337,7 +337,7 @@ def create_parameters_svm( method, nvar, eff_nvar, SEED,
 
 def create_parameters_regularized( method, nvar, eff_nvar, SEED,
                                    penalty_all = ['l1', 'l2'],
-                                   C_all = np.arange(0.001, 1, 0.1).tolist()):
+                                   C_all = np.arange(0.1, 1, 0.3).tolist()):
     parameters = expand_grid(
         {'penalty': penalty_all,
          'C': C_all} )
@@ -352,7 +352,7 @@ def create_parameters_regularized( method, nvar, eff_nvar, SEED,
 
 
 def create_parameters_BNB( method, nvar, eff_nvar, SEED,
-                           alpha_all = np.arange( 0.01, 1, 0.1).tolist()):
+                           alpha_all = np.arange( 0.1, 1, 0.3).tolist()):
 
     parameters = expand_grid(
         {'alpha': alpha_all} )
@@ -369,8 +369,8 @@ def create_parameters_BNB( method, nvar, eff_nvar, SEED,
 
 
 def create_parameters_KNN( method, nvar, eff_nvar, SEED,
-                           n_neighbors_all = np.arange(5, 500, 50).tolist(),
-                           p_all = [ 1,2,3,4] ):
+                           n_neighbors_all = np.arange(5, 500, 100).tolist(),
+                           p_all = [ 2,3] ):
     parameters = expand_grid(
         {'n_neighbors': n_neighbors_all,
          'p': p_all} )
@@ -382,9 +382,6 @@ def create_parameters_KNN( method, nvar, eff_nvar, SEED,
     parameters['effective_nvar'] = np.repeat( eff_nvar, n_params)
     parameters['SEED'] = np.repeat( SEED, n_params)
     return parameters
-
-
-
 
 
 

@@ -2,7 +2,7 @@ exec(open("Utils.py").read(), globals())
 exec(open("Utils_parallel.py").read(), globals())
 
 SEED = 741
-njob = 50
+njob = 1
 
 # exec(open("015_SPLITTING_DATA.py").read(), globals())
 # exec(open("030_VARIABLES_SELECTION.py").read(), globals())
