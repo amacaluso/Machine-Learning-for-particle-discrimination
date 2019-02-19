@@ -100,7 +100,7 @@ parameters = create_parameters_nn( method, nvar, eff_nvar, SEED)
 
 
 np.random.seed( SEED )
-seeds = np.random.randint(0, 100, 5).tolist()
+seeds = np.random.randint(0, 100, 2).tolist()
 best_score = 0
 
 ## MODELING

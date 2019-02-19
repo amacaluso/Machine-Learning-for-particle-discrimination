@@ -19,8 +19,6 @@ print '   DECISION TREE ---', 'VAR SEL:', method, '- SEED:', str(SEED), '- N° V
 print ' >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> '
 
 
-
-'''DECISION TREE'''
 parameters = create_parameters_dt( method, nvar, eff_nvar, SEED)
 
 inputs = range( len(parameters))
@@ -65,7 +63,6 @@ importance = create_variable_score (  model = model, SEED = SEED, VARIABLES = X_
                                       method_var_sel = method, n_var = eff_nvar )
 update_var_score( importance )
 
-''' POST PROCESSING '''
 # test_set = pd.concat( [ test_set, pd.Series(prediction)], axis = 1 )
 # test_set_prediction = pd.concat([pd.Series( test_set.index.tolist()),
 #                                 test_set[test_set.columns[-3:]]],

@@ -256,9 +256,9 @@ def extract_predictors( method = 'RANDOM_FOREST' , n_var = 40, SEED = 231):
 
 
 def create_parameters_dt( method, nvar, eff_nvar, SEED,
-                          max_depth_all = [5, 20 ],
-                          min_samples_leaf_all = [ 100, 1000],
-                          min_samples_split_all = [ 50, 1000],
+                          max_depth_all = [5, 10 ],
+                          min_samples_leaf_all = [ 1000],
+                          min_samples_split_all = [1000],
                           criterion_all =  ['gini', 'entropy']):
 
     parameters = expand_grid(
