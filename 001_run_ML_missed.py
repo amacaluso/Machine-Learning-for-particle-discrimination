@@ -57,27 +57,3 @@ for method in methods:
 
 
 
-
-
-
-methods = [ 'LASSO' ]
-nvars = [ 251 ]
-
-
-# predictors = extract_predictors( method, nvar, SEED)
-# eff_nvar = len(predictors)
-probs_to_check = np.arange(0.1, 0.91, 0.1)
-DF = pd.DataFrame()
-
-scheduled_model = 'running_model/'
-create_dir( scheduled_model)
-
-for method in methods:
-    for nvar in nvars:
-        predictors = extract_predictors(method, nvar, SEED)
-        eff_nvar = len(predictors)
-        print method, eff_nvar
-        try:
-            exec(open("041_GBM.py").read(), globals())
-        except:
-            DF.to_csv( scheduled_model + 'ERROR_GBM_' + method + '_' + str(nvar) + '.csv')
