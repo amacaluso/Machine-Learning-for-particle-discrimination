@@ -14,6 +14,7 @@ data = data[ data$SEED == 741, ]
 data = data[order( data$Model, data$Method, data$n_variables ), ]
 
 data = data[ !(data$n_variables == 251 & data$Method == 'GBM') , ]
+data[ data$n_variables == 251, ]
 save( data, file = 'data.RData')
 
 df = data.frame() 
