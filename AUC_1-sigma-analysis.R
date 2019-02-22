@@ -1,13 +1,33 @@
-library(gridExtra)
-library(ggplot2)
-
 # path = "/home/antonio/PycharmProjects/Deep_Learning_for_Astrophysics/results/MODELING/CLASSIFICATION/"
+source('Utils.R')
 load('data.RData')
 
 table( data$Model, data$Method)[ , 2:9 ]
-cols = c("Method", "Model", "n_variables", "AUC")
+cols = c("Method", "Model", "n_variables", "Accuracy", 'AUC')
 data = data[ , cols ]
-data$AUC = round( data$AUC, 2 )
+
+### ++++++++++ Best results for each Model ++++++++++ ### 
+
+best = data %>% group_by( Model ) %>% filter( AUC == max( AUC ))
+best = best %>% group_by( Model ) %>% filter( n_variables == min( n_variables ))
+best = best[!duplicated( best$Model, best$n_variables, best$AUC, best$AUC),]
+
+write.csv2( best, file = paste0( dir_result, '/best_AUC.csv') )
+
+### +++++++++++++++++++++++++++++++++++++++++++++++++ ###
+
+
+### ++++++++++ Isolation of ISIS ++++++++++ ### 
+
+data_ISIS = data[ data$Method == 'ISIS',]
+best_ISIS = data_ISIS %>% group_by( Model ) %>% filter( AUC == max( AUC ))
+best_ISIS = best_ISIS %>% group_by( Model ) %>% filter( n_variables == min( n_variables ))
+best_ISIS = best_ISIS[!duplicated( best_ISIS$Model, best$n_variables, best_ISIS$AUC, best_ISIS$AUC),]
+
+write.csv2( best, file = paste0( dir_result, '/best_ISIS_AUC.csv') )
+
+### +++++++++++++++++++++++++++++++++++++++++++++++++ ###
+
 
 data$model_method = paste0( data$Model, '_', data$Method )
 
@@ -47,7 +67,7 @@ for ( model in unique( data$Model) )
     df_one_sigma[ ix , c("Model", "Method") ] = c( model, method)
     AUC = data[ data$Method == method & data$Model == model & data$n_variables == df_one_sigma[ ix, 'Min'], 'AUC']
     df_one_sigma[ ix, 'exact_AUC'] = AUC
-  
+    
   }
 
 df_one_sigma = data.frame( df_one_sigma)
@@ -59,14 +79,20 @@ df_one_sigma$FLG_MAX = ifelse( test = ( df_one_sigma$AUC_max >= df_one_sigma$low
 
 table(df_one_sigma$FLG_MAX)
 
-View( df_one_sigma[ df_one_sigma$FLG_MAX == F ,])
-View( df_one_sigma[ df_one_sigma$FLG_MAX == T ,])
-View( data[ data$Model == 'GBM' ,])
+# View( df_one_sigma[ df_one_sigma$FLG_MAX == F ,])
+# View( df_one_sigma[ df_one_sigma$FLG_MAX == T ,])
+# View( data[ data$Model == 'GBM' ,])
 ####################################################################################
 
-tapply( df_one_sigma$AUC, df_one_sigma$Model, FUN = mean)
+tapply( df_one_sigma$AUC, df_one_sigma$Model, FUN = max)
 df_one_sigma = df_one_sigma[ df_one_sigma$FLG_MAX == T ,]
 
+### ++++++++++ Best results for each Model ++++++++++ ### 
+
+best_IC = df_one_sigma %>% group_by( Model ) %>% filter( AUC == max( AUC ))
+
+write.csv2( best, file = paste0( dir_result, '/best_IC.csv') )
+### +++++++++++++++++++++++++++++++++++++++++++++++++ ###
 
 ####################################################################################
 

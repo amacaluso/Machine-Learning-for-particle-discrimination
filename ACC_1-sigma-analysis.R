@@ -1,13 +1,33 @@
-library(gridExtra)
-library(ggplot2)
-
 # path = "/home/antonio/PycharmProjects/Deep_Learning_for_Astrophysics/results/MODELING/CLASSIFICATION/"
+source('Utils.R')
 load('data.RData')
 
 table( data$Model, data$Method)[ , 2:9 ]
-cols = c("Method", "Model", "n_variables", "Accuracy")
+cols = c("Method", "Model", "n_variables", "Accuracy", 'AUC')
 data = data[ , cols ]
-data$Accuracy = round( data$Accuracy, 2 )
+
+### ++++++++++ Best results for each Model ++++++++++ ### 
+
+best = data %>% group_by( Model ) %>% filter( Accuracy == max( Accuracy ))
+best = best %>% group_by( Model ) %>% filter( n_variables == min( n_variables ))
+best = best[!duplicated( best$Model, best$n_variables, best$Accuracy, best$AUC),]
+
+write.csv2( best, file = paste0( dir_result, '/best.csv') )
+
+### +++++++++++++++++++++++++++++++++++++++++++++++++ ###
+
+
+### ++++++++++ Isolation of ISIS ++++++++++ ### 
+
+data_ISIS = data[ data$Method == 'ISIS',]
+best_ISIS = data_ISIS %>% group_by( Model ) %>% filter( Accuracy == max( Accuracy ))
+best_ISIS = best_ISIS %>% group_by( Model ) %>% filter( n_variables == min( n_variables ))
+best_ISIS = best_ISIS[!duplicated( best_ISIS$Model, best$n_variables, best_ISIS$Accuracy, best_ISIS$AUC),]
+
+write.csv2( best_ISIS, file = paste0( dir_result, '/best_ISIS.csv') )
+
+### +++++++++++++++++++++++++++++++++++++++++++++++++ ###
+
 
 data$model_method = paste0( data$Model, '_', data$Method )
 
@@ -59,18 +79,20 @@ df_one_sigma$FLG_MAX = ifelse( test = ( df_one_sigma$Accuracy_max >= df_one_sigm
 
 table(df_one_sigma$FLG_MAX)
 
-View( df_one_sigma[ df_one_sigma$FLG_MAX == F ,])
-View( df_one_sigma[ df_one_sigma$FLG_MAX == T ,])
-View( data[ data$Model == 'GBM' ,])
+# View( df_one_sigma[ df_one_sigma$FLG_MAX == F ,])
+# View( df_one_sigma[ df_one_sigma$FLG_MAX == T ,])
+# View( data[ data$Model == 'GBM' ,])
 ####################################################################################
 
 tapply( df_one_sigma$Accuracy, df_one_sigma$Model, FUN = max)
 df_one_sigma = df_one_sigma[ df_one_sigma$FLG_MAX == T ,]
 
+### ++++++++++ Best results for each Model ++++++++++ ### 
 
+best_IC = df_one_sigma %>% group_by( Model ) %>% filter( Accuracy == max( Accuracy ))
 
-library(dplyr)
-df = df_one_sigma %>% group_by(Model) %>% filter(Accuracy==max(Accuracy))
+write.csv2( best, file = paste0( dir_result, '/best_IC.csv') )
+### +++++++++++++++++++++++++++++++++++++++++++++++++ ###
 
 ####################################################################################
 
