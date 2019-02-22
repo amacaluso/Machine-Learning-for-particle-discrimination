@@ -94,8 +94,9 @@ best_IC = df_one_sigma %>% group_by( Model ) %>% filter( AUC == max( AUC ))
 write.csv2( best, file = paste0( dir_result, '/best_IC.csv') )
 ### +++++++++++++++++++++++++++++++++++++++++++++++++ ###
 
-####################################################################################
+#########################################################
 
+### ++++++ Significance Test ++++++ ###
 
 # data_KW = as.data.frame( df_one_sigma[ , c('Model', 'Method', 'AUC')] )
 # data_KW$Method = as.factor( data_KW$Method )
@@ -141,49 +142,3 @@ write.csv2( best, file = paste0( dir_result, '/best_IC.csv') )
 #    row = df_one_sigma[ df_one_sigma$std_dev == df$Min_std[ i ] & df_one_sigma$Model == df$Model[ i ], ] 
 #    df_one_sigma_v2 = rbind( df_one_sigma_v2, row)
 # }
-
-
-###############################################################
-
-
-
-# library(grid)
-# library(gridExtra)
-# library(ggplot2)
-# 
-# path = "/home/antonio/PycharmProjects/Deep_Learning_for_Astrophysics/results/MODELING/CLASSIFICATION/"
-# data = read.csv( paste0(path, "metrics.csv") )
-# data_NN = read.csv( paste0(path, 'NEURAL_NETWORK/metrics.csv'))
-# 
-# data = rbind(data, data_NN)
-# 
-# data = data[ data$Treshold == 0.5, ]
-# data = data[ data$Method != 'DECISION_TREE', ]
-# 
-# 
-# 
-# data = data[order( data$Model, data$Method, data$n_variables ), ]
-# data$model_method = paste0( data$Model, '_', data$Method )
-# 
-# avg = as.data.frame( tapply( X = data$AUC, INDEX = data$Model, FUN = mean) )
-# colnames( avg ) = 'avg'
-# avg$Model = row.names( avg )
-# avg$sd = tapply( X = data$AUC, INDEX = data$Model, FUN = sd)
-# 
-# data = merge( data, avg )
-# 
-# data$upper = data$avg + data$sd
-# data$lower = data$avg - data$sd
-# 
-# data$FLG = ifelse( test = ( data$AUC >= data$lower & data$AUC <= data$upper), yes = T, no = F)
-# dim( data[ data$FLG == T, ])
-# 
-# 
-# df_one_sigma = data.frame( Max = tapply(data$n_variables[ data$FLG == T], INDEX = data$Model[ data$FLG == T], FUN = max),
-#                            Min = tapply(data$n_variables[ data$FLG == T], INDEX = data$Model[ data$FLG == T], FUN = min),
-#                            AUC = tapply( X = data$AUC, INDEX = data$Model, FUN = mean), 
-#                            std_dev = tapply( X = data$AUC, INDEX = data$Model, FUN = sd) )
-# 
-# data_temp = data[]
-# 
-# 
