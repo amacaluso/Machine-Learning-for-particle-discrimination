@@ -19,7 +19,7 @@ write.csv2( best, file = paste0( dir_result, '/best_AUC.csv') )
 
 ### ++++++++++ Isolation of ISIS ++++++++++ ### 
 
-data_ISIS = data[ data$Method == 'ISIS',]
+data_ISIS = data[ data$Method == 'ISIS', ]
 best_ISIS = data_ISIS %>% group_by( Model ) %>% filter( AUC == max( AUC ))
 best_ISIS = best_ISIS %>% group_by( Model ) %>% filter( n_variables == min( n_variables ))
 best_ISIS = best_ISIS[!duplicated( best_ISIS$Model, best$n_variables, best_ISIS$AUC, best_ISIS$AUC),]
