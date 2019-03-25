@@ -1,8 +1,8 @@
 library(gridExtra)
 library(ggplot2)
 
-#path = "C:/Users/a.macaluso.locadmin/PycharmProjects/ML_Experiments/results/MODELING/CLASSIFICATION/"
-path = "/home/antonio/PycharmProjects/Deep_Learning_for_Astrophysics/results/MODELING/CLASSIFICATION/"
+path = "C:/Users/a.macaluso.locadmin/PycharmProjects/ML_Experiments/results/MODELING/CLASSIFICATION/"
+#path = "/home/antonio/PycharmProjects/Deep_Learning_for_Astrophysics/results/MODELING/CLASSIFICATION/"
 
 data = read.csv( paste0(path, "metrics.csv") )
 data_NN = read.csv( paste0(path, 'NEURAL_NETWORK/metrics.csv'))
@@ -68,7 +68,7 @@ for (model in unique( data$Model))
 
 
 
-df_IC = df[ , c(1,3,4,9, 10, 15:19)]
+df_IC = df[ , c(1,2,3,4,9, 10, 15:19)]
 df_IC$Accuracy = paste0( round( df_IC$Accuracy*100,2), '%' )
 df_IC$AUC = paste0( round( df_IC$AUC*100,2), '%' )
 
@@ -84,123 +84,123 @@ df_IC
 ###########################################################################################
 ###########################################################################################
 ###########################################################################################
-
-multiplot <- function(..., plotlist=NULL, file, cols=1, layout=NULL) 
-{
-  library(grid)
-  
-  # Make a list from the ... arguments and plotlist
-  plots <- c(list(...), plotlist)
-  
-  numPlots = length(plots)
-  
-  # If layout is NULL, then use 'cols' to determine layout
-  if (is.null(layout)) {
-    # Make the panel
-    # ncol: Number of columns of plots
-    # nrow: Number of rows needed, calculated from # of cols
-    layout <- matrix(seq(1, cols * ceiling(numPlots/cols)),
-                     ncol = cols, nrow = ceiling(numPlots/cols))
-  }
-  
-  if (numPlots==1) {
-    print(plots[[1]])
-    
-  } else {
-    # Set up the page
-    grid.newpage()
-    pushViewport(viewport(layout = grid.layout(nrow(layout), ncol(layout))))
-    
-    # Make each plot, in the correct location
-    for (i in 1:numPlots) {
-      # Get the i,j matrix positions of the regions that contain this subplot
-      matchidx <- as.data.frame(which(layout == i, arr.ind = TRUE))
-      
-      print(plots[[i]], vp = viewport(layout.pos.row = matchidx$row,
-                                      layout.pos.col = matchidx$col))
-    }
-  }
-}
-
-
-
-
-methods = unique( data$Method )
-method = methods[3]
-
-
-
-data$ACC_NEW = data$Accuracy/data$n_variables
-list_plot = list( )
-
-i = 1
-for ( method in methods) 
-{
-  
-  current_df = data[ data$Method == method, ]
-  
- plot = ggplot( current_df , aes( x = n_variables, group = Model )) + 
-   geom_line( aes( y = Accuracy, color = Model) ) + 
-   geom_point(  aes( y = Accuracy, color = Model) ) +
-  ggtitle( method )
- 
- 
- list_plot[[i]] = plot
- i = i+ 1
-}
-
-
-plots = list_plot
-
-
-p = plots[[3]]
-
-# Extract the legend. Returns a gtable
-leg <- get_legend(p)
-
-# Convert to a ggplot and print
-legend = as_ggplot(leg)
-
-
-
-
-g_legend <- function(a.gplot){ 
-  tmp <- ggplot_gtable(ggplot_build(a.gplot)) 
-  leg <- which(sapply(tmp$grobs, function(x) x$name) == "guide-box") 
-  legend <- tmp$grobs[[leg]] 
-  return(legend)} 
-
-legend = g_legend(p)
-
-p1 = plots[[1]] + theme(legend.position="none") 
-p2 = plots[[2]]+ theme(legend.position="none") 
-p3 = plots[[3]]+ theme(legend.position="none")
-p4 = plots[[4]]+ theme(legend.position="none")
-p5 = plots[[5]]+ theme(legend.position="none")
-p6 = plots[[6]]+ theme(legend.position="none")
-p7 = plots[[7]]+ theme(legend.position="none")
-p8 = plots[[8]] + theme(legend.position="none")
-
-
-cols = c(1, 3, 4, 9, 10)
-
-
-
-df_ACC = df[ df$criteria == 'ACC', cols ]
-
-df_ACC$Accuracy = paste0( round( df_ACC$Accuracy*100, 2) , '%' ) 
-df_ACC$AUC = paste0( round( df_ACC$AUC*100, 2) , '%' ) 
-
-
-
-tab = grid.table( df_ACC )
-ss <- tableGrob(df_ACC, rows = NULL)
-
-grid.arrange(p1, p2, p3, p4, legend, p5, p6, p7, p8,
-             ncol = 3, nrow = 3)
-             #top = textGrob("Performance: Model Selection and Variable Ranking", gp=gpar(cex=1.5), just="top"))#"Performance: Model Selection and Variable Ranking")
-
-legend
+# 
+# multiplot <- function(..., plotlist=NULL, file, cols=1, layout=NULL) 
+# {
+#   library(grid)
+#   
+#   # Make a list from the ... arguments and plotlist
+#   plots <- c(list(...), plotlist)
+#   
+#   numPlots = length(plots)
+#   
+#   # If layout is NULL, then use 'cols' to determine layout
+#   if (is.null(layout)) {
+#     # Make the panel
+#     # ncol: Number of columns of plots
+#     # nrow: Number of rows needed, calculated from # of cols
+#     layout <- matrix(seq(1, cols * ceiling(numPlots/cols)),
+#                      ncol = cols, nrow = ceiling(numPlots/cols))
+#   }
+#   
+#   if (numPlots==1) {
+#     print(plots[[1]])
+#     
+#   } else {
+#     # Set up the page
+#     grid.newpage()
+#     pushViewport(viewport(layout = grid.layout(nrow(layout), ncol(layout))))
+#     
+#     # Make each plot, in the correct location
+#     for (i in 1:numPlots) {
+#       # Get the i,j matrix positions of the regions that contain this subplot
+#       matchidx <- as.data.frame(which(layout == i, arr.ind = TRUE))
+#       
+#       print(plots[[i]], vp = viewport(layout.pos.row = matchidx$row,
+#                                       layout.pos.col = matchidx$col))
+#     }
+#   }
+# }
+# 
+# 
+# 
+# 
+# methods = unique( data$Method )
+# method = methods[3]
+# 
+# 
+# 
+# data$ACC_NEW = data$Accuracy/data$n_variables
+# list_plot = list( )
+# 
+# i = 1
+# for ( method in methods) 
+# {
+#   
+#   current_df = data[ data$Method == method, ]
+#   
+#  plot = ggplot( current_df , aes( x = n_variables, group = Model )) + 
+#    geom_line( aes( y = Accuracy, color = Model) ) + 
+#    geom_point(  aes( y = Accuracy, color = Model) ) +
+#   ggtitle( method )
+#  
+#  
+#  list_plot[[i]] = plot
+#  i = i+ 1
+# }
+# 
+# 
+# plots = list_plot
+# 
+# 
+# p = plots[[3]]
+# 
+# # Extract the legend. Returns a gtable
+# leg <- get_legend(p)
+# 
+# # Convert to a ggplot and print
+# legend = as_ggplot(leg)
+# 
+# 
+# 
+# 
+# g_legend <- function(a.gplot){ 
+#   tmp <- ggplot_gtable(ggplot_build(a.gplot)) 
+#   leg <- which(sapply(tmp$grobs, function(x) x$name) == "guide-box") 
+#   legend <- tmp$grobs[[leg]] 
+#   return(legend)} 
+# 
+# legend = g_legend(p)
+# 
+# p1 = plots[[1]] + theme(legend.position="none") 
+# p2 = plots[[2]]+ theme(legend.position="none") 
+# p3 = plots[[3]]+ theme(legend.position="none")
+# p4 = plots[[4]]+ theme(legend.position="none")
+# p5 = plots[[5]]+ theme(legend.position="none")
+# p6 = plots[[6]]+ theme(legend.position="none")
+# p7 = plots[[7]]+ theme(legend.position="none")
+# p8 = plots[[8]] + theme(legend.position="none")
+# 
+# 
+# cols = c(1, 3, 4, 9, 10)
+# 
+# 
+# 
+# df_ACC = df[ df$criteria == 'ACC', cols ]
+# 
+# df_ACC$Accuracy = paste0( round( df_ACC$Accuracy*100, 2) , '%' ) 
+# df_ACC$AUC = paste0( round( df_ACC$AUC*100, 2) , '%' ) 
+# 
+# 
+# 
+# tab = grid.table( df_ACC )
+# ss <- tableGrob(df_ACC, rows = NULL)
+# 
+# grid.arrange(p1, p2, p3, p4, legend, p5, p6, p7, p8,
+#              ncol = 3, nrow = 3)
+#              #top = textGrob("Performance: Model Selection and Variable Ranking", gp=gpar(cex=1.5), just="top"))#"Performance: Model Selection and Variable Ranking")
+# 
+# legend
 
 # 
 # 
