@@ -36,12 +36,13 @@ for (model in unique( data$Model))
 
 
 df$nvar_min = NA
-df$max = NA
-df$min = NA
-df$AUC_bis = NA
-df$ACC_bis = NA
-
-
+df$nvar_max = NA
+df$AUC_min = NA
+df$AUC_max = NA
+df$ACC_min = NA
+df$ACC_max = NA
+df$IC_min = NA
+df$IC_max = NA
 
 for (model in unique( data$Model))
 {
@@ -56,28 +57,47 @@ for (model in unique( data$Model))
     current_data = current_data_model[ current_data_model$Method == method, ]
     media = mean(current_data$Accuracy)
     sd = sd(current_data$Accuracy)
+    
     row = current_data[ current_data$Accuracy < media + sd & current_data$Accuracy > media - sd, ]
     row = row[ which.min(row$n_variables), ]
     df$nvar_min[ df$Model == row$Model & df$Method == row$Method  ] = row$n_variables
-    df$max[ df$Model == row$Model & df$Method == row$Method  ] = media + sd
-    df$min[ df$Model == row$Model & df$Method == row$Method  ] = media - sd
-    df$AUC_bis[ df$Model == row$Model & df$Method == row$Method  ] = row$AUC
-    df$ACC_bis[ df$Model == row$Model & df$Method == row$Method  ] = row$Accuracy
+    df$AUC_min[ df$Model == row$Model & df$Method == row$Method  ] = row$AUC
+    df$ACC_min[ df$Model == row$Model & df$Method == row$Method  ] = row$Accuracy
+
+    row = current_data[ current_data$Accuracy < media + sd & current_data$Accuracy > media - sd, ]
+    row = row[ which.max(row$n_variables), ]
+    df$nvar_max[ df$Model == row$Model & df$Method == row$Method  ] = row$n_variables
+    df$AUC_max[ df$Model == row$Model & df$Method == row$Method  ] = row$AUC
+    df$ACC_max[ df$Model == row$Model & df$Method == row$Method  ] = row$Accuracy
+    
+    
+    df$IC_max[ df$Model == row$Model & df$Method == row$Method  ] = media + sd
+    df$IC_min[ df$Model == row$Model & df$Method == row$Method  ] = media - sd
+
+    
+    
     }
 }
 
 
 
-df_IC = df[ , c(1,2,3,4,9, 10, 15:19)]
-df_IC$Accuracy = paste0( round( df_IC$Accuracy*100,2), '%' )
-df_IC$AUC = paste0( round( df_IC$AUC*100,2), '%' )
+df_IC = df[ , c(1, 2, 5, 6, 13, 14:22)]
 
-df_IC$AUC_bis = paste0( round( df_IC$AUC_bis*100,2), '%' )
-df_IC$ACC_bis = paste0( round( df_IC$ACC_bis*100,2), '%' )
+df_IC$IC = ifelse( test = ( (df_IC$AUC_min < df_IC$AUC & df_IC$AUC < df_IC$AUC_max ) & df_IC$criteria == 'AUC' ), 
+                   yes = T, 
+                   no = ifelse( test = ( (df_IC$ACC_min < df_IC$Accuracy & df_IC$Accuracy < df_IC$ACC_max) & df_IC$criteria == 'Accuracy' ), 
+                                yes = T, 
+                                no = F))
 
-df_IC$max = paste0( round( df_IC$max*100,2), '%' )
-df_IC$min = paste0( round( df_IC$min*100,2), '%' )
-df_IC
+df_IC$AUC_min = paste0( round( df_IC$AUC_min*100,2), '%' )
+df_IC$AUC_max = paste0( round( df_IC$AUC_max*100,2), '%' )
+
+df_IC$ACC_min = paste0( round( df_IC$ACC_min*100,2), '%' )
+df_IC$ACC_max = paste0( round( df_IC$ACC_max*100,2), '%' )
+
+df_IC$IC_min = paste0( round( df_IC$IC_min*100,2), '%' )
+df_IC$IC_max = paste0( round( df_IC$IC_max*100,2), '%' )
+
 
 
 
