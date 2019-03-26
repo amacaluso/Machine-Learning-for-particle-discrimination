@@ -75,7 +75,7 @@ create_dir( dir_dest )
 data.shape
 data.Method.unique()
 data.Model.unique()
-
+data.n_variables.unique()
 print data.columns
 
 data = data[ data.Treshold == 0.5 ]
