@@ -145,7 +145,7 @@ multiplot <- function(..., plotlist=NULL, file, cols=1, layout=NULL)
 # 
 # 
 # 
-method = methods[3]
+# method = methods[3]
 # 
 # 
 # 
@@ -171,7 +171,7 @@ data$Method = gsub( 'E_NET', 'Elastic-Net', data$Method )
 data$Method = gsub( 'GBM', 'Gradient Boosting Machine (GBM)', data$Method )
 data$Method = gsub( 'RANDOM_FOREST', 'Random Forest (RF)', data$Method )
 data$Method = gsub( 'INFORMATION_GAIN', 'Information Gain (IG)', data$Method )
-data$Method = gsub( 'LR_ACCURACY', 'Simple LR (Acc.) (LR)', data$Method )
+data$Method = gsub( 'LR_ACCURACY', 'Simple LR (Acc.)', data$Method )
 data$Method = gsub( 'LASSO', 'Lasso penalty', data$Method )
 data$Method = gsub( 'RIDGE', 'Ridge penalty', data$Method )
 data$Method = gsub( 'ISIS', 'Iterative SIS', data$Method )
@@ -205,10 +205,10 @@ plots = list_plot
 p = plots[[3]]
 
 # Extract the legend. Returns a gtable
-leg <- get_legend(p)
+# leg <- get_legend(p)
 
 # Convert to a ggplot and print
-legend = as_ggplot(leg)
+# legend = as_ggplot(leg)
 
 
 
@@ -262,7 +262,7 @@ p.list <- list(p1,p2,p3,p4,p5,p6,p7, p8)
 grid.arrange(grobs=p.list, layout_matrix=lay)
 
 
-ggarrange( p1, p2, p3, p4, p5, p6, p7, p8, 
+ggarrange( p3, p7, p2, p5, p8, p1, p6 ,  p4,  
            ncol = 3, nrow = 3, common.legend = TRUE,
            legend="bottom")
 
