@@ -12,9 +12,12 @@ X_tr, X_val, X_ts, Y_tr, \
 Y_val, Y_ts = load_data_for_modeling( SEED, predictors)
 
 
-parameters = create_parameters_rf( method, nvar,
-                                   eff_nvar, SEED,
-                                   max_features_all = list(set(np.random.randint(2, eff_nvar, 6))))
+parameters = create_parameters_rf( method, nvar, eff_nvar, SEED,
+                                   max_features_all = [6],
+                                   max_depth_all = [3],
+                                   min_samples_split_all = [100])
+
+
 inputs = range( len(parameters))
 tr_val_error = Parallel(n_jobs = njob)(delayed(parallel_rf)(i) for i in inputs)
 
@@ -57,26 +60,26 @@ importance = create_variable_score (  model = model, SEED = SEED, VARIABLES = X_
                                       method_var_sel = method, n_var = eff_nvar )
 update_var_score( importance )
 
-# ''' POST PROCESSING '''
-# test_set = pd.concat( [ test_set, pd.Series(prediction)], axis = 1 )
-# test_set_prediction = pd.concat([pd.Series( test_set.index.tolist()),
-#                                 test_set[test_set.columns[-3:]]],
-#                                 axis = 1)
-# test_set_prediction.columns = ['ID', 'Y', 'ENERGY', 'Probability']
-# update_prediction(prediction = test_set_prediction, SEED = SEED, MODEL = model, METHOD = method, NVAR = eff_nvar,)
-# # test_set_prediction.to_csv( dir_dest + 'prediction_' + str(SEED) + '.csv')
-#
-# for energy in test_set.ENERGY.unique():
-#     if energy > 0:
-#         #energy = test_set.ENERGY.unique()[4]
-#         df = test_set[test_set.ENERGY == energy]
-#         probabilities = df.ix[:, -1].tolist()
-#         ROC_subset = ROC_analysis(y_true = df.Y.tolist(), y_prob = probabilities , label = model,
-#                                   probability_tresholds = probs_to_check)
-#         cols_roc = ROC_subset.columns.tolist() +[ 'Energy']
-#         ROC_subset = pd.concat( [ROC_subset,
-#                                 pd.Series( np.repeat(energy, len(probs_to_check)))],
-#                                 axis = 1 )
-#         ROC_subset.columns = cols_roc
-#         update_subset_metrics(ROC_subset, SEED, method, eff_nvar)
-#
+''' POST PROCESSING '''
+test_set = pd.concat( [ test_set, pd.Series(prediction)], axis = 1 )
+test_set_prediction = pd.concat([pd.Series( test_set.index.tolist()),
+                                test_set[test_set.columns[-3:]]],
+                                axis = 1)
+test_set_prediction.columns = ['ID', 'Y', 'ENERGY', 'Probability']
+update_prediction(prediction = test_set_prediction, SEED = SEED, MODEL = model, METHOD = method, NVAR = eff_nvar,)
+# test_set_prediction.to_csv( dir_dest + 'prediction_' + str(SEED) + '.csv')
+
+for energy in test_set.ENERGY.unique():
+    if energy > 0:
+        #energy = test_set.ENERGY.unique()[4]
+        df = test_set[test_set.ENERGY == energy]
+        probabilities = df.ix[:, -1].tolist()
+        ROC_subset = ROC_analysis(y_true = df.Y.tolist(), y_prob = probabilities , label = model,
+                                  probability_tresholds = probs_to_check)
+        cols_roc = ROC_subset.columns.tolist() +[ 'Energy']
+        ROC_subset = pd.concat( [ROC_subset,
+                                pd.Series( np.repeat(energy, len(probs_to_check)))],
+                                axis = 1 )
+        ROC_subset.columns = cols_roc
+        update_subset_metrics(ROC_subset, SEED, method, eff_nvar)
+
