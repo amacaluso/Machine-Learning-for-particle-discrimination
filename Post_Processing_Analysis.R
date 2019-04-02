@@ -1,7 +1,7 @@
 library(gridExtra)
 library(ggplot2)
 
-path = "C:/Users/a.macaluso.locadmin/PycharmProjects/ML_Experiments/results/MODELING/CLASSIFICATION/"
+path = "results/MODELING/CLASSIFICATION/"
 #path = "/home/antonio/PycharmProjects/Deep_Learning_for_Astrophysics/results/MODELING/CLASSIFICATION/"
 
 data = read.csv( paste0(path, "metrics.csv") )
@@ -261,6 +261,8 @@ p.list <- list(p1,p2,p3,p4,p5,p6,p7, p8)
 
 grid.arrange(grobs=p.list, layout_matrix=lay)
 
+if(!require(devtools)) install.packages("devtools")
+devtools::install_github("kassambara/ggpubr")
 
 ggarrange( p3, p7, p2, p5, p8, p1, p6 ,  p4,  
            ncol = 3, nrow = 3, common.legend = TRUE,
