@@ -159,7 +159,7 @@ data$Model_old = data$Model
 data$Model = gsub( 'TREE', 'Decision Tree', data$Model )
 data$Model = gsub( 'BERNOULLI_NAIVE_BAYES', 'Bernoulli Naive Bayes', data$Model )
 data$Model = gsub( 'GAUSSIAN_NAIVE_BAYES', 'Gaussian Naive Bayes', data$Model )
-data$Model = gsub( 'GBM', 'Gradient Boosting Machine', data$Model )
+data$Model = gsub( 'GBM', 'Gradient Boosting', data$Model )
 data$Model = gsub( 'KNN', 'K nearest neighbor', data$Model )
 data$Model = gsub( 'NEURAL_NETWORK', 'Neural Network', data$Model )
 data$Model = gsub( 'RANDOM_FOREST', 'Random Forest', data$Model )
@@ -168,7 +168,7 @@ data$Model = gsub( 'REGULARIZED_METHODS', 'Regularized Methods', data$Model )
 data$Method_old = data$Method
 data$Method = gsub( 'TREE', 'Decision Tree', data$Method )
 data$Method = gsub( 'E_NET', 'Elastic-Net', data$Method )
-data$Method = gsub( 'GBM', 'Gradient Boosting Machine (GBM)', data$Method )
+data$Method = gsub( 'GBM', 'Gradient Boosting (GBM)', data$Method )
 data$Method = gsub( 'RANDOM_FOREST', 'Random Forest (RF)', data$Method )
 data$Method = gsub( 'INFORMATION_GAIN', 'Information Gain (IG)', data$Method )
 data$Method = gsub( 'LR_ACCURACY', 'Simple LR (Acc.)', data$Method )
@@ -229,6 +229,8 @@ p5 = plots[[5]]+ theme(legend.position="none")
 p6 = plots[[6]]+ theme(legend.position="none")
 p7 = plots[[7]]+ theme(legend.position="none")
 p8 = plots[[8]] + theme(legend.position="none")
+
+p9 = plots[[8]] + theme(legend.position="bottom")
 # 
 # 
 cols = c(1, 3, 4, 9, 10)
@@ -254,12 +256,12 @@ layout_matrix = cbind(c(1,1,11), c(1,1,1))
 layout_matrix
 lay <- rbind(c(0,1,2),
              c(3,4,5),
-             c(6,7,8))
+             c(6,7,10))
 
 
 p.list <- list(p1,p2,p3,p4,p5,p6,p7, p8)
 
-grid.arrange(grobs=p.list, layout_matrix=lay)
+p_legend = grid.arrange(grobs=p.list, layout_matrix=lay)
 
 if(!require(devtools)) install.packages("devtools")
 devtools::install_github("kassambara/ggpubr")
@@ -295,12 +297,15 @@ for (i in 1:length(lst)) {
 p_no_labels = lapply(lst_p, function(x) x + xlab("") + ylab(""))
 
 # title = cowplot::ggdraw() + cowplot::draw_label("test", size = 20)
-top_row = cowplot::plot_grid(p1, p2, p3, ncol=3)
-middle_row = cowplot::plot_grid(p4, p5, p6, ncol=3)
+top_row = cowplot::plot_grid( p3, p7, p2, NULL, ncol=4, rel_widths=c(0.25,0.25, 0.25, 0.03))
+middle_row = cowplot::plot_grid( p5, p8, p1, NULL, ncol=4, rel_widths=c(0.25,0.25, 0.25, 0.03) )
 
-bottom_row = cowplot::plot_grid(NULL, p7, p8, NULL, ncol= 4, rel_widths=c(0.165,0.33, 0.33,0.165))
+bottom_row = cowplot::plot_grid(NULL, p6 , p4, NULL, ncol= 4, rel_widths=c(0.165,0.33, 0.33,0.165))
+p = plot_grid( top_row, middle_row, bottom_row,ncol = 1)
 
-cowplot::plot_grid( top_row, middle_row, bottom_row, ncol = 1,  rel_heights = c( 1, 1, 1 ))
+
+legend = get_legend(p9)
+cowplot::plot_grid( p, legend, ncol = 1,  rel_heights = c( 0.9, 0.05))
 
 
 # 

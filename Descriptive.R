@@ -17,12 +17,12 @@ data$energy = gsub( "MEV.5", "", data$energy )
 data$energy = as.numeric( data$energy )
 
 df_energy = as.data.frame( table( data$energy ) )
-colnames(df_energy) = c('energy', 'f')
+colnames(df_energy) = c('energy', 'n')
 
 
-ggplot(df_energy, aes(energy, f, fill=energy)) + 
+ggplot(df_energy, aes(energy, n, fill=energy)) + 
   geom_bar(stat="identity") + guides(fill=FALSE) + xlab( 'Energy (MeV)') +
-  theme(axis.text.x = element_text(angle = 60, hjust = 1))
+  theme(axis.text.x = element_text(angle = 60, hjust = 1))+ ylab( 'n° of particles' )
 
 
 
@@ -64,9 +64,9 @@ data$Model_old = data$Model
 data$Model = gsub( 'TREE', 'Decision Tree', data$Model )
 data$Model = gsub( 'BERNOULLI_NAIVE_BAYES', 'Bernoulli Naive Bayes', data$Model )
 data$Model = gsub( 'GAUSSIAN_NAIVE_BAYES', 'Gaussian Naive Bayes', data$Model )
-data$Model = gsub( 'GBM', 'Gradient Boosting Machine', data$Model )
+data$Model = gsub( 'GBM', 'Gradient Boosting', data$Model )
 data$Model = gsub( 'KNN', 'K nearest neighbor', data$Model )
-data$Model = gsub( 'NEURAL_NETWORK', 'Neural Network', data$Model )
+data$Model = gsub( 'NEURAL_NETWORK', 'Deep Neural Network', data$Model )
 data$Model = gsub( 'RANDOM_FOREST', 'Random Forest', data$Model )
 data$Model = gsub( 'REGULARIZED_METHODS', 'Regularized Methods', data$Model )
 
@@ -92,10 +92,11 @@ df$log_energy = log2( df$Energy )
 df = df[ order( df$Model, df$Energy ),]
 
 p_best = ggplot( df, aes( x = log_energy, group = Model)) +
-          geom_line( aes( y = Accuracy, color = Model ) ) + 
-          geom_point( aes( y = Accuracy, color = Model)) +
-          theme(legend.position="bottom") + xlab( expression(log[2]*" (energy)")) + 
-          scale_fill_manual(palette="GrandBudapest")
+         geom_line( aes( y = Accuracy, color = Model ) ) + 
+         geom_point( aes( y = Accuracy, color = Model)) +
+         #  theme(legend.position="bottom") + 
+         xlab( expression(log[2]*" (energy)")) + 
+         scale_color_brewer(palette="Dark2") + theme_light()
 
 p_best
 
